@@ -1,0 +1,21 @@
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+*.swp
+*.swo
+
+# Temp / backup files
+*.bak
+*.tmp
+*~
+
+# Node (if you ever add tooling)
+node_modules/
+npm-debug.log*
+
+# Old versions folder — track only current release
+html old V/

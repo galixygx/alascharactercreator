@@ -1,0 +1,2 @@
+# Fallback: serve index.html for all routes (SPA catch-all)
+/*    /index.html    200
