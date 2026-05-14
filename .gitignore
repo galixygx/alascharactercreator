@@ -19,3 +19,6 @@ npm-debug.log*
 
 # Old versions folder — track only current release
 html old V/
+
+# Local Netlify folder
+.netlify
