@@ -23466,7 +23466,7 @@ function keeperTab(id, btn){
   if(btn) btn.classList.add('active');
   const panel = document.getElementById('ktab-'+id);
   if(panel) panel.classList.add('active');
-  if(id==='agent') renderAgentAlasReport();
+  if(id==='agent'){ renderAgentAlasReport(); renderDeviceAuthStatus(); }
   if(id==='encounter') renderEncounterList();
   if(id==='world'||id==='notes') loadKeeperState();
 }
@@ -25609,6 +25609,21 @@ function copyReport(){
                         <div style="font-size:10px;color:var(--txt-dim)">System Intelligence · Memory Active</div>
                         <button class="dm-tool-btn" style="margin-left:auto" onclick="renderAgentAlasReport()">↻ Refresh Report</button>
                     </div>
+
+                    <!-- ── DEVICE ACCESS CODE ── -->
+                    <div id="deviceAuthBlock" style="margin-bottom:18px;padding:14px 16px;background:rgba(160,96,224,.07);border:1px solid rgba(160,96,224,.25);border-radius:6px;">
+                        <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:rgba(160,96,224,.9);margin-bottom:10px;">🔑 DEVICE AUTHENTICATION</div>
+                        <div id="deviceAuthStatus" style="font-size:11px;margin-bottom:12px;"></div>
+                        <div id="deviceAuthUnlockRow" style="display:flex;gap:8px;align-items:center;">
+                            <input id="galixyAccessCode" type="password"
+                                   style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:8px 11px;font-family:'EB Garamond',serif;font-size:13px;color:#e8e0d0;outline:none;"
+                                   placeholder="Enter Access Code…"
+                                   onkeydown="if(event.key==='Enter')galixyUnlockDevice()">
+                            <button class="dm-tool-btn" onclick="galixyUnlockDevice()" style="white-space:nowrap;">Unlock Device</button>
+                        </div>
+                        <div id="deviceAuthMsg" style="font-family:'EB Garamond',serif;font-size:11px;font-style:italic;margin-top:8px;min-height:16px;"></div>
+                    </div>
+
                     <div id="agentAlasReport"><div style="color:var(--txt-dim);font-size:11px">Loading Agent Alas report…</div></div>
                 </div>
 
@@ -25999,16 +26014,14 @@ const AUTH = {
 
   _success(key, displayName){
     const sessionData={key,name:displayName};
-    // Galixy: bind this session to the current device.
-    // A device token is generated once per browser and stored in localStorage.
-    // On restore, the stored token must match — no other browser can auto-restore.
+    // Galixy: include the device token ONLY if this device has already been
+    // unlocked via the Access Code. Auto-login requires the token.
+    // A brand-new device gets no token here — Galixy must enter the Access Code
+    // in Keeper's Panel to authorise it.
     if(key==='galixy'){
-      let tok=localStorage.getItem('alas_gx_tok');
-      if(!tok){
-        tok=_alasHash(navigator.userAgent+Math.random()+Date.now());
-        localStorage.setItem('alas_gx_tok',tok);
-      }
-      sessionData.deviceToken=tok;
+      const tok=localStorage.getItem('alas_gx_tok');
+      if(tok) sessionData.deviceToken=tok; // device already authorised
+      // else: no token → session works this tab only, no auto-restore next time
     }
     this.currentUser=sessionData;
     sessionStorage.setItem(this.SESS_KEY,JSON.stringify(sessionData));
@@ -26194,6 +26207,77 @@ function _postLoginSetup(){
     const _orig=window.saveAll;
     window.saveAll=function(){ _orig(); if(AUTH.currentUser) AUTH.saveUserState(); };
     window._authSavePatched=true;
+  }
+}
+
+// ── Galixy device access code ────────────────────────────────
+const GALIXY_ACCESS_CODE = 'galixy'; // case-insensitive
+
+function galixyUnlockDevice(){
+  const inp  = document.getElementById('galixyAccessCode');
+  const msgEl= document.getElementById('deviceAuthMsg');
+  if(!inp) return;
+  const entered = inp.value.trim().toLowerCase();
+  if(entered !== GALIXY_ACCESS_CODE){
+    msgEl.style.color='#e05060';
+    msgEl.textContent='⚠ Incorrect Access Code.';
+    inp.value='';
+    return;
+  }
+  // Generate a fresh device token and store it permanently in localStorage
+  const tok = _alasHash(navigator.userAgent + Math.random().toString(36) + Date.now());
+  localStorage.setItem('alas_gx_tok', tok);
+  // Embed it in the live session so this tab benefits immediately
+  if(AUTH.currentUser && AUTH.currentUser.key==='galixy'){
+    AUTH.currentUser.deviceToken = tok;
+    sessionStorage.setItem(AUTH.SESS_KEY, JSON.stringify(AUTH.currentUser));
+  }
+  inp.value='';
+  msgEl.style.color='#3dd6db';
+  msgEl.textContent='✓ Device unlocked — auto-login is now active on this browser.';
+  renderDeviceAuthStatus();
+  launchFireworks();
+  showToast('Device authorised. Auto-login enabled.');
+}
+
+function galixyRevokeDevice(){
+  if(!confirm('Revoke auto-login on this device? You will need to enter the Access Code again to re-enable it.')) return;
+  localStorage.removeItem('alas_gx_tok');
+  // Strip token from live session (auto-login won't restore next time)
+  if(AUTH.currentUser && AUTH.currentUser.key==='galixy'){
+    delete AUTH.currentUser.deviceToken;
+    sessionStorage.setItem(AUTH.SESS_KEY, JSON.stringify(AUTH.currentUser));
+  }
+  renderDeviceAuthStatus();
+  showToast('Device access revoked.');
+}
+
+function renderDeviceAuthStatus(){
+  const statusEl  = document.getElementById('deviceAuthStatus');
+  const unlockRow = document.getElementById('deviceAuthUnlockRow');
+  const msgEl     = document.getElementById('deviceAuthMsg');
+  if(!statusEl) return;
+  const tok = localStorage.getItem('alas_gx_tok');
+  if(tok){
+    statusEl.innerHTML =
+      `<span style="color:#3dd6db;font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:1.5px;">● UNLOCKED</span>
+       <span style="color:rgba(200,200,220,.45);font-size:10px;margin-left:10px;">Auto-login active on this browser</span>`;
+    unlockRow.innerHTML =
+      `<span style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:rgba(200,200,220,.5);flex:1;">
+         This device is authorised. Enter a new code to rotate the token, or revoke access below.
+       </span>
+       <button class="dm-tool-btn danger" onclick="galixyRevokeDevice()" style="white-space:nowrap;">Revoke Device</button>`;
+    if(msgEl) msgEl.textContent='';
+  } else {
+    statusEl.innerHTML =
+      `<span style="color:rgba(200,80,80,.8);font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:1.5px;">○ LOCKED</span>
+       <span style="color:rgba(200,200,220,.45);font-size:10px;margin-left:10px;">Auto-login disabled — enter Access Code to unlock</span>`;
+    unlockRow.innerHTML =
+      `<input id="galixyAccessCode" type="password"
+              style="flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:4px;padding:8px 11px;font-family:'EB Garamond',serif;font-size:13px;color:#e8e0d0;outline:none;"
+              placeholder="Enter Access Code…"
+              onkeydown="if(event.key==='Enter')galixyUnlockDevice()">
+       <button class="dm-tool-btn" onclick="galixyUnlockDevice()" style="white-space:nowrap;">Unlock Device</button>`;
   }
 }
 
