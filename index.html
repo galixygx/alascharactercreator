@@ -22229,11 +22229,11 @@ function saveCharacterFile(){
   showToast('Character saved — ' + fileName);
 }
 
-/** Password-gated wrapper for the HTML download. Password: keeper */
+/** Password-gated wrapper for the HTML download. Password: Aldric Voss */
 function lockedDownloadHtml(){
   const entered = prompt('Enter Keeper password to download sheet:');
   if(entered === null) return; // cancelled
-  if(entered.trim().toLowerCase() === 'keeper'){
+  if(entered.trim().toLowerCase() === 'aldric voss'){
     downloadPortableSheetHtml();
   } else {
     showToast('Incorrect password.');
