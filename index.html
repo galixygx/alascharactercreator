@@ -13067,10 +13067,8 @@ function castSigilByRC(rc, ip, name, aff, card){
     }
   }
 
-  // Apply instability (from IP field + affinity rules)
+  // Apply instability (only what the player explicitly entered — no automatic affinity minimums)
   let totalIns = ip;
-  if(aff === 'Fire')  totalIns = Math.max(totalIns, 1);
-  if(aff === 'Chaos') totalIns = Math.max(totalIns, 2);
   if(totalIns > 0){
     const rawIns2 = (state.instability||0) + totalIns;
     if(rawIns2 > 7){
