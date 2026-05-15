@@ -11938,6 +11938,7 @@ function ensureStateDefaults(){
   if(!Array.isArray(state.capturedCreatures)) state.capturedCreatures = [];
   if(!state.shopCustomItems || typeof state.shopCustomItems !== 'object') state.shopCustomItems = {};
   if(!state.knownClassSigils || typeof state.knownClassSigils !== 'object') state.knownClassSigils = {};
+  if(!Array.isArray(state.completedSpells)) state.completedSpells = [];
   (state.sigils||[]).forEach(s=>{ if(s.dailySpent===undefined) s.dailySpent=false; });
 }
 
@@ -12674,7 +12675,7 @@ function updateScarTiers(){
 function doRest(type){
   const rpMax=parseInt(document.getElementById('rpMax').value)||8;
   const rpCurEl=document.getElementById('rpCur');
-  const hpMaxEl=document.getElementById('hpMax').value||'8';
+  const hpMaxEl=parseInt(document.getElementById('hpMax').value)||8;
   const hpCurEl=document.getElementById('hpCur');
   let msg='';
   if(type==='resonance'){
@@ -12692,8 +12693,8 @@ function doRest(type){
     updateBar('rp');updateRpState();
     msg=`Recovery Rest — +${restore} Resonance, −1 Exhaustion`;
   } else {
-    rpCurEl.value=rpMax;
-    hpCurEl.value=hpMaxEl;
+    rpCurEl.value=rpMax;  state.rpCur=rpMax;
+    hpCurEl.value=hpMaxEl; state.hpCur=hpMaxEl;
     state.instability=0;
     document.getElementById('insVal').textContent=0;
     document.getElementById('insState').textContent='Stable';
@@ -13591,6 +13592,24 @@ function addSpell(data){
   if(elemSel  && data.element) elemSel.value  = data.element;
   if(dmgSel   && data.dmgType) dmgSel.value   = data.dmgType;
   if(data.aff) card.querySelector('.c-sel').value = data.aff;
+  // Restore Unstable Magic toggle and 6-box result table
+  if(data.unstableMagic){
+    const uToggle = card.querySelector('.sp-unstable-row input[type="checkbox"]');
+    if(uToggle){
+      uToggle.checked = true;
+      const uPanel = card.querySelector('.sp-unstable-panel');
+      if(uPanel) uPanel.style.display = 'block';
+    }
+    if(data.unstableTable){
+      try {
+        const arr = JSON.parse(data.unstableTable);
+        if(Array.isArray(arr)){
+          const uBoxes = card.querySelectorAll('.sp-unstable-box');
+          uBoxes.forEach(function(b, i){ if(arr[i] !== undefined) b.value = arr[i]; });
+        }
+      } catch(e) {}
+    }
+  }
   list.appendChild(card);
   updateSigilRCUI(card);
 }
@@ -16788,8 +16807,9 @@ function saveCards(listId, stateKey){
     if(listId==='sigilsList'){
       d.name=(card.querySelectorAll('.c-inp')[0]||{}).value||'';
       d.aff=(card.querySelector('.c-sel')||{}).value||'Common';
-      d.rc=(card.querySelectorAll('.c-inp')[1]||{}).value||'2';
-      d.ip=(card.querySelectorAll('.c-inp')[2]||{}).value||'0';
+      // c-inp order: [0]=Name, [1]=SpellLevel, [2]=RC Cost, [3]=Instability+
+      d.rc=(card.querySelector('.sig-rc-inp')||card.querySelectorAll('.c-inp')[2]||{}).value||'2';
+      d.ip=(card.querySelectorAll('.c-inp')[3]||{}).value||'0';
       // New structured spell fields from dataset
       d.attackType   = card.dataset.attackType   || 'none';
       d.saveType     = card.dataset.saveType     || 'none';
@@ -16818,6 +16838,17 @@ function saveCards(listId, stateKey){
       d.range = (sels[3]||{}).value || '60 ft.';
       const sb = card.querySelector('.sig-avail-btn');
       d.dailySpent = sb && sb.getAttribute('data-spent')==='1';
+      // Unstable Magic — persist toggle + 6 result boxes
+      const uToggle = card.querySelector('.sp-unstable-row input[type="checkbox"]');
+      d.unstableMagic = !!(uToggle && uToggle.checked);
+      if(d.unstableMagic){
+        const uBoxes = card.querySelectorAll('.sp-unstable-box');
+        d.unstableTable = uBoxes.length === 6
+          ? JSON.stringify(Array.from(uBoxes).map(function(b){ return b.value.trim(); }))
+          : '';
+      } else {
+        d.unstableTable = '';
+      }
     } else if(listId==='activeEffectsList'){
       const inps = card.querySelectorAll('.c-inp');
       const sel  = card.querySelector('.c-sel');
@@ -25291,7 +25322,8 @@ function completeSpell(card){
   const lvlInp  = card.querySelector('input[type="number"][title]');
   const affSel  = card.querySelector('.c-sel');
   const rcEl    = card.querySelector('.sig-rc-inp');
-  const ipEl    = card.querySelectorAll('.c-inp')[2];
+  // c-inp order: [0]=Name [1]=SpellLevel [2]=RC [3]=Instability+ — use [3] for IP
+  const ipEl    = card.querySelectorAll('.c-inp')[3];
   const notesEl = card.querySelector('.c-ta');
 
   // Unstable Magic
