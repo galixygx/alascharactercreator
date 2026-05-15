@@ -5282,6 +5282,13 @@
         .sp-unstable-panel{padding:6px 0 0;display:none;}
         .sp-unstable-ta{width:100%;background:rgba(208,112,48,.05);border:1px solid rgba(208,112,48,.18);border-radius:4px;padding:8px 10px;font-family:'EB Garamond',serif;font-size:12px;color:#e8d0b0;resize:vertical;min-height:88px;outline:none;box-sizing:border-box;line-height:1.55;}
         .sp-unstable-ta::placeholder{color:rgba(208,112,48,.35);font-style:italic;}
+        /* ── Unstable Magic 1-6 Result Boxes ── */
+        .sp-unstable-boxes{display:flex;flex-direction:column;gap:4px;padding:4px 0 2px;}
+        .sp-unstable-box-row{display:flex;align-items:center;gap:8px;}
+        .sp-unstable-box-lbl{font-family:'Cinzel',serif;font-size:9px;font-weight:bold;color:rgba(208,112,48,.85);min-width:16px;text-align:center;flex-shrink:0;}
+        .sp-unstable-box{flex:1;background:rgba(208,112,48,.05);border:1px solid rgba(208,112,48,.2);border-radius:4px;padding:5px 8px;font-family:'EB Garamond',serif;font-size:12px;color:#e8d0b0;outline:none;box-sizing:border-box;}
+        .sp-unstable-box:focus{border-color:rgba(208,112,48,.6);background:rgba(208,112,48,.09);}
+        .sp-unstable-box::placeholder{color:rgba(208,112,48,.3);font-style:italic;}
         /* ── Unstable Magic Roll Modal ── */
         #unstableMagicModal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);align-items:center;justify-content:center;}
         #unstableMagicModal.open{display:flex;}
@@ -13556,10 +13563,17 @@ function addSpell(data){
       <span class="sp-unstable-lbl">⚡ Unstable Magic — Roll 1d6 on Cast</span>
     </div>
     <div class="sp-unstable-panel">
-      <textarea class="sp-unstable-ta" placeholder="Define each 1d6 result:\n1 = …\n2 = …\n3 = …\n4 = …\n5 = …\n6 = …"></textarea>
+      <div class="sp-unstable-boxes">
+        <div class="sp-unstable-box-row"><span class="sp-unstable-box-lbl">1</span><input class="sp-unstable-box" type="text" placeholder="Roll 1 result…"></div>
+        <div class="sp-unstable-box-row"><span class="sp-unstable-box-lbl">2</span><input class="sp-unstable-box" type="text" placeholder="Roll 2 result…"></div>
+        <div class="sp-unstable-box-row"><span class="sp-unstable-box-lbl">3</span><input class="sp-unstable-box" type="text" placeholder="Roll 3 result…"></div>
+        <div class="sp-unstable-box-row"><span class="sp-unstable-box-lbl">4</span><input class="sp-unstable-box" type="text" placeholder="Roll 4 result…"></div>
+        <div class="sp-unstable-box-row"><span class="sp-unstable-box-lbl">5</span><input class="sp-unstable-box" type="text" placeholder="Roll 5 result…"></div>
+        <div class="sp-unstable-box-row"><span class="sp-unstable-box-lbl">6</span><input class="sp-unstable-box" type="text" placeholder="Roll 6 result…"></div>
+      </div>
     </div>
-    <!-- Cast -->
-    <div class="sig-cast-row">
+    <!-- Cast button is hidden in the builder — only available in Spell List after Complete -->
+    <div class="sig-cast-row" style="display:none;">
       <span class="sig-cast-rc-lbl">Cast — spends RC from Resonance Pool</span>
       <button type="button" class="sig-cast-btn" onclick="castSigil(this)">⟳ Cast</button>
     </div>
@@ -25282,9 +25296,19 @@ function completeSpell(card){
 
   // Unstable Magic
   const unstableToggle = card.querySelector('.sp-unstable-row input[type="checkbox"]');
-  const unstableTA     = card.querySelector('.sp-unstable-ta');
   const unstableMagic  = !!(unstableToggle && unstableToggle.checked);
-  const unstableTable  = unstableMagic && unstableTA ? unstableTA.value.trim() : '';
+  let unstableTable = '';
+  if(unstableMagic){
+    const boxes = card.querySelectorAll('.sp-unstable-box');
+    if(boxes.length === 6){
+      // Store as JSON array ["result1",…,"result6"]
+      unstableTable = JSON.stringify(Array.from(boxes).map(function(b){ return b.value.trim(); }));
+    } else {
+      // Legacy: textarea fallback
+      const ta = card.querySelector('.sp-unstable-ta');
+      unstableTable = ta ? ta.value.trim() : '';
+    }
+  }
 
   const sels = card.querySelectorAll('.c-sel');
   const ctVal    = (sels[1]||{}).value || 'Action';
@@ -25387,7 +25411,7 @@ function renderSpellList(){
         </div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:${sp.notes||conds?'8px':'0'};">
           <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">RC <strong style="color:rgba(61,214,219,.8);">${sp.rc}</strong></span>
-          <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">INS+ <strong style="color:rgba(208,112,48,.8);">${sp.ip}</strong></span>
+          ${parseInt(sp.ip||0)>0 ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">INS+ <strong style="color:rgba(208,112,48,.8);">${sp.ip}</strong></span>` : ''}
           <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">${sp.ct}</span>
           <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">${sp.range}</span>
           <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">${sp.dur}</span>
@@ -25468,7 +25492,7 @@ function openUnstableMagicRoll(sp){
   document.getElementById('unstableResultLbl').textContent   = '';
   document.getElementById('unstableConsequence').textContent = '';
   const btn = document.getElementById('unstableRollBtn');
-  if(btn){ btn.disabled=false; btn.textContent='🎲 ROLL'; }
+  if(btn){ btn.disabled=false; btn.textContent='🎲 ROLL UNSTABLE MAGIC'; }
   modal.classList.add('open');
 }
 
@@ -25483,7 +25507,7 @@ function rollUnstableD6(){
   if(_unstableRolling) return;
   _unstableRolling = true;
   const btn = document.getElementById('unstableRollBtn');
-  if(btn){ btn.disabled=true; btn.textContent='Rolling…'; }
+  if(btn){ btn.disabled=true; btn.textContent='Rolling…'; btn.style.letterSpacing='2px'; }
   // Animate the die
   const disp = document.getElementById('unstableDieDisplay');
   let   ticks = 0;
@@ -25500,7 +25524,7 @@ function rollUnstableD6(){
       const consequence = _parseUnstableResult(result, _unstableSpell ? _unstableSpell.unstableTable : '');
       const cEl = document.getElementById('unstableConsequence');
       cEl.textContent = consequence || '(No consequence defined for this result.)';
-      if(btn){ btn.disabled=false; btn.textContent='🎲 Roll Again'; }
+      if(btn){ btn.disabled=false; btn.textContent='🎲 ROLL AGAIN'; }
       _unstableRolling = false;
     }
   }, 55);
@@ -25508,15 +25532,20 @@ function rollUnstableD6(){
 
 function _parseUnstableResult(roll, table){
   if(!table) return '';
-  // Try to match "1 = …" or "1: …" or "1- …" patterns
+  // Primary: JSON array from 6 individual input boxes ["result1",…,"result6"]
+  try {
+    const arr = JSON.parse(table);
+    if(Array.isArray(arr)) return (arr[roll - 1] || '').trim();
+  } catch(e) {}
+  // Fallback: legacy "1 = …" / "1: …" / "1- …" line format
   const lines = table.split('\n');
   for(let line of lines){
     const m = line.match(/^\s*(\d)\s*[=:\-–]\s*(.+)/);
     if(m && parseInt(m[1])===roll) return m[2].trim();
   }
-  // Fallback: just return the Nth line if there are exactly 6 lines
-  const nonEmpty = lines.filter(l=>l.trim());
-  if(nonEmpty.length>=roll) return nonEmpty[roll-1].trim();
+  // Last resort: Nth non-empty line
+  const nonEmpty = lines.filter(function(l){ return l.trim(); });
+  if(nonEmpty.length >= roll) return nonEmpty[roll - 1].trim();
   return '';
 }
 
@@ -26316,12 +26345,12 @@ function copyReport(){
 <div id="unstableMagicModal" onclick="if(event.target===this)closeUnstableModal()">
   <div class="unstable-box">
     <button class="unstable-close" onclick="closeUnstableModal()" title="Close">✕</button>
-    <div class="unstable-ttl">Roll Instability</div>
+    <div class="unstable-ttl">Roll Unstable Magic</div>
     <div class="unstable-sub" id="unstableSpellName">— Unstable Magic —</div>
     <div class="unstable-die-display" id="unstableDieDisplay">?</div>
     <div class="unstable-result-lbl" id="unstableResultLbl"></div>
     <div class="unstable-consequence" id="unstableConsequence"></div>
-    <button class="unstable-roll-btn" id="unstableRollBtn" onclick="rollUnstableD6()">🎲 ROLL</button>
+    <button class="unstable-roll-btn" id="unstableRollBtn" onclick="rollUnstableD6()">🎲 ROLL UNSTABLE MAGIC</button>
   </div>
 </div>
 
