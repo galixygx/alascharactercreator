@@ -5270,6 +5270,44 @@
             flex: 1;
         }
 
+        /* ── Unstable Magic Toggle ── */
+        .sp-unstable-row{display:flex;align-items:center;gap:10px;padding:8px 0 4px;margin-top:6px;border-top:1px dashed rgba(208,112,48,.2);}
+        .sp-toggle-sw{position:relative;display:inline-block;width:36px;height:20px;flex-shrink:0;}
+        .sp-toggle-sw input{opacity:0;width:0;height:0;position:absolute;}
+        .sp-toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:10px;transition:.25s;cursor:pointer;}
+        .sp-toggle-slider:before{content:'';position:absolute;width:14px;height:14px;left:2px;top:2px;background:rgba(255,255,255,.4);border-radius:50%;transition:.25s;}
+        .sp-toggle-sw input:checked + .sp-toggle-slider{background:rgba(208,112,48,.25);border-color:rgba(208,112,48,.7);}
+        .sp-toggle-sw input:checked + .sp-toggle-slider:before{transform:translateX(16px);background:#d07030;}
+        .sp-unstable-lbl{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:rgba(208,112,48,.75);text-transform:uppercase;cursor:pointer;}
+        .sp-unstable-panel{padding:6px 0 0;display:none;}
+        .sp-unstable-ta{width:100%;background:rgba(208,112,48,.05);border:1px solid rgba(208,112,48,.18);border-radius:4px;padding:8px 10px;font-family:'EB Garamond',serif;font-size:12px;color:#e8d0b0;resize:vertical;min-height:88px;outline:none;box-sizing:border-box;line-height:1.55;}
+        .sp-unstable-ta::placeholder{color:rgba(208,112,48,.35);font-style:italic;}
+        /* ── Unstable Magic Roll Modal ── */
+        #unstableMagicModal{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.85);align-items:center;justify-content:center;}
+        #unstableMagicModal.open{display:flex;}
+        .unstable-box{background:linear-gradient(155deg,#12090a 0%,#1a0e12 100%);border:1px solid rgba(208,112,48,.4);border-radius:10px;padding:30px 32px;max-width:420px;width:94vw;text-align:center;position:relative;box-shadow:0 0 40px rgba(208,112,48,.12);}
+        .unstable-ttl{font-family:'Cinzel Decorative',serif;font-size:17px;letter-spacing:3px;color:#d07030;margin-bottom:3px;}
+        .unstable-sub{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:rgba(208,112,48,.5);margin-bottom:22px;}
+        .unstable-die-display{font-family:'Cinzel Decorative',serif;font-size:52px;color:#d07030;min-height:64px;line-height:1;margin:6px 0 4px;text-shadow:0 0 24px rgba(208,112,48,.45);}
+        .unstable-result-lbl{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:rgba(208,112,48,.6);margin-bottom:10px;min-height:14px;}
+        .unstable-consequence{font-family:'EB Garamond',serif;font-size:15px;font-style:italic;color:rgba(240,200,160,.88);min-height:20px;line-height:1.5;padding:0 8px;margin-bottom:18px;}
+        .unstable-roll-btn{font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;padding:12px 32px;background:linear-gradient(135deg,rgba(208,112,48,.18),rgba(208,112,48,.06));border:1px solid rgba(208,112,48,.55);border-radius:5px;color:#d07030;cursor:pointer;transition:.2s;}
+        .unstable-roll-btn:hover{background:rgba(208,112,48,.3);border-color:rgba(208,112,48,.9);color:#f09060;}
+        .unstable-roll-btn:disabled{opacity:.4;cursor:not-allowed;}
+        .unstable-close{position:absolute;top:10px;right:14px;background:transparent;border:none;color:rgba(255,255,255,.35);font-size:17px;cursor:pointer;line-height:1;padding:0;}
+        /* ── Players Tab ── */
+        .players-tbl{width:100%;border-collapse:collapse;}
+        .players-tbl th{font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--gold-d);text-align:left;padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.09);text-transform:uppercase;}
+        .players-tbl td{font-family:'EB Garamond',serif;font-size:13px;color:#d0c8b8;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+        .players-tbl tr:hover td{background:rgba(255,255,255,.025);}
+        .rank-badge,.role-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;text-transform:uppercase;}
+        .rank-owner{background:rgba(201,162,39,.15);border:1px solid rgba(201,162,39,.45);color:var(--gold);}
+        .rank-admin{background:rgba(160,96,224,.12);border:1px solid rgba(160,96,224,.38);color:#b070f0;}
+        .rank-assistant{background:rgba(61,214,219,.1);border:1px solid rgba(61,214,219,.32);color:var(--res);}
+        .rank-user{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:rgba(255,255,255,.55);}
+        .role-badge{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.5);}
+        .keeper-rank-sel,.keeper-role-sel{font-family:'Cinzel',serif;font-size:8px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:3px;color:#c8c0b0;padding:4px 6px;cursor:pointer;outline:none;}
+
         /* ═══════════════════ SETTINGS STYLES ═══════════════════ */
         .settings-btn {
             background: transparent;
@@ -13462,6 +13500,17 @@ function addSpell(data){
       </div>
     </div>
 
+    <!-- Unstable Magic -->
+    <div class="sp-unstable-row">
+      <label class="sp-toggle-sw">
+        <input type="checkbox" onchange="spellToggleUnstable(this)">
+        <span class="sp-toggle-slider"></span>
+      </label>
+      <span class="sp-unstable-lbl">⚡ Unstable Magic — Roll 1d6 on Cast</span>
+    </div>
+    <div class="sp-unstable-panel">
+      <textarea class="sp-unstable-ta" placeholder="Define each 1d6 result:\n1 = …\n2 = …\n3 = …\n4 = …\n5 = …\n6 = …"></textarea>
+    </div>
     <!-- Cast -->
     <div class="sig-cast-row">
       <span class="sig-cast-rc-lbl">Cast — spends RC from Resonance Pool</span>
@@ -23469,6 +23518,7 @@ function keeperTab(id, btn){
   if(id==='agent'){ renderAgentAlasReport(); renderDeviceAuthStatus(); }
   if(id==='encounter') renderEncounterList();
   if(id==='world'||id==='notes') loadKeeperState();
+  if(id==='players') keeperRenderPlayers();
 }
 
 function saveKeeperState(){
@@ -25028,27 +25078,35 @@ function completeSpell(card){
   const ipEl    = card.querySelectorAll('.c-inp')[2];
   const notesEl = card.querySelector('.c-ta');
 
+  // Unstable Magic
+  const unstableToggle = card.querySelector('.sp-unstable-row input[type="checkbox"]');
+  const unstableTA     = card.querySelector('.sp-unstable-ta');
+  const unstableMagic  = !!(unstableToggle && unstableToggle.checked);
+  const unstableTable  = unstableMagic && unstableTA ? unstableTA.value.trim() : '';
+
   const sels = card.querySelectorAll('.c-sel');
   const ctVal    = (sels[1]||{}).value || 'Action';
   const durVal   = (sels[2]||{}).value || 'Instant';
   const rangeVal = (sels[3]||{}).value || '—';
 
   const entry = {
-    id:         Date.now() + '_' + Math.random().toString(36).slice(2,6),
-    name:       (nameEl  ||{}).value || 'Unnamed Spell',
-    spellLevel: card.dataset.spellLevel || '1',
-    aff:        (affSel  ||{}).value || '—',
-    rc:         (rcEl    ||{}).value || '0',
-    ip:         (ipEl    ||{}).value || '0',
-    element:    card.dataset.element  || '—',
-    dmgDie:     card.dataset.dmgDie   || 'none',
-    dmgCount:   card.dataset.dmgCount || '1',
-    dmgType:    card.dataset.dmgType  || '—',
-    ct:         ctVal,
-    dur:        durVal,
-    range:      rangeVal,
-    conditions: card.dataset.conditions || '',
-    notes:      (notesEl ||{}).value || '',
+    id:            Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    name:          (nameEl  ||{}).value || 'Unnamed Spell',
+    spellLevel:    card.dataset.spellLevel || '1',
+    aff:           (affSel  ||{}).value || '—',
+    rc:            (rcEl    ||{}).value || '0',
+    ip:            (ipEl    ||{}).value || '0',
+    element:       card.dataset.element  || '—',
+    dmgDie:        card.dataset.dmgDie   || 'none',
+    dmgCount:      card.dataset.dmgCount || '1',
+    dmgType:       card.dataset.dmgType  || '—',
+    ct:            ctVal,
+    dur:           durVal,
+    range:         rangeVal,
+    conditions:    card.dataset.conditions || '',
+    notes:         (notesEl ||{}).value || '',
+    unstableMagic: unstableMagic,
+    unstableTable: unstableTable,
   };
 
   if(!Array.isArray(state.completedSpells)) state.completedSpells = [];
@@ -25123,6 +25181,7 @@ function renderSpellList(){
           <span style="font-family:'Cinzel Decorative',serif;font-size:12px;color:${col};">${sp.name}</span>
           <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:rgba(201,162,39,.7);padding:1px 6px;border:1px solid rgba(201,162,39,.25);border-radius:3px;">LVL ${sp.spellLevel}</span>
           <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:${col};opacity:.7;">${sp.aff}</span>
+          ${sp.unstableMagic ? `<span title="Unstable Magic: rolls 1d6 on cast" style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:rgba(208,112,48,.85);padding:1px 6px;border:1px solid rgba(208,112,48,.3);border-radius:3px;">⚡ UNSTABLE</span>` : ''}
         </div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:${sp.notes||conds?'8px':'0'};">
           <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">RC <strong style="color:rgba(61,214,219,.8);">${sp.rc}</strong></span>
@@ -25175,6 +25234,291 @@ function castCompletedSpell(spId){
       openSmartRoll({type:'sigil', sigilName:sp.name, sigilAff:sp.aff, sigilEffect:spellEffect});
     }, 150);
   }
+
+  // Unstable Magic — open 1d6 roll popup after cast pipeline completes
+  if(sp.unstableMagic){
+    setTimeout(function(){ openUnstableMagicRoll(sp); }, 320);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UNSTABLE MAGIC SYSTEM
+// ═══════════════════════════════════════════════════════════════
+
+function spellToggleUnstable(checkbox){
+  const row   = checkbox.closest('.sp-unstable-row');
+  const panel = row && row.nextElementSibling;
+  if(panel && panel.classList.contains('sp-unstable-panel')){
+    panel.style.display = checkbox.checked ? 'block' : 'none';
+  }
+}
+
+let _unstableSpell = null;
+let _unstableRolling = false;
+
+function openUnstableMagicRoll(sp){
+  _unstableSpell   = sp;
+  _unstableRolling = false;
+  const modal = document.getElementById('unstableMagicModal');
+  if(!modal) return;
+  document.getElementById('unstableSpellName').textContent = sp.name + ' — Unstable Magic';
+  document.getElementById('unstableDieDisplay').textContent  = '?';
+  document.getElementById('unstableResultLbl').textContent   = '';
+  document.getElementById('unstableConsequence').textContent = '';
+  const btn = document.getElementById('unstableRollBtn');
+  if(btn){ btn.disabled=false; btn.textContent='🎲 ROLL'; }
+  modal.classList.add('open');
+}
+
+function closeUnstableModal(){
+  const modal = document.getElementById('unstableMagicModal');
+  if(modal) modal.classList.remove('open');
+  _unstableSpell   = null;
+  _unstableRolling = false;
+}
+
+function rollUnstableD6(){
+  if(_unstableRolling) return;
+  _unstableRolling = true;
+  const btn = document.getElementById('unstableRollBtn');
+  if(btn){ btn.disabled=true; btn.textContent='Rolling…'; }
+  // Animate the die
+  const disp = document.getElementById('unstableDieDisplay');
+  let   ticks = 0;
+  const total = 18;
+  const anim  = setInterval(function(){
+    ticks++;
+    disp.textContent = Math.floor(Math.random()*6)+1;
+    if(ticks >= total){
+      clearInterval(anim);
+      const result = Math.floor(Math.random()*6)+1;
+      disp.textContent = result;
+      document.getElementById('unstableResultLbl').textContent = 'Result: ' + result;
+      // Parse consequence from table
+      const consequence = _parseUnstableResult(result, _unstableSpell ? _unstableSpell.unstableTable : '');
+      const cEl = document.getElementById('unstableConsequence');
+      cEl.textContent = consequence || '(No consequence defined for this result.)';
+      if(btn){ btn.disabled=false; btn.textContent='🎲 Roll Again'; }
+      _unstableRolling = false;
+    }
+  }, 55);
+}
+
+function _parseUnstableResult(roll, table){
+  if(!table) return '';
+  // Try to match "1 = …" or "1: …" or "1- …" patterns
+  const lines = table.split('\n');
+  for(let line of lines){
+    const m = line.match(/^\s*(\d)\s*[=:\-–]\s*(.+)/);
+    if(m && parseInt(m[1])===roll) return m[2].trim();
+  }
+  // Fallback: just return the Nth line if there are exactly 6 lines
+  const nonEmpty = lines.filter(l=>l.trim());
+  if(nonEmpty.length>=roll) return nonEmpty[roll-1].trim();
+  return '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// KEEPER'S PANEL — PLAYERS / USER MANAGEMENT
+// ═══════════════════════════════════════════════════════════════
+
+function keeperRenderPlayers(){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  const users = AUTH.getUsers();
+  const keys  = Object.keys(users);
+  const wrap  = document.getElementById('playersTableWrap');
+  if(!wrap) return;
+
+  if(!keys.length){ wrap.innerHTML='<div style="color:var(--txt-dim);font-size:11px;font-family:\'EB Garamond\',serif;">No registered users yet.</div>'; return; }
+
+  const RANK_OPTS = ['admin','assistant','user'];
+  const ROLE_OPTS = ['dungeon master','player','npc'];
+  const now = Date.now();
+
+  let html = `<table class="players-tbl">
+    <thead><tr>
+      <th>Username</th><th>Display</th><th>Rank</th><th>Role</th><th>Status</th><th>Last Seen</th>
+    </tr></thead><tbody>`;
+
+  keys.forEach(k=>{
+    const u = users[k];
+    const rank  = u.rank  || 'user';
+    const role  = u.role  || 'player';
+    const isOwner = (k==='galixy');
+    const diff  = now - (u.lastActivity||u.lastLogin||0);
+    const status = diff < 5*60000 ? '<span style="color:#7cd46a;">● Active</span>'
+                 : diff < 30*60000 ? '<span style="color:#c9a227;">◌ AFK</span>'
+                 : '<span style="color:rgba(255,255,255,.3);">○ Offline</span>';
+    const ago = _timeAgo(u.lastActivity||u.lastLogin||0);
+
+    const rankBadge = `<span class="rank-badge rank-${rank}">${rank}</span>`;
+
+    const rankCtrl = isOwner
+      ? rankBadge
+      : `<select class="keeper-rank-sel" onchange="keeperSetRank('${k}',this.value)">
+           ${RANK_OPTS.map(r=>`<option value="${r}" ${r===rank?'selected':''}>${r.charAt(0).toUpperCase()+r.slice(1)}</option>`).join('')}
+         </select>`;
+
+    const roleCtrl = isOwner
+      ? `<span class="role-badge">${role}</span>`
+      : `<select class="keeper-role-sel" onchange="keeperSetRole('${k}',this.value)">
+           ${ROLE_OPTS.map(r=>`<option value="${r}" ${r===role?'selected':''}>${r.split(' ').map(w=>w.charAt(0).toUpperCase()+w.slice(1)).join(' ')}</option>`).join('')}
+         </select>`;
+
+    html += `<tr>
+      <td><span style="font-family:'Cinzel',serif;font-size:11px;">${_escHtml(k)}</span></td>
+      <td>${_escHtml(u.display||k)}</td>
+      <td>${rankCtrl}</td>
+      <td>${roleCtrl}</td>
+      <td>${status}</td>
+      <td style="font-size:11px;color:var(--txt-dim);">${ago}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+
+  // Populate dropdowns
+  _kpPopulateTargetSelects(keys, users);
+}
+
+function _kpPopulateTargetSelects(keys, users){
+  const selIds = ['kpGrantTarget','kpNotesTarget','kpAccountTarget'];
+  selIds.forEach(id=>{
+    const sel = document.getElementById(id);
+    if(!sel) return;
+    sel.innerHTML = keys.map(k=>`<option value="${k}">${users[k].display||k} (${k})</option>`).join('');
+  });
+}
+
+function _timeAgo(ts){
+  if(!ts) return '—';
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s<60) return 'Just now';
+  if(s<3600) return Math.floor(s/60)+'m ago';
+  if(s<86400) return Math.floor(s/3600)+'h ago';
+  return Math.floor(s/86400)+'d ago';
+}
+
+function keeperSetRank(key, rank){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  AUTH.setUserRank(key, rank);
+  showToast(`Rank set to "${rank}" for ${key}.`);
+}
+
+function keeperSetRole(key, role){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  AUTH.setUserRole(key, role);
+  showToast(`Role set to "${role}" for ${key}.`);
+}
+
+function keeperGrantResources(){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  const targetKey = (document.getElementById('kpGrantTarget')||{}).value;
+  const xp  = parseInt((document.getElementById('kpGrantXP')||{}).value)  || 0;
+  const gold = parseInt((document.getElementById('kpGrantGold')||{}).value)|| 0;
+  if(!targetKey){ showToast('Select a player first.'); return; }
+  if(!xp && !gold){ showToast('Enter XP or Gold to grant.'); return; }
+  // Load target user state, add values, save back
+  const stateKey = AUTH.STATE_PRE + targetKey;
+  try{
+    const raw  = localStorage.getItem(stateKey);
+    const uSt  = raw ? JSON.parse(raw) : {};
+    if(xp){
+      const cur = parseInt(uSt.xp)||0;
+      uSt.xp = cur + xp;
+      // Sync xp input if it's the current user
+      const inp = document.getElementById('xpInput');
+      if(inp && AUTH.currentUser && AUTH.currentUser.key===targetKey) inp.value=uSt.xp;
+    }
+    if(gold){
+      const cur = parseInt(uSt.gold)||0;
+      uSt.gold = cur + gold;
+      const inp = document.getElementById('goldInput');
+      if(inp && AUTH.currentUser && AUTH.currentUser.key===targetKey) inp.value=uSt.gold;
+    }
+    localStorage.setItem(stateKey, JSON.stringify(uSt));
+    showToast(`Granted ${xp?xp+' XP':''}${xp&&gold?' + ':''}${gold?gold+' Gold':''} to ${targetKey}.`);
+    // Clear inputs
+    ['kpGrantXP','kpGrantGold'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
+  }catch(e){ showToast('Could not update player data.'); console.warn(e); }
+}
+
+function keeperPostAnnouncement(){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  const ta = document.getElementById('kpAnnouncement');
+  const msg = ta ? ta.value.trim() : '';
+  if(!msg){ showToast('Enter a message first.'); return; }
+  // Store announcement globally so any user can read it
+  localStorage.setItem('alas_announcement', JSON.stringify({msg, ts:Date.now(), from:'Galixy'}));
+  showToast('Announcement posted to all players.');
+  if(ta) ta.value='';
+}
+
+function keeperLoadPlayerNotes(){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  const targetKey = (document.getElementById('kpNotesTarget')||{}).value;
+  if(!targetKey) return;
+  const key = 'alas_keeper_notes_'+targetKey;
+  const notes = localStorage.getItem(key)||'';
+  const ta = document.getElementById('kpPlayerNotes');
+  if(ta) ta.value = notes;
+}
+
+function keeperSavePlayerNotes(){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  const targetKey = (document.getElementById('kpNotesTarget')||{}).value;
+  if(!targetKey) return;
+  const ta = document.getElementById('kpPlayerNotes');
+  const notes = ta ? ta.value : '';
+  localStorage.setItem('alas_keeper_notes_'+targetKey, notes);
+  showToast('Notes saved for '+targetKey+'.');
+}
+
+function keeperViewCharacter(){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  const targetKey = (document.getElementById('kpAccountTarget')||{}).value;
+  if(!targetKey){ showToast('Select a player first.'); return; }
+  const stateKey = AUTH.STATE_PRE + targetKey;
+  const raw = localStorage.getItem(stateKey);
+  if(!raw){ showToast('No saved character data for '+targetKey+'.'); return; }
+  try{
+    const data = JSON.parse(raw);
+    const info = [
+      'Character: '+(data.name||'(unnamed)'),
+      'Class: '+(data.charClass||'—'),
+      'Level: '+(data.level||data.charLevel||'—'),
+      'HP: '+(data.hp||'—'),
+      'XP: '+(data.xp||0),
+      'Gold: '+(data.gold||0),
+      'Spells in List: '+((data.completedSpells||[]).length),
+    ].join('\n');
+    alert('Character data for "'+targetKey+'":\n\n'+info);
+  }catch(e){ showToast('Could not read character data.'); }
+}
+
+function keeperResetPlayerState(){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  const targetKey = (document.getElementById('kpAccountTarget')||{}).value;
+  if(!targetKey){ showToast('Select a player first.'); return; }
+  if(!confirm('Reset ALL character data for "'+targetKey+'"? This cannot be undone.')){ return; }
+  localStorage.removeItem(AUTH.STATE_PRE+targetKey);
+  showToast('Character data reset for '+targetKey+'.');
+}
+
+function keeperDeleteAccount(){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  const targetKey = (document.getElementById('kpAccountTarget')||{}).value;
+  if(!targetKey){ showToast('Select a player first.'); return; }
+  if(targetKey==='galixy'){ showToast('Cannot delete the Owner account.'); return; }
+  if(!confirm('Permanently delete account "'+targetKey+'"? All data will be lost.')){ return; }
+  const users = AUTH.getUsers();
+  delete users[targetKey];
+  AUTH.saveUsers(users);
+  localStorage.removeItem(AUTH.STATE_PRE+targetKey);
+  localStorage.removeItem(AUTH.LOG_PRE+targetKey);
+  showToast('Account "'+targetKey+'" deleted.');
+  keeperRenderPlayers();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -25576,8 +25920,9 @@ function copyReport(){
             </div>
 
             <!-- Keeper Nav Tabs -->
-            <div style="display:flex;gap:0;border-bottom:1px solid var(--bdr-g);background:var(--surf);flex-shrink:0">
+            <div style="display:flex;gap:0;border-bottom:1px solid var(--bdr-g);background:var(--surf);flex-shrink:0;flex-wrap:wrap;">
                 <button class="keeper-tab-btn active" onclick="keeperTab('party',this)">⚔ Party</button>
+                <button class="keeper-tab-btn" onclick="keeperTab('players',this)" id="keeperTabPlayers">👥 Players</button>
                 <button class="keeper-tab-btn" onclick="keeperTab('agent',this)">◈ Agent Alas</button>
                 <button class="keeper-tab-btn" onclick="keeperTab('world',this)">🌐 World State</button>
                 <button class="keeper-tab-btn" onclick="keeperTab('encounter',this)">⚡ Encounter</button>
@@ -25692,9 +26037,91 @@ function copyReport(){
                     <div class="fld"><span class="fld-lbl">Loose Threads / Next Session Hooks</span><textarea class="fld-inp" id="ksHooks" rows="4" style="resize:vertical" oninput="saveKeeperState()" placeholder="Unresolved plot threads, cliffhangers, planned setups…"></textarea></div>
                     <button class="dm-tool-btn" onclick="exportKeeperNotes()">Export Notes (.txt)</button>
                 </div>
+
+                <!-- ── PLAYERS / USER MANAGEMENT TAB ── -->
+                <div class="keeper-tab-panel" id="ktab-players" style="padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;">
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                        <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold);">👥 PLAYER MANAGEMENT</div>
+                        <button class="dm-tool-btn" style="margin-left:auto;" onclick="keeperRenderPlayers()">↻ Refresh</button>
+                    </div>
+
+                    <!-- Legend -->
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-family:'EB Garamond',serif;font-size:11px;color:var(--txt-dim);">
+                        <span>Ranks:</span>
+                        <span class="rank-badge rank-owner">Owner</span>
+                        <span class="rank-badge rank-admin">Admin</span>
+                        <span class="rank-badge rank-assistant">Assistant</span>
+                        <span class="rank-badge rank-user">User</span>
+                        <span style="margin-left:8px;">Roles:</span>
+                        <span class="role-badge">Dungeon Master</span>
+                        <span class="role-badge">Player</span>
+                        <span class="role-badge">NPC</span>
+                    </div>
+
+                    <!-- Player table -->
+                    <div id="playersTableWrap" style="overflow-x:auto;">
+                        <div style="color:var(--txt-dim);font-size:11px;font-family:'EB Garamond',serif;">Loading players…</div>
+                    </div>
+
+                    <!-- Quick-action tools -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;">
+                        <!-- Grant XP / Gold -->
+                        <div style="padding:12px;background:rgba(124,212,106,.05);border:1px solid rgba(124,212,106,.18);border-radius:6px;">
+                            <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:rgba(124,212,106,.7);margin-bottom:8px;">🎁 GRANT XP / GOLD</div>
+                            <select id="kpGrantTarget" class="fld-inp" style="margin-bottom:6px;font-size:11px;"></select>
+                            <div style="display:flex;gap:5px;margin-bottom:6px;">
+                                <input id="kpGrantXP" class="fld-inp" type="number" placeholder="XP" min="0" style="font-size:11px;">
+                                <input id="kpGrantGold" class="fld-inp" type="number" placeholder="Gold" min="0" style="font-size:11px;">
+                            </div>
+                            <button class="dm-tool-btn" onclick="keeperGrantResources()">Grant</button>
+                        </div>
+                        <!-- Announcement -->
+                        <div style="padding:12px;background:rgba(61,214,219,.05);border:1px solid rgba(61,214,219,.18);border-radius:6px;">
+                            <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:rgba(61,214,219,.7);margin-bottom:8px;">📢 ANNOUNCEMENT</div>
+                            <textarea id="kpAnnouncement" class="fld-inp" rows="3" style="font-size:11px;resize:none;margin-bottom:6px;" placeholder="Message to all players…"></textarea>
+                            <button class="dm-tool-btn" onclick="keeperPostAnnouncement()">Post</button>
+                        </div>
+                    </div>
+
+                    <!-- Player Session Notes -->
+                    <div style="padding:12px;background:rgba(201,162,39,.04);border:1px solid rgba(201,162,39,.15);border-radius:6px;">
+                        <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:rgba(201,162,39,.7);margin-bottom:8px;">📋 PLAYER SESSION NOTES</div>
+                        <select id="kpNotesTarget" class="fld-inp" style="margin-bottom:6px;font-size:11px;"></select>
+                        <textarea id="kpPlayerNotes" class="fld-inp" rows="4" style="font-size:11px;resize:vertical;" placeholder="Private notes about this player's character, progress, tendencies…"></textarea>
+                        <div style="display:flex;gap:6px;margin-top:6px;">
+                            <button class="dm-tool-btn" onclick="keeperLoadPlayerNotes()">Load Notes</button>
+                            <button class="dm-tool-btn" onclick="keeperSavePlayerNotes()">Save Notes</button>
+                        </div>
+                    </div>
+
+                    <!-- Account Controls -->
+                    <div style="padding:12px;background:rgba(200,32,48,.05);border:1px solid rgba(200,32,48,.18);border-radius:6px;">
+                        <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:rgba(200,32,48,.7);margin-bottom:8px;">⚙ ACCOUNT CONTROLS</div>
+                        <select id="kpAccountTarget" class="fld-inp" style="margin-bottom:6px;font-size:11px;"></select>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                            <button class="dm-tool-btn" onclick="keeperViewCharacter()">🔍 View Character</button>
+                            <button class="dm-tool-btn" onclick="keeperResetPlayerState()">↺ Reset Character Data</button>
+                            <button class="dm-tool-btn" style="border-color:rgba(200,32,48,.4);color:rgba(200,32,48,.8);" onclick="keeperDeleteAccount()">✕ Delete Account</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
+
+<!-- ── Unstable Magic Roll Modal ── -->
+<div id="unstableMagicModal" onclick="if(event.target===this)closeUnstableModal()">
+  <div class="unstable-box">
+    <button class="unstable-close" onclick="closeUnstableModal()" title="Close">✕</button>
+    <div class="unstable-ttl">Roll Instability</div>
+    <div class="unstable-sub" id="unstableSpellName">— Unstable Magic —</div>
+    <div class="unstable-die-display" id="unstableDieDisplay">?</div>
+    <div class="unstable-result-lbl" id="unstableResultLbl"></div>
+    <div class="unstable-consequence" id="unstableConsequence"></div>
+    <button class="unstable-roll-btn" id="unstableRollBtn" onclick="rollUnstableD6()">🎲 ROLL</button>
+  </div>
+</div>
 
 <!-- ── Units Converter Overlay ── -->
 <div class="units-conv-overlay" id="unitsConvOverlay" onclick="if(event.target===this)closeUnitsConverter()">
@@ -25996,7 +26423,8 @@ const AUTH = {
     const users=this.getUsers();
     // Strict duplicate check (case-insensitive)
     if(users[u]) return{ok:false,msg:`"${username.trim()}" is already taken — choose a different username.`};
-    users[u]={display:username.trim(),hash:_alasHash(password),created:Date.now(),lastLogin:Date.now(),lastActivity:Date.now()};
+    const isOwner=(u==='galixy');
+    users[u]={display:username.trim(),hash:_alasHash(password),created:Date.now(),lastLogin:Date.now(),lastActivity:Date.now(),rank:isOwner?'owner':'user',role:isOwner?'keeper':'player'};
     this.saveUsers(users);
     return this._success(u,users[u].display);
   },
@@ -26096,6 +26524,26 @@ const AUTH = {
   getApiKey(){ return localStorage.getItem(this.APIKEY)||''; },
   setApiKey(k){ localStorage.setItem(this.APIKEY,k.trim()); },
   isGalixy(){ return this.currentUser && this.currentUser.key==='galixy'; },
+  isOwner(){ return this.currentUser && this.getUserRank(this.currentUser.key)==='owner'; },
+
+  getUserRank(key){ const u=this.getUsers(); return (u[key]||{}).rank||'user'; },
+  getUserRole(key){ const u=this.getUsers(); return (u[key]||{}).role||'player'; },
+  setUserRank(key,rank){
+    if(key==='galixy') return; // OWNER rank is immutable
+    const u=this.getUsers(); if(u[key]){u[key].rank=rank;this.saveUsers(u);}
+  },
+  setUserRole(key,role){
+    if(key==='galixy') return; // Keeper role is immutable
+    const u=this.getUsers(); if(u[key]){u[key].role=role;this.saveUsers(u);}
+  },
+  // Ensure galixy account always has owner/keeper regardless of when it was created
+  ensureGalixyRank(){
+    const u=this.getUsers(); if(!u['galixy']) return;
+    let changed=false;
+    if(u['galixy'].rank!=='owner'){u['galixy'].rank='owner';changed=true;}
+    if(u['galixy'].role!=='keeper'){u['galixy'].role='keeper';changed=true;}
+    if(changed) this.saveUsers(u);
+  },
 };
 
 // ── Auth modal helpers ────────────────────────────────────────
@@ -26149,6 +26597,7 @@ function _authLoginSuccess(){
     if(saved && saved.name){
       if(confirm('Welcome back, '+user.name+'! Load your saved character "'+saved.name+'"?')){
         titleScreenDismiss(()=>{ _loadStateObject(saved); _afterTitleScreenDismiss(); _postLoginSetup(); showToast('Welcome back, '+user.name+'!'); });
+        _checkAnnouncement(user.name);
         return;
       }
     }
@@ -26156,6 +26605,20 @@ function _authLoginSuccess(){
   } else {
     _postLoginSetup();
   }
+  _checkAnnouncement(user.name);
+}
+
+function _checkAnnouncement(username){
+  try{
+    const raw = localStorage.getItem('alas_announcement');
+    if(!raw) return;
+    const ann = JSON.parse(raw);
+    if(!ann || !ann.msg) return;
+    // Show after brief delay
+    setTimeout(()=>{
+      showToast('📢 Keeper Announcement: '+ann.msg.slice(0,120)+(ann.msg.length>120?'…':''));
+    }, 800);
+  }catch{}
 }
 
 function authSignOut(){
@@ -26183,7 +26646,12 @@ function _postLoginSetup(){
   const strip=document.getElementById('sbUserStrip');
   const nameEl=document.getElementById('sbUserName');
   if(strip){ strip.style.display='flex'; }
-  if(nameEl){ nameEl.textContent='◈ '+user.name; }
+  if(nameEl){
+    const rank = AUTH.getUserRank(user.key);
+    const role = AUTH.getUserRole(user.key);
+    const rankLabel = rank==='owner' ? ' [OWNER · Keeper]' : (rank==='admin' ? ' [Admin]' : (rank==='assistant' ? ' [Assistant]' : ''));
+    nameEl.textContent='◈ '+user.name + rankLabel;
+  }
   // Keeper-only elements — only show to Galixy
   if(AUTH.isGalixy()){
     document.querySelectorAll('.galixy-only').forEach(el=>{ el.style.display=''; });
@@ -26505,6 +26973,7 @@ function _escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
 // ── Init — restore session on page load ───────────────────────
 (function(){
   AUTH.restoreSession();
+  AUTH.ensureGalixyRank();
   // Always hide Keeper-only elements by default (CSS .galixy-only sets display:none)
   // They get shown by _postLoginSetup() only for Galixy
   if(AUTH.currentUser){
