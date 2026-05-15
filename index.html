@@ -24782,9 +24782,45 @@ function renderSpellList(){
         ${conds ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${conds}</div>` : ''}
         ${sp.notes ? `<div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:rgba(208,208,232,.6);line-height:1.5;">${sp.notes}</div>` : ''}
       </div>
-      <button onclick="removeCompletedSpell('${sp.id}')" title="Remove from Spell List" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(200,32,48,.3);border-radius:4px;color:rgba(200,32,48,.6);cursor:pointer;white-space:nowrap;">✕ Remove</button>`;
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+        <button type="button" class="sig-cast-btn" onclick="castCompletedSpell('${sp.id}')" style="font-size:7.5px;padding:5px 12px;letter-spacing:1.5px;">⟳ Cast</button>
+        <button type="button" onclick="removeCompletedSpell('${sp.id}')" title="Remove from Spell List" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(200,32,48,.3);border-radius:4px;color:rgba(200,32,48,.6);cursor:pointer;white-space:nowrap;">✕ Remove</button>
+      </div>`;
     grid.appendChild(div);
   });
+}
+
+/** Cast a spell from the Spell List.
+ *  Deducts RC, applies Instability, fires toast + Smart Roll + Casting Scale —
+ *  the same pipeline used by custom sigil cards and class sigil ref-cards.
+ */
+function castCompletedSpell(spId){
+  const sp = (state.completedSpells||[]).find(function(s){ return s.id === spId; });
+  if(!sp){ showToast('Spell not found.'); return; }
+
+  const rc = parseInt(sp.rc)||0;
+  const ip = parseInt(sp.ip)||0;
+
+  // Build a rich effect string so Smart Roll parses damage / range correctly
+  const dmgStr = (sp.dmgDie && sp.dmgDie !== 'none')
+    ? (sp.dmgCount||'1') + sp.dmgDie + (sp.dmgType ? ' ' + sp.dmgType : '')
+    : '';
+  const effectParts = [];
+  if(dmgStr) effectParts.push(dmgStr.trim());
+  if(sp.range  && sp.range  !== '—') effectParts.push('Range: ' + sp.range);
+  if(sp.conditions) effectParts.push(sp.conditions.split(',').filter(Boolean).join(', '));
+  if(sp.notes) effectParts.push(sp.notes);
+  const spellEffect = effectParts.join('. ');
+
+  // Use the core engine: RC deduction → Instability → toast → Smart Roll → Casting Scale
+  castSigilByRC(rc, ip, sp.name, sp.aff, null);
+
+  // Override Smart Roll with richer effect data (fires after castSigilByRC's 80ms timeout)
+  if(spellEffect){
+    setTimeout(function(){
+      openSmartRoll({type:'sigil', sigilName:sp.name, sigilAff:sp.aff, sigilEffect:spellEffect});
+    }, 150);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
