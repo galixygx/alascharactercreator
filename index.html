@@ -8338,6 +8338,37 @@
             color: rgba(255,255,255,.2); text-align: center; margin-top: 40px;
         }
 
+        /* ── Fireworks canvas ── */
+        #fireworksCanvas {
+            position: fixed; inset: 0; z-index: 9999;
+            pointer-events: none; display: none;
+        }
+
+        /* ── Sidebar user strip ── */
+        #sbUserStrip {
+            display: none;
+            align-items: center; gap: 8px;
+            padding: 7px 12px;
+            background: rgba(160,96,224,.07);
+            border-bottom: 1px solid rgba(160,96,224,.18);
+            border-top: 1px solid rgba(160,96,224,.12);
+        }
+        #sbUserName {
+            font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.5px;
+            color: rgba(200,160,255,.85); flex: 1;
+        }
+        .sb-logout-btn {
+            font-family: 'Cinzel', serif; font-size: 6.5px; letter-spacing: 1px;
+            padding: 4px 9px; background: transparent;
+            border: 1px solid rgba(200,80,80,.35); border-radius: 3px;
+            color: rgba(200,80,80,.7); cursor: pointer; white-space: nowrap;
+            transition: all .15s;
+        }
+        .sb-logout-btn:hover { background: rgba(200,80,80,.12); border-color: rgba(200,80,80,.6); color: rgba(220,100,100,.95); }
+
+        /* ── Keeper-only elements ── */
+        .galixy-only { display: none; }
+
         /* api key prompt */
         #apiKeyOverlay {
             display: none; position: fixed; inset: 0; z-index: 1500;
@@ -8554,6 +8585,11 @@
 
         <!-- ═══════════ SIDEBAR ═══════════ -->
         <aside class="sidebar">
+            <!-- User strip — shown when logged in -->
+            <div id="sbUserStrip">
+                <span id="sbUserName">◈ —</span>
+                <button class="sb-logout-btn" onclick="authSignOut()">Sign Out</button>
+            </div>
             <div class="sb-head sb-head-dice">
                 <div class="sb-head-left">
                     <button type="button" class="roll-results-btn" onclick="showRollHistory()">Results</button>
@@ -8832,13 +8868,13 @@
                     </button>
                 </div>
                 <input type="file" id="charLoadInput" class="load-inp-hidden" accept=".alas,.json" onchange="loadCharacterFile(this)">
-                <div class="save-bar save-bar-portable">
+                <div class="save-bar save-bar-portable galixy-only" id="downloadSheetBar">
                     <button type="button" class="save-btn save-btn-wide" onclick="lockedDownloadHtml()" title="Download this page as one HTML file with your character embedded — open offline or share without separate .alas file">
                         <span class="sb-icon">🔒</span>
                         <span class="sb-lbl">Download sheet (.html)</span>
                     </button>
                 </div>
-                <button class="dm-btn" onclick="openDMPanel()">
+                <button class="dm-btn galixy-only" id="keeperPanelBtn" onclick="openDMPanel()">
                     <span>⚔</span> Keeper's Panel
                 </button>
                 <button class="reset-btn" onclick="if(confirm('Reset entire sheet?')){localStorage.clear();location.reload();}">Reset Sheet</button>
@@ -22642,14 +22678,16 @@ let dmChars = [];       // array of {data, dmNote}
 let dmNotesMap = {};    // charName -> dm note (persists in localStorage)
 
 function openDMPanel(){
-  const pw = prompt('KEEPER\'S PANEL\nEnter password to access:');
-  if(pw === null) return;
-  if(pw.trim() !== 'Keeper Panel') { showToast('Access denied — incorrect Keeper password.'); return; }
-  try{dmNotesMap=JSON.parse(localStorage.getItem('alas_dm_notes')||'{}');}catch(e){dmNotesMap={};}
-  renderDMPanel();
-  loadKeeperState();
-  document.getElementById('dmOverlay').classList.add('open');
-  AgentAlas.logEvent('keeper_panel_opened', { ts: Date.now() });
+  // Galixy can open directly; anyone else is blocked
+  if(AUTH.currentUser && AUTH.currentUser.key === 'galixy'){
+    try{dmNotesMap=JSON.parse(localStorage.getItem('alas_dm_notes')||'{}');}catch(e){dmNotesMap={};}
+    renderDMPanel();
+    loadKeeperState();
+    document.getElementById('dmOverlay').classList.add('open');
+    AgentAlas.logEvent('keeper_panel_opened', { ts: Date.now() });
+    return;
+  }
+  showToast('Access denied — Keeper\'s Panel is restricted.');
 }
 
 function closeDMPanel(){
@@ -23493,7 +23531,49 @@ function renderAgentAlasReport(){
     <div style="margin-top:10px;display:flex;gap:8px">
       <button class="dm-tool-btn" onclick="AgentAlas.logEvent('manual_report_generated',null);renderAgentAlasReport()">Log Event &amp; Refresh</button>
       <button class="dm-tool-btn danger" onclick="if(confirm('Clear all Agent Alas memory?')){AgentAlas.clearMemory();renderAgentAlasReport();}">Clear Memory</button>
+    </div>
+    ${_renderAllUsersPanel()}`;
+}
+
+// ─── Agent Alas: All-Users Dashboard (Keeper view) ───────────────────────────
+function _renderAllUsersPanel(){
+  const users = AUTH.getUsers();
+  const keys  = Object.keys(users);
+  const now   = Date.now();
+  const SESSION_ACTIVE_MS = 15 * 60 * 1000;  // <15 min = Active
+  const SESSION_AFK_MS    = 60 * 60 * 1000;  // 15–60 min = AFK
+
+  if(!keys.length) return `<div style="margin-top:16px;font-size:10px;color:var(--txt-dim);font-style:italic">No registered users yet.</div>`;
+
+  const rows = keys.map(k => {
+    const u = users[k];
+    const lastLogin = u.lastLogin || u.created || 0;
+    const lastActivity = u.lastActivity || lastLogin;
+    const elapsed = now - lastActivity;
+    let status, statusCol;
+    if(elapsed < SESSION_ACTIVE_MS){ status='● ACTIVE';   statusCol='#3dd6db'; }
+    else if(elapsed < SESSION_AFK_MS){ status='◌ AFK';    statusCol='#c9a227'; }
+    else { status='○ INACTIVE'; statusCol='rgba(200,200,220,.3)'; }
+    const lastSeen = lastActivity ? new Date(lastActivity).toLocaleString() : '—';
+    const created  = u.created    ? new Date(u.created).toLocaleDateString()  : '—';
+    const logCount = (() => {
+      try{ return JSON.parse(localStorage.getItem('alas_ulog_'+k)||'[]').length; } catch{ return 0; }
+    })();
+    return `<div style="display:grid;grid-template-columns:1fr auto;align-items:center;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.05);">
+      <div>
+        <div style="font-family:'Cinzel',serif;font-size:9px;color:var(--gold);letter-spacing:1px">${_escHtml(u.display||k)}</div>
+        <div style="font-size:8.5px;color:var(--txt-dim);margin-top:2px">Joined: ${created} · Last seen: ${lastSeen}</div>
+        <div style="font-size:8.5px;color:var(--txt-dim)">Agent log entries: ${logCount}</div>
+      </div>
+      <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;color:${statusCol};text-align:right">${status}</div>
     </div>`;
+  }).join('');
+
+  return `<div style="margin-top:18px">
+    <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--gold-d);margin-bottom:6px">REGISTERED USERS (${keys.length})</div>
+    <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;overflow:hidden">${rows}</div>
+    <div style="font-size:8px;color:var(--txt-dim);font-style:italic;margin-top:5px">Active = last activity &lt;15 min · AFK = &lt;1 hr · Inactive = &gt;1 hr</div>
+  </div>`;
 }
 
 // ─── Encounter Manager ───────────────────────────────────────────────────────
@@ -25763,7 +25843,10 @@ function ucConvert(from, val){
   </div>
 </div>
 
-<!-- Agent Alas floating button -->
+<!-- Fireworks canvas -->
+<canvas id="fireworksCanvas"></canvas>
+
+<!-- Agent Alas floating button (Galixy only) -->
 <button id="agentAlasBtn" onclick="toggleAgentPanel()" title="Agent Alas">🔮</button>
 
 <!-- Agent Alas side panel -->
@@ -25837,6 +25920,46 @@ function _alasHash(str){
 }
 
 // ════════════════════════════════════════════════════════════
+// FIREWORKS — celebration animation on login/register
+// ════════════════════════════════════════════════════════════
+function launchFireworks(){
+  const canvas=document.getElementById('fireworksCanvas');
+  if(!canvas) return;
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  canvas.style.display='block';
+  const ctx=canvas.getContext('2d');
+  const COLORS=['#c9a227','#a060e0','#3dd6db','#e07040','#7cd46a','#e8d070','#ff80c0'];
+  const particles=[];
+  for(let b=0;b<7;b++){
+    setTimeout(()=>{
+      const cx=Math.random()*canvas.width*0.7+canvas.width*0.15;
+      const cy=Math.random()*canvas.height*0.5+canvas.height*0.1;
+      const col=COLORS[Math.floor(Math.random()*COLORS.length)];
+      for(let i=0;i<60;i++){
+        const angle=Math.random()*Math.PI*2;
+        const speed=Math.random()*5+2;
+        particles.push({x:cx,y:cy,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,alpha:1,col,r:Math.random()*2.5+1});
+      }
+    },b*220);
+  }
+  let frame=0;
+  function tick(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach((p,i)=>{
+      p.x+=p.vx; p.y+=p.vy; p.vy+=0.12; p.vx*=0.98; p.alpha-=0.012;
+      ctx.globalAlpha=Math.max(0,p.alpha);
+      ctx.fillStyle=p.col;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha=1;
+    frame++;
+    if(frame<220) requestAnimationFrame(tick);
+    else{ canvas.style.display='none'; ctx.clearRect(0,0,canvas.width,canvas.height); }
+  }
+  requestAnimationFrame(tick);
+}
+
+// ════════════════════════════════════════════════════════════
 // AUTH — per-user account + state system
 // ════════════════════════════════════════════════════════════
 const AUTH = {
@@ -25846,7 +25969,7 @@ const AUTH = {
   SESS_KEY   : 'alas_session',
   APIKEY     : 'alas_agent_key',
   currentUser: null,
-  _authMode  : 'login', // 'login' | 'register'
+  _authMode  : 'login',
 
   getUsers(){ try{return JSON.parse(localStorage.getItem(this.USERS_KEY)||'{}')}catch{return{}} },
   saveUsers(u){ localStorage.setItem(this.USERS_KEY,JSON.stringify(u)); },
@@ -25856,8 +25979,9 @@ const AUTH = {
     if(u.length<2) return{ok:false,msg:'Username must be at least 2 characters.'};
     if(password.length<4) return{ok:false,msg:'Password must be at least 4 characters.'};
     const users=this.getUsers();
-    if(users[u]) return{ok:false,msg:'Username already taken. Try another.'};
-    users[u]={display:username.trim(),hash:_alasHash(password),created:Date.now()};
+    // Strict duplicate check (case-insensitive)
+    if(users[u]) return{ok:false,msg:`"${username.trim()}" is already taken — choose a different username.`};
+    users[u]={display:username.trim(),hash:_alasHash(password),created:Date.now(),lastLogin:Date.now(),lastActivity:Date.now()};
     this.saveUsers(users);
     return this._success(u,users[u].display);
   },
@@ -25867,6 +25991,9 @@ const AUTH = {
     const users=this.getUsers();
     if(!users[u]) return{ok:false,msg:'Account not found. Check your username or register.'};
     if(users[u].hash!==_alasHash(password)) return{ok:false,msg:'Incorrect password.'};
+    // Update last login timestamp
+    users[u].lastLogin=Date.now(); users[u].lastActivity=Date.now();
+    this.saveUsers(users);
     return this._success(u,users[u].display);
   },
 
@@ -25880,20 +26007,30 @@ const AUTH = {
     if(this.currentUser) this.saveUserState();
     this.currentUser=null;
     sessionStorage.removeItem(this.SESS_KEY);
+    if(this._autoSaveInterval){ clearInterval(this._autoSaveInterval); this._autoSaveInterval=null; }
   },
 
   restoreSession(){
     try{
       const s=sessionStorage.getItem(this.SESS_KEY);
-      if(s) this.currentUser=JSON.parse(s);
+      if(s){ this.currentUser=JSON.parse(s); this._touchActivity(); }
     }catch{}
+  },
+
+  _touchActivity(){
+    if(!this.currentUser) return;
+    const users=this.getUsers();
+    if(users[this.currentUser.key]){
+      users[this.currentUser.key].lastActivity=Date.now();
+      this.saveUsers(users);
+    }
   },
 
   saveUserState(){
     if(!this.currentUser) return;
     try{
-      const snapshot={...state};
-      localStorage.setItem(this.STATE_PRE+this.currentUser.key, JSON.stringify(snapshot));
+      localStorage.setItem(this.STATE_PRE+this.currentUser.key, JSON.stringify({...state}));
+      this._touchActivity();
     }catch(e){ console.warn('Auth: could not save user state',e); }
   },
 
@@ -25920,6 +26057,7 @@ const AUTH = {
 
   getApiKey(){ return localStorage.getItem(this.APIKEY)||''; },
   setApiKey(k){ localStorage.setItem(this.APIKEY,k.trim()); },
+  isGalixy(){ return this.currentUser && this.currentUser.key==='galixy'; },
 };
 
 // ── Auth modal helpers ────────────────────────────────────────
@@ -25934,16 +26072,16 @@ function closeAuthModal(){
   document.getElementById('authError').textContent='';
 }
 function authToggleMode(){
-  AUTH._authMode = AUTH._authMode==='login'?'register':'login';
+  AUTH._authMode=AUTH._authMode==='login'?'register':'login';
   _applyAuthMode();
   document.getElementById('authError').textContent='';
 }
 function _applyAuthMode(){
   const isReg=AUTH._authMode==='register';
-  document.getElementById('authModalTitle').textContent = isReg?'Register':'Sign In';
-  document.getElementById('authModalSub').textContent   = isReg?'Create your Alas account':'Access your character across sessions';
-  document.getElementById('authSubmitBtn').textContent  = isReg?'Create Account':'Sign In';
-  document.getElementById('authToggle').innerHTML       = isReg?'Already have an account? <span>Sign in</span>':'No account? <span>Register here</span>';
+  document.getElementById('authModalTitle').textContent=isReg?'Register':'Sign In';
+  document.getElementById('authModalSub').textContent=isReg?'Create your Alas account':'Access your character across sessions';
+  document.getElementById('authSubmitBtn').textContent=isReg?'Create Account':'Sign In';
+  document.getElementById('authToggle').innerHTML=isReg?'Already have an account? <span>Sign in</span>':'No account? <span>Register here</span>';
 }
 function authSubmit(){
   const username=document.getElementById('authUsername').value.trim();
@@ -25951,37 +26089,28 @@ function authSubmit(){
   const errEl=document.getElementById('authError');
   errEl.textContent='';
   if(!username||!password){ errEl.textContent='Please enter username and password.'; return; }
-  const result = AUTH._authMode==='register'
-    ? AUTH.register(username,password)
-    : AUTH.login(username,password);
+  const result=AUTH._authMode==='register'?AUTH.register(username,password):AUTH.login(username,password);
   if(!result.ok){ errEl.textContent=result.msg; return; }
-  // Success — load user state and enter app
   closeAuthModal();
+  launchFireworks();
   _authLoginSuccess();
 }
+
 function _authLoginSuccess(){
   const user=AUTH.currentUser;
   if(!user) return;
-  // Update title screen badge
+  // Title screen badge
   const badge=document.getElementById('tsUserBadge');
-  if(badge){
-    badge.textContent='◈ Signed in as '+user.name;
-    badge.style.display='block';
-  }
+  if(badge){ badge.textContent='◈ Signed in as '+user.name; badge.style.display='block'; }
   const loginBtn=document.getElementById('tsLoginBtn');
-  if(loginBtn){ loginBtn.textContent='◈ Signed In ('+user.name+')'; loginBtn.onclick=authSignOut; }
-  // If we're on the title screen, offer to load character
+  if(loginBtn){ loginBtn.textContent='◈ '+user.name; loginBtn.onclick=authSignOut; }
+  // Check if title screen still showing
   const ts=document.getElementById('alasTitleScreen');
   if(ts){
     const saved=AUTH.loadUserState();
     if(saved && saved.name){
       if(confirm('Welcome back, '+user.name+'! Load your saved character "'+saved.name+'"?')){
-        titleScreenDismiss(()=>{
-          _loadStateObject(saved);
-          _afterTitleScreenDismiss();
-          _postLoginSetup();
-          showToast('Welcome back, '+user.name+'!');
-        });
+        titleScreenDismiss(()=>{ _loadStateObject(saved); _afterTitleScreenDismiss(); _postLoginSetup(); showToast('Welcome back, '+user.name+'!'); });
         return;
       }
     }
@@ -25990,32 +26119,55 @@ function _authLoginSuccess(){
     _postLoginSetup();
   }
 }
+
 function authSignOut(){
   if(!confirm('Sign out? Your character progress has been saved.')) return;
   AUTH.saveUserState();
   AUTH.logout();
   _agentPanelHide();
+  // Hide Keeper-only elements
+  document.querySelectorAll('.galixy-only').forEach(el=>el.style.display='none');
+  // Sidebar strip
+  const strip=document.getElementById('sbUserStrip');
+  if(strip) strip.style.display='none';
+  // Title screen button
   const loginBtn=document.getElementById('tsLoginBtn');
   if(loginBtn){ loginBtn.textContent='◈ Sign In / Register'; loginBtn.onclick=openAuthModal; }
   const badge=document.getElementById('tsUserBadge');
   if(badge) badge.style.display='none';
   showToast('Signed out.');
 }
+
 function _postLoginSetup(){
-  // Show Agent Alas button
-  const fab=document.getElementById('agentAlasBtn');
-  if(fab) fab.classList.add('visible');
-  // Update agent panel user label
-  const lbl=document.getElementById('apUserLabel');
-  if(lbl && AUTH.currentUser) lbl.textContent='◈ '+AUTH.currentUser.name;
-  // Auto-save state on interval while logged in
-  if(AUTH.currentUser && !AUTH._autoSaveInterval){
-    AUTH._autoSaveInterval=setInterval(()=>{ if(AUTH.currentUser) AUTH.saveUserState(); }, 30000);
+  const user=AUTH.currentUser;
+  if(!user) return;
+  // Sidebar user strip
+  const strip=document.getElementById('sbUserStrip');
+  const nameEl=document.getElementById('sbUserName');
+  if(strip){ strip.style.display='flex'; }
+  if(nameEl){ nameEl.textContent='◈ '+user.name; }
+  // Keeper-only elements — only show to Galixy
+  if(AUTH.isGalixy()){
+    document.querySelectorAll('.galixy-only').forEach(el=>{ el.style.display=''; });
+    // Agent Alas FAB — Galixy only
+    const fab=document.getElementById('agentAlasBtn');
+    if(fab) fab.classList.add('visible');
+  } else {
+    document.querySelectorAll('.galixy-only').forEach(el=>{ el.style.display='none'; });
+    const fab=document.getElementById('agentAlasBtn');
+    if(fab) fab.classList.remove('visible');
   }
-  // Patch saveAll to also save to user account
-  const _origSaveAll=window.saveAll;
-  if(_origSaveAll && !window._authSavePatched){
-    window.saveAll=function(){ _origSaveAll(); if(AUTH.currentUser) AUTH.saveUserState(); };
+  // Agent panel user label
+  const lbl=document.getElementById('apUserLabel');
+  if(lbl) lbl.textContent='◈ '+user.name;
+  // Auto-save every 30s + touch activity
+  if(!AUTH._autoSaveInterval){
+    AUTH._autoSaveInterval=setInterval(()=>{ if(AUTH.currentUser){ AUTH.saveUserState(); AUTH._touchActivity(); } },30000);
+  }
+  // Patch saveAll to also persist to user account
+  if(window.saveAll && !window._authSavePatched){
+    const _orig=window.saveAll;
+    window.saveAll=function(){ _orig(); if(AUTH.currentUser) AUTH.saveUserState(); };
     window._authSavePatched=true;
   }
 }
@@ -26244,25 +26396,23 @@ function _escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
 // ── Init — restore session on page load ───────────────────────
 (function(){
   AUTH.restoreSession();
+  // Always hide Keeper-only elements by default (CSS .galixy-only sets display:none)
+  // They get shown by _postLoginSetup() only for Galixy
   if(AUTH.currentUser){
-    // Already logged in this session — show agent button after title screen dismiss
+    // Wrap _afterTitleScreenDismiss to run _postLoginSetup after sheet loads
     const origAfter=window._afterTitleScreenDismiss;
-    window._afterTitleScreenDismissOrig=origAfter;
     window._afterTitleScreenDismiss=function(){
       if(origAfter) origAfter();
       _postLoginSetup();
     };
-    // Update title screen button
-    const tryPatch=()=>{
-      const loginBtn=document.getElementById('tsLoginBtn');
-      if(loginBtn && AUTH.currentUser){
-        loginBtn.textContent='◈ Signed In ('+AUTH.currentUser.name+')';
-        loginBtn.onclick=authSignOut;
-        const badge=document.getElementById('tsUserBadge');
-        if(badge){ badge.textContent='◈ Signed in as '+AUTH.currentUser.name; badge.style.display='block'; }
-      }
+    // Patch title screen login button
+    const patch=()=>{
+      const btn=document.getElementById('tsLoginBtn');
+      if(btn){ btn.textContent='◈ '+AUTH.currentUser.name; btn.onclick=authSignOut; }
+      const badge=document.getElementById('tsUserBadge');
+      if(badge){ badge.textContent='◈ Signed in as '+AUTH.currentUser.name; badge.style.display='block'; }
     };
-    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',tryPatch); else tryPatch();
+    if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',patch); else patch();
   }
 })();
 </script>
