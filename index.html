@@ -8152,7 +8152,7 @@
 
         /* ── Auth modal overlay ── */
         #authOverlay {
-            display: none; position: fixed; inset: 0; z-index: 1400;
+            display: none; position: fixed; inset: 0; z-index: 999999;
             background: rgba(0,0,8,.85); backdrop-filter: blur(6px);
             align-items: center; justify-content: center;
         }
@@ -26654,7 +26654,7 @@ function _postLoginSetup(){
   }
   // Keeper-only elements — only show to Galixy
   if(AUTH.isGalixy()){
-    document.querySelectorAll('.galixy-only').forEach(el=>{ el.style.display=''; });
+    document.querySelectorAll('.galixy-only').forEach(el=>{ el.style.display='block'; });
     // Agent Alas FAB — Galixy only
     const fab=document.getElementById('agentAlasBtn');
     if(fab) fab.classList.add('visible');
