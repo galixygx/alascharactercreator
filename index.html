@@ -25998,8 +25998,20 @@ const AUTH = {
   },
 
   _success(key, displayName){
-    this.currentUser={key,name:displayName};
-    sessionStorage.setItem(this.SESS_KEY,JSON.stringify(this.currentUser));
+    const sessionData={key,name:displayName};
+    // Galixy: bind this session to the current device.
+    // A device token is generated once per browser and stored in localStorage.
+    // On restore, the stored token must match — no other browser can auto-restore.
+    if(key==='galixy'){
+      let tok=localStorage.getItem('alas_gx_tok');
+      if(!tok){
+        tok=_alasHash(navigator.userAgent+Math.random()+Date.now());
+        localStorage.setItem('alas_gx_tok',tok);
+      }
+      sessionData.deviceToken=tok;
+    }
+    this.currentUser=sessionData;
+    sessionStorage.setItem(this.SESS_KEY,JSON.stringify(sessionData));
     return{ok:true};
   },
 
@@ -26013,7 +26025,20 @@ const AUTH = {
   restoreSession(){
     try{
       const s=sessionStorage.getItem(this.SESS_KEY);
-      if(s){ this.currentUser=JSON.parse(s); this._touchActivity(); }
+      if(!s) return;
+      const data=JSON.parse(s);
+      // Galixy: verify device token before restoring.
+      // If token is absent or doesn't match this browser's stored token,
+      // the session is silently rejected — manual login required.
+      if(data.key==='galixy'){
+        const storedTok=localStorage.getItem('alas_gx_tok');
+        if(!storedTok || storedTok!==data.deviceToken){
+          sessionStorage.removeItem(this.SESS_KEY); // wipe the invalid session
+          return;
+        }
+      }
+      this.currentUser=data;
+      this._touchActivity();
     }catch{}
   },
 
