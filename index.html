@@ -13147,15 +13147,18 @@ function castSigilByRC(rc, ip, name, aff, card){
     openSmartRoll({type:'sigil', sigilName:name, sigilAff:aff, sigilEffect:effect});
   }, 80);
 
-  // Casting Scale pop-up — show if any scar tier is active
-  const _ins = state.instability||0;
-  const _cor = state.corruption||0;
-  let _castTier = 0;
-  if(_cor >= 5) _castTier = 4;
-  else if(_cor >= 1) _castTier = 3;
-  else if(_ins >= 4) _castTier = 2;
-  else if(_ins >= 1) _castTier = 1;
-  if(_castTier > 0) setTimeout(()=>openCastingScaleModal(_castTier), 400);
+  // Casting Scale pop-up — ONLY when RC exceeds available Resonance (overflow)
+  // If the player had enough RP to cover the cost, no scale appears.
+  if(overflowTriggered){
+    const _ins = state.instability||0;
+    const _cor = state.corruption||0;
+    let _castTier = 0;
+    if(_cor >= 5) _castTier = 4;
+    else if(_cor >= 1) _castTier = 3;
+    else if(_ins >= 4) _castTier = 2;
+    else if(_ins >= 1) _castTier = 1;
+    if(_castTier > 0) setTimeout(()=>openCastingScaleModal(_castTier), 400);
+  }
 }
 
 // ─── Element ↔ Damage type maps ───────────────────────────
