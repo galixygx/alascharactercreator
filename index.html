@@ -9720,7 +9720,8 @@
                     <div class="shop-modal-sub" id="shopModalSub"></div>
                 </div>
                 <div style="display:flex;align-items:center;gap:8px;">
-                    <button class="shop-lore-btn" id="shopLoreBtn" onclick="toggleShopLorePanel()">📖 About This Shop</button>
+                    <button class="shop-lore-btn" id="shopLoreBtn" onclick="toggleShopLorePanel()">📖 About</button>
+                    <button class="shop-lore-btn" id="shopModeToggle" onclick="toggleShopSellMode()" style="background:rgba(124,212,106,.1);border-color:rgba(124,212,106,.3);color:rgba(124,212,106,.85);">🪙 Sell Items</button>
                     <button class="shop-modal-close" onclick="closeShopWindow()">✕</button>
                 </div>
             </div>
@@ -11113,6 +11114,51 @@ const PLACES_DATA = {
   },
 };
 
+
+// ═══════════════════════════════════════════════════
+// SHOP CATEGORY PRICING
+// Per-location multipliers by item category.
+// Categories: gem | weapon | armor | book | healing | general
+// Falls back to loc.priceMultiplier when location not listed.
+// ═══════════════════════════════════════════════════
+const SHOP_CATEGORY_PRICING = {
+  'Aloria (Tech-Metropolis)': {
+    gem:1.0, weapon:1.0, armor:1.0, book:1.0, healing:1.0, general:1.0,
+    note:'Market baseline — all categories at standard price.',
+  },
+  'Roken Guldorad (Ember Forge)': {
+    gem:0.85, weapon:0.8, armor:0.8, book:1.1, healing:1.1, general:1.1,
+    note:'Forge goods (weapons/armor/gems) −20%. Non-forge imports +10%.',
+  },
+  'Roax (Clock-Tower City)': {
+    gem:1.2, weapon:0.9, armor:0.9, book:1.2, healing:0.9, general:0.9,
+    note:'Books & scholarly goods +20%. Standard goods −10%.',
+  },
+  'Eldoria (Port City)': {
+    gem:1.15, weapon:1.0, armor:1.0, book:1.0, healing:1.0, general:1.0,
+    note:'Draconic materials & quality gems +15%. Sea goods at standard.',
+  },
+  'Lyx (Village)': {
+    gem:1.0, weapon:1.0, armor:1.0, book:1.2, healing:0.8, general:0.8,
+    note:'Basic provisions −20%. Books & specialty goods scarce, +20%.',
+  },
+  'Skyhaven Mountain': {
+    gem:1.25, weapon:1.3, armor:1.3, book:1.3, healing:1.3, general:1.3,
+    note:'Celestial/sky goods at premium. Ground-world imports +30%.',
+  },
+  'Paw Islands (Felicity Isle)': {
+    gem:1.0, weapon:1.25, armor:1.25, book:1.25, healing:1.0, general:1.25,
+    note:'Local crafts & healing at fair price. Imports +25%.',
+  },
+  'Silkwood Forest': {
+    gem:1.0, weapon:1.0, armor:1.0, book:1.0, healing:0.9, general:1.0,
+    note:'No conventional economy. Gifted or salvaged goods only.',
+  },
+  'Eldoria (The Trade Port)': {
+    gem:1.15, weapon:1.0, armor:1.0, book:1.0, healing:1.0, general:1.0,
+    note:'Specialty gems & sea artifacts +15%. Maritime goods at standard.',
+  },
+};
 
 // ═══════════════════════════════════════════════════
 // SHOP RARE ITEM POOLS
@@ -15400,7 +15446,8 @@ function openShopWindow(locationId, districtIdx, shopIdx){
   delete state.shopRotationPick[shop.id];
 
   document.getElementById('shopModalTitle').textContent = shop.name;
-  document.getElementById('shopModalSub').textContent = `${shop.keeper.name} (${shop.keeper.race}) · ${loc.type.split('—')[0].trim()} · Price modifier: ×${loc.priceMultiplier.toFixed(1)}`;
+  const catNote = (SHOP_CATEGORY_PRICING[locationId]||{}).note || `Price modifier: ×${loc.priceMultiplier.toFixed(1)}`;
+  document.getElementById('shopModalSub').textContent = `${shop.keeper.name} (${shop.keeper.race}) · ${loc.type.split('—')[0].trim()} · ${catNote}`;
 
   renderShopBody(locationId, districtIdx, shopIdx);
   document.getElementById('shopOverlay').classList.add('open');
@@ -15408,7 +15455,7 @@ function openShopWindow(locationId, districtIdx, shopIdx){
 
 function shopRowHtml(item, locationId, districtIdx, shopIdx, rowIdx, gp, loc, shop){
   const isCust = !!item.custom;
-  const finalPrice = isCust ? item.price : Math.round(item.price * loc.priceMultiplier);
+  const finalPrice = isCust ? item.price : getShopItemPrice(item, loc, locationId);
   const st = stockRemaining(shop.id, item);
   const oos = st === 0;
   const canBuy = gp >= finalPrice && !oos;
@@ -15516,6 +15563,10 @@ function closeShopWindow(){
   document.getElementById('shopOverlay').classList.remove('open');
   const lorePanel = document.getElementById('shopLorePanel');
   if(lorePanel) lorePanel.style.display = 'none';
+  // Reset sell mode
+  _shopSellMode = false;
+  const modeBtn = document.getElementById('shopModeToggle');
+  if(modeBtn){ modeBtn.textContent='🪙 Sell Items'; modeBtn.style.background='rgba(124,212,106,.1)'; modeBtn.style.borderColor='rgba(124,212,106,.3)'; modeBtn.style.color='rgba(124,212,106,.85)'; }
   if(currentShop){
     const sh = PLACES_DATA[currentShop.locationId]?.districts?.[currentShop.districtIdx]?.shops?.[currentShop.shopIdx];
     if(sh) delete state.shopRotationPick[sh.id];
@@ -15689,12 +15740,33 @@ function mapPurchaseInvType(item){
   return t;
 }
 
+// ── Shop Category Pricing Helpers ────────────────────────────────────────────
+function getItemCategory(item){
+  const t = (item.invType || item.type || 'gear').toLowerCase();
+  const n = (item.name || '').toLowerCase();
+  if(t === 'gem' || t === 'material' || t === 'jewelry') return 'gem';
+  if(t === 'weapon') return 'weapon';
+  if(t === 'armor' || t === 'shield') return 'armor';
+  if(/manual|primer|tome|codex|journal|scroll|map|chart|atlas|registry|analysis|compendium|brief|document|report|intelligence/.test(n)) return 'book';
+  if(/potion|healing|salve|antidote|tonic|medicine|bandage|kit|ration|provisions|pack/.test(n)) return 'healing';
+  return 'general';
+}
+
+function getShopItemPrice(item, loc, locationId){
+  if(item.custom) return item.price;
+  const catPricing = SHOP_CATEGORY_PRICING[locationId];
+  if(!catPricing) return Math.round(item.price * (loc.priceMultiplier || 1.0));
+  const cat = getItemCategory(item);
+  const mult = (catPricing[cat] !== undefined) ? catPricing[cat] : (catPricing.general || loc.priceMultiplier || 1.0);
+  return Math.round(item.price * mult);
+}
+
 function buyShopItem(rowIdx){
   if(!currentShop || !_shopDisplayRows[rowIdx]) return;
   const {item, shop} = _shopDisplayRows[rowIdx];
   const loc = PLACES_DATA[currentShop.locationId];
   const isCust = !!item.custom;
-  const finalPrice = isCust ? item.price : Math.round(item.price * loc.priceMultiplier);
+  const finalPrice = isCust ? item.price : getShopItemPrice(item, loc, currentShop.locationId);
   const st = stockRemaining(shop.id, item);
   if(st === 0){ showToast('Out of stock'); return; }
 
@@ -15722,13 +15794,119 @@ function buyShopItem(rowIdx){
     slot: slot,
     set: '',
     equipped: false,
-    notes: `${item.stats||''}\n\nPurchased at ${shop.name} (${currentShop.locationId}) for ${finalPrice} GP.`
+    sellValue: Math.floor(finalPrice * 0.5),
+    notes: `${item.stats||''}\n\nPurchased at ${shop.name} (${currentShop.locationId}) for ${finalPrice} GP. Sell value: ${Math.floor(finalPrice*0.5)} GP.`
   };
   addInventory(invItem);
   saveCards('inventoryList','inventory');
   _debouncedSave();
   showToast(`Purchased: ${item.name} — ${finalPrice} GP`);
   renderShopBody(currentShop.locationId, currentShop.districtIdx, currentShop.shopIdx);
+}
+
+// ── Shop Sell Mode ────────────────────────────────────────────────────────────
+let _shopSellMode = false;
+
+function toggleShopSellMode(){
+  _shopSellMode = !_shopSellMode;
+  const btn = document.getElementById('shopModeToggle');
+  if(btn){
+    btn.textContent = _shopSellMode ? '🛒 Buy Items' : '🪙 Sell Items';
+    btn.style.background = _shopSellMode ? 'rgba(201,162,39,.1)' : 'rgba(124,212,106,.1)';
+    btn.style.borderColor = _shopSellMode ? 'rgba(201,162,39,.35)' : 'rgba(124,212,106,.3)';
+    btn.style.color = _shopSellMode ? 'var(--gold)' : 'rgba(124,212,106,.85)';
+  }
+  if(_shopSellMode){
+    renderSellPanel();
+  } else if(currentShop){
+    renderShopBody(currentShop.locationId, currentShop.districtIdx, currentShop.shopIdx);
+  }
+}
+
+function renderSellPanel(){
+  const body = document.getElementById('shopModalBody');
+  if(!body) return;
+  const inv = Array.isArray(state.inventory) ? state.inventory : [];
+
+  let html = `<div class="shop-currency-bar" style="margin-bottom:10px;">`;
+  html += `💰 GP: <span class="shop-currency-val">${state.goldGP||0}</span>`;
+  html += `</div>`;
+
+  html += `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:rgba(124,212,106,.7);padding:0 16px 8px;">🪙 SELL FROM INVENTORY</div>`;
+  html += `<div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);padding:0 16px 12px;">Sell price is 50% of market value. Equipped items cannot be sold.</div>`;
+
+  if(!inv.length){
+    html += `<div style="padding:24px 16px;color:var(--txt-dim);font-family:'EB Garamond',serif;font-size:13px;">Your inventory is empty.</div>`;
+    body.innerHTML = html;
+    return;
+  }
+
+  html += `<div class="shop-item-grid">`;
+  inv.forEach(function(invItem, idx){
+    if(!invItem || !invItem.name) return;
+    // Determine sell value
+    let sellVal = invItem.sellValue || invItem.value || 0;
+    if(!sellVal && invItem.notes){
+      // Try to parse from notes: "for X GP"
+      const m = invItem.notes.match(/for (\d+) GP/i);
+      if(m) sellVal = Math.floor(parseInt(m[1]) * 0.5);
+    }
+    if(!sellVal && invItem.type === 'gem' && invItem.value) sellVal = Math.floor(invItem.value * 0.5);
+    const isEquipped = !!(invItem.equipped);
+    const canSell = !isEquipped && sellVal >= 0;
+
+    html += `<div class="shop-item-card">`;
+    html += `<div class="shop-item-info">`;
+    html += `<div class="shop-item-meta">`;
+    html += `<span class="rarity-pill rarity-Common">${invItem.type||'item'}</span>`;
+    if(isEquipped) html += `<span style="font-family:'Cinzel',serif;font-size:7px;color:var(--gold);padding:1px 5px;border:1px solid rgba(201,162,39,.35);border-radius:3px;margin-left:4px;">EQUIPPED</span>`;
+    html += `</div>`;
+    html += `<div class="shop-item-name">${invItem.name}${(invItem.qty&&invItem.qty>1)?' ×'+invItem.qty:''}</div>`;
+    if(invItem.notes){
+      const shortNote = invItem.notes.split('\n')[0];
+      if(shortNote) html += `<div class="shop-item-stats" style="margin-top:4px;">${shortNote}</div>`;
+    }
+    html += `</div>`;
+    html += `<div class="shop-item-right">`;
+    html += `<div><div class="shop-price-lbl">Sell For</div><div class="shop-price" style="color:rgba(124,212,106,.9);">${sellVal} GP</div></div>`;
+    if(canSell){
+      html += `<button class="shop-buy-btn" style="background:rgba(124,212,106,.12);border-color:rgba(124,212,106,.4);color:rgba(124,212,106,.9);" onclick="sellInventoryItem(${idx})">Sell</button>`;
+    } else {
+      html += `<button class="shop-buy-btn" disabled>${isEquipped?'Equipped':'No Value'}</button>`;
+    }
+    html += `</div></div>`;
+  });
+  html += `</div>`;
+  body.innerHTML = html;
+}
+
+function sellInventoryItem(idx){
+  const inv = state.inventory;
+  if(!Array.isArray(inv) || !inv[idx]) return;
+  const item = inv[idx];
+  if(item.equipped){ showToast('Unequip this item before selling.'); return; }
+
+  let sellVal = item.sellValue || item.value || 0;
+  if(!sellVal && item.notes){
+    const m = item.notes.match(/for (\d+) GP/i);
+    if(m) sellVal = Math.floor(parseInt(m[1]) * 0.5);
+  }
+  if(!sellVal && item.type === 'gem' && item.value) sellVal = Math.floor(item.value * 0.5);
+
+  if(!confirm(`Sell "${item.name}" for ${sellVal} GP?`)) return;
+
+  state.inventory.splice(idx, 1);
+  state.goldGP = (state.goldGP||0) + sellVal;
+
+  // Sync gold display
+  const gpEl = document.getElementById('goldGP');
+  if(gpEl) gpEl.value = state.goldGP;
+
+  // Re-render inventory DOM
+  saveCards('inventoryList','inventory');
+  _debouncedSave();
+  showToast(`Sold "${item.name}" for ${sellVal} GP.`);
+  renderSellPanel();
 }
 
 function addKeeperShopItem(locationId, districtIdx, shopIdx){
@@ -24462,6 +24640,27 @@ const GEMS_DATA = [
    combineNotes:'Compatible with all Fire gems as an inert catalyst.'},
 ];
 
+// ── GEM TIER BASE PRICE MULTIPLIERS ──────────────────────────────────────────
+// Applied once at load time. These multipliers set the new BASE PRICE for each tier.
+// Sigil ×1250 | Dragon ×120 | Legendary ×100 | Mythic ×80
+// Ultra-Rare ×6 | Rare ×4 | Uncommon ×2 | Common ×1 (unchanged)
+const GEM_TIER_MULTIPLIERS = {
+  sigil:     1250,
+  dragon:    120,
+  legendary: 100,
+  mythic:    80,
+  ultrarare: 6,
+  rare:      4,
+  uncommon:  2,
+  common:    1,
+};
+(function _applyGemTierMultipliers(){
+  GEMS_DATA.forEach(function(g){
+    const m = GEM_TIER_MULTIPLIERS[g.tier] || 1;
+    g.price = Math.round(g.price * m);
+  });
+})();
+
 // Gem combination results
 const GEM_COMBINE_TABLE = {
   'amethyst+obsidian': {result:'Void Schism',compat:false,severity:'major',desc:'Light and Chaos affinities are fundamentally opposed. Combining forces a resonance inversion — the gems neutralize each other and release the stored energy as a burst of raw Instability. Bearer gains 1d6 Instability immediately. Both gems are reduced to Clear Quartz.',forceResult:'Shattered Chaos-Light Shard — useless as a gem, but can be used as a one-time RC cost reducer (-3) for any Sigil before crumbling.'},
@@ -24527,6 +24726,7 @@ function buildGemTab(){
       card.innerHTML = `
         <div class="gem-card-name" style="color:${gem.color}">${gem.name}</div>
         <div class="gem-card-tier">${gem.tierLabel}${gem.sigilAff && gem.sigilAff!=='All'?' · '+gem.sigilAff+' Sigil':''}</div>
+        <div style="font-family:'Cinzel',serif;font-size:8px;color:${gem.color};opacity:.75;letter-spacing:.5px;margin-top:1px;">Base Price: ${(gem.price||0).toLocaleString()} GP</div>
         <div class="gem-card-hint">${gem.lore.substring(0,80)}…</div>
         <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap;">
           <button class="gem-card-add" onclick="event.stopPropagation();addGemToInventory('${gem.id}')">+ Add to Inventory</button>
@@ -24583,14 +24783,15 @@ function addGemToInventory(gemId){
   if(!gem) return;
   ensureStateDefaults();
   const item = {
-    name:    gem.name,
-    qty:     1,
-    weight:  0.1,
-    value:   gem.price||0,
-    rarity:  gem.tierLabel,
-    type:    'gem',
-    notes:   `${gem.tierLabel} · ${gem.sigilAff!=='All'?gem.sigilAff+' Sigil · ':''}${gem.powers[0]||''}`,
-    slot:    '',
+    name:      gem.name,
+    qty:       1,
+    weight:    0.1,
+    value:     gem.price||0,
+    sellValue: Math.floor((gem.price||0) * 0.5),
+    rarity:    gem.tierLabel,
+    type:      'gem',
+    notes:     `${gem.tierLabel} · ${gem.sigilAff!=='All'?gem.sigilAff+' Sigil · ':''}${gem.powers[0]||''}\n\nBase Price: ${(gem.price||0).toLocaleString()} GP. Sell value: ${Math.floor((gem.price||0)*0.5).toLocaleString()} GP.`,
+    slot:      '',
     dailySpent: false,
   };
   if(!Array.isArray(state.inventory)) state.inventory=[];
