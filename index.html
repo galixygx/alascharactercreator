@@ -9198,7 +9198,7 @@
                 <div class="tab-panel" id="tab-abilities">
                     <div class="sec-hdr">Combat Abilities &amp; Techniques</div>
                     <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:14px;">
-                        Martial techniques, resonance arts, class maneuvers, and trained combat forms. Abilities may use Stamina, Focus, RC, or other resources. Set an RC Cost to enable the Cast button (spends from your Resonance Pool). Passive abilities are always active and cannot be cast. Use the Tactical Builder to design balanced abilities following the Four-Pillar system.
+                        Martial techniques, resonance arts, class maneuvers, and trained combat forms. Build your ability below, then press <em>Complete</em> to lock it into your Ability List. Cast from the Ability List during play. Passive abilities are always active and cannot be cast.
                     </div>
                     <div class="card-list" id="abilitiesList"></div>
                     <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
@@ -9206,6 +9206,18 @@
                       <span id="abilityLimitDisplay" style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1px;color:var(--txt-dim);"></span>
                     </div>
                     <div id="abilityKeeperNotice" style="display:none;font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--ins);margin-top:6px;padding:6px 10px;background:rgba(232,160,32,0.08);border:1px solid rgba(232,160,32,0.25);border-radius:4px;">⚠ Ability limit reached (3 per level). Additional abilities require Keeper approval.</div>
+
+                    <!-- ─── ABILITY LIST (completed/locked abilities) ─── -->
+                    <div class="sec-hdr" style="margin-top:28px;" id="abilityListHdr">Ability List</div>
+                    <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:14px;">
+                        Completed abilities locked in from your builder above. Press <em>Complete</em> on any ability card to add it here as a permanent reference. Cast directly from this list during play.
+                    </div>
+                    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+                        <button onclick="sortAbilityList('name')"   id="alSortName"   class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;">Name</button>
+                        <button onclick="sortAbilityList('action')" id="alSortAction" class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;">Action Type</button>
+                    </div>
+                    <div id="abilityListGrid" style="display:flex;flex-direction:column;gap:8px;"></div>
+                    <div id="abilityListEmpty" style="font-family:'EB Garamond',serif;font-size:13px;color:var(--txt-dim);font-style:italic;padding:10px 0;">No completed abilities yet — press <strong style="color:var(--gold-d)">Complete</strong> on an ability card above to add it to your list.</div>
                 </div>
 
                 <!-- ─── INVENTORY ─── -->
@@ -11995,6 +12007,7 @@ let state = {
   customShapes: {wildshape:[], beastshape:[]},
   savedContext: [],
   completedSpells: [],
+  completedAbilities: [],
 };
 
 function saveAll(){
@@ -12078,6 +12091,7 @@ function ensureStateDefaults(){
   if(!state.shopCustomItems || typeof state.shopCustomItems !== 'object') state.shopCustomItems = {};
   if(!state.knownClassSigils || typeof state.knownClassSigils !== 'object') state.knownClassSigils = {};
   if(!Array.isArray(state.completedSpells)) state.completedSpells = [];
+  if(!Array.isArray(state.completedAbilities)) state.completedAbilities = [];
   (state.sigils||[]).forEach(s=>{ if(s.dailySpent===undefined) s.dailySpent=false; });
   if(state.acMod===undefined) state.acMod=0;
   if(state.initMod===undefined) state.initMod=0;
@@ -13834,7 +13848,9 @@ function addSpellChecked(){
 function addAbilityChecked(){
   const limit = getSpellAbilityLimit();
   const current = document.querySelectorAll('#abilitiesList .item-card').length;
-  if(current >= limit){
+  const completed = (state.completedAbilities||[]).length;
+  const total = current + completed;
+  if(total >= limit){
     const notice = document.getElementById('abilityKeeperNotice');
     if(notice){ notice.style.display='block'; setTimeout(()=>notice.style.display='none', 4000); }
     if(confirm(`You have reached your ability limit (${limit} for Level ${parseInt((document.getElementById('charLevel')||{}).value)||1}). Add anyway with Keeper approval?`)){
@@ -13859,9 +13875,11 @@ function updateSpellLimitDisplay(){
 function updateAbilityLimitDisplay(){
   const limit = getSpellAbilityLimit();
   const current = document.querySelectorAll('#abilitiesList .item-card').length;
+  const completed = (state.completedAbilities||[]).length;
+  const total = current + completed;
   const el = document.getElementById('abilityLimitDisplay');
-  if(el) el.textContent = `${current}/${limit} abilities`;
-  if(el) el.style.color = current >= limit ? 'var(--ins)' : 'var(--txt-dim)';
+  if(el) el.textContent = `${total}/${limit} abilities`;
+  if(el) el.style.color = total >= limit ? 'var(--ins)' : 'var(--txt-dim)';
 }
 
 // ═══════════════════════════════════════════════════
@@ -13996,7 +14014,7 @@ function addAbility(data){
       </select></div>
     </div>
 
-    <!-- RC Cost & Cast (hidden for Passive) -->
+    <!-- RC Cost & Instability -->
     <div class="ab-cast-section" style="margin-bottom:8px;">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">
         <div class="c-fld"><span class="c-fld-lbl">RC Cost <small style="opacity:.6;font-size:7px">(Resonance Pool)</small></span>
@@ -14005,10 +14023,6 @@ function addAbility(data){
         <div class="c-fld"><span class="c-fld-lbl">Instability+</span>
           <input class="c-inp ab-ip-inp" type="number" value="${data.ip||0}" min="0" oninput="saveCards('abilitiesList','abilities')">
         </div>
-      </div>
-      <div class="ab-cast-row sig-cast-row" style="${(data.actionType||'Action')==='Passive'?'display:none;':''}">
-        <span class="sig-cast-rc-lbl">Cast — spends RC from Resonance Pool</span>
-        <button type="button" class="sig-cast-btn" onclick="castAbility(this)">⟳ Cast</button>
       </div>
       <div class="ab-passive-badge" style="display:${(data.actionType||'Action')==='Passive'?'flex':'none'};align-items:center;gap:8px;padding:5px 10px;background:rgba(201,162,39,.06);border:1px solid rgba(201,162,39,.2);border-radius:4px;">
         <span style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;color:var(--gold-d);">⬤ PASSIVE — Always Active</span>
@@ -14115,6 +14129,12 @@ function addAbility(data){
 
     <!-- Notes -->
     <div class="c-fld" style="margin-top:8px;"><span class="c-fld-lbl">Notes / Flavor</span><textarea class="c-ta" style="min-height:44px" placeholder="Narrative flavor, visual description, class source…" oninput="saveCards('abilitiesList','abilities')">${data.notes||''}</textarea></div>
+
+    <!-- Complete -->
+    <div class="sig-rc-daily sig-daily-wrap" style="margin-top:10px;">
+      <span class="sig-usage-lbl" style="font-family:'Cinzel',serif;font-size:7px;color:var(--txt-dim);text-transform:uppercase;">Lock ability into your Ability List</span>
+      <button type="button" class="sig-avail-btn" style="background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.45);color:var(--gold-d);" onclick="completeAbility(this.closest('.item-card'))">✓ Complete</button>
+    </div>
   `;
   list.appendChild(card);
   saveCards('abilitiesList','abilities');
@@ -14139,11 +14159,141 @@ function abUpdateCastRow(card){
   if(!card) return;
   const sel = card.querySelector('.c-sel');
   const actionType = sel ? sel.value : 'Action';
-  const castRow    = card.querySelector('.ab-cast-row');
   const passiveBadge = card.querySelector('.ab-passive-badge');
   const isPassive  = actionType === 'Passive';
-  if(castRow)      castRow.style.display      = isPassive ? 'none' : '';
   if(passiveBadge) passiveBadge.style.display = isPassive ? 'flex' : 'none';
+}
+
+// ═══════════════════════════════════════════════════
+// ABILITY LIST SYSTEM
+// ═══════════════════════════════════════════════════
+
+let _alSortKey = 'name';
+
+function completeAbility(card){
+  if(!card) return;
+  saveCards('abilitiesList','abilities');
+
+  const inps  = card.querySelectorAll('.c-inp');
+  const sels  = card.querySelectorAll('.c-sel');
+  const tas   = card.querySelectorAll('.c-ta');
+  const name  = (inps[0]||{}).value || 'Unnamed Ability';
+
+  if(!Array.isArray(state.completedAbilities)) state.completedAbilities = [];
+  if(state.completedAbilities.some(function(a){ return a.name === name; })){
+    showToast('"' + name + '" is already in your Ability List.'); return;
+  }
+
+  const entry = {
+    id:         Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    name:       name,
+    actionType: (sels[0]||{}).value || 'Action',
+    cost:       (inps[1]||{}).value || '',
+    recharge:   (sels[1]||{}).value || 'Per Turn',
+    range:      (sels[2]||{}).value || 'Self',
+    target:     (sels[3]||{}).value || 'Single Target',
+    duration:   (sels[4]||{}).value || 'Instant',
+    rc:         (card.querySelector('.ab-rc-inp')||{}).value || '0',
+    ip:         (card.querySelector('.ab-ip-inp')||{}).value || '0',
+    archetype:  card.dataset.archetype || '',
+    effect:     (tas[0]||{}).value || '',
+    counterplay:(tas[1]||{}).value || '',
+    notes:      (tas[2]||{}).value || '',
+  };
+
+  state.completedAbilities.push(entry);
+  _debouncedSave();
+  renderAbilityList();
+  showToast('"' + name + '" added to Ability List.');
+  card.remove();
+  saveCards('abilitiesList','abilities');
+  updateAbilityLimitDisplay();
+}
+
+function removeCompletedAbility(id){
+  if(!Array.isArray(state.completedAbilities)) return;
+  const ab = state.completedAbilities.find(function(a){ return a.id === id; });
+  state.completedAbilities = state.completedAbilities.filter(function(a){ return a.id !== id; });
+  _debouncedSave();
+  renderAbilityList();
+  updateAbilityLimitDisplay();
+  if(ab) showToast('"' + ab.name + '" removed from Ability List.');
+}
+
+function sortAbilityList(key){
+  _alSortKey = key;
+  ['name','action'].forEach(function(k){
+    const btn = document.getElementById('alSort' + k.charAt(0).toUpperCase() + k.slice(1));
+    if(btn){ btn.style.borderColor = k === key ? 'rgba(201,162,39,.8)' : ''; btn.style.color = k === key ? 'var(--gold)' : ''; }
+  });
+  renderAbilityList();
+}
+
+function castCompletedAbility(id){
+  const ab = (state.completedAbilities||[]).find(function(a){ return a.id === id; });
+  if(!ab){ showToast('Ability not found.'); return; }
+  castSigilByRC(parseInt(ab.rc)||0, parseInt(ab.ip)||0, ab.name, 'Common', null);
+}
+
+function renderAbilityList(){
+  const grid  = document.getElementById('abilityListGrid');
+  const empty = document.getElementById('abilityListEmpty');
+  const hdr   = document.getElementById('abilityListHdr');
+  if(!grid) return;
+
+  const abilities = Array.isArray(state.completedAbilities) ? state.completedAbilities.slice() : [];
+  if(empty) empty.style.display = abilities.length ? 'none' : '';
+  if(hdr)   hdr.textContent     = abilities.length ? 'Ability List (' + abilities.length + ')' : 'Ability List';
+
+  abilities.sort(function(a, b){
+    if(_alSortKey === 'action') return (a.actionType||'').localeCompare(b.actionType||'');
+    return (a.name||'').localeCompare(b.name||'');
+  });
+
+  const ACTION_COLORS = {
+    'Action':'#c9a227','Bonus Action':'#50b8e0','Reaction':'#e07040',
+    'Free Action':'#7cd46a','Passive':'#a060e0','Special':'#a0a0b8'
+  };
+
+  grid.innerHTML = '';
+  abilities.forEach(function(ab){
+    const col       = ACTION_COLORS[ab.actionType] || '#c9a227';
+    const isPassive = ab.actionType === 'Passive';
+    const rcNum     = parseInt(ab.rc) || 0;
+    const ipNum     = parseInt(ab.ip) || 0;
+
+    const archPills = (ab.archetype||'').split(',').filter(Boolean).map(function(a){
+      return '<span style="display:inline-block;padding:1px 7px;background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);border-radius:3px;font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:.5px;color:var(--gold-d);">' + a + '</span>';
+    }).join('');
+
+    const div = document.createElement('div');
+    div.style.cssText = 'background:rgba(10,10,18,.6);border:1px solid rgba(255,255,255,.08);border-left:3px solid ' + col + ';border-radius:6px;padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;';
+    div.innerHTML =
+      '<div>' +
+        '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap;">' +
+          '<span style="font-family:\'Cinzel Decorative\',serif;font-size:12px;color:' + col + ';">' + _escHtml(ab.name) + '</span>' +
+          '<span style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:1px;color:' + col + ';opacity:.8;padding:1px 6px;border:1px solid rgba(255,255,255,.15);border-radius:3px;">' + _escHtml(ab.actionType) + '</span>' +
+          (ab.recharge ? '<span style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:.5px;color:var(--txt-dim);padding:1px 6px;border:1px solid rgba(255,255,255,.08);border-radius:3px;">' + _escHtml(ab.recharge) + '</span>' : '') +
+          (isPassive ? '<span style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:1px;color:var(--gold-d);padding:1px 6px;border:1px solid rgba(201,162,39,.3);border-radius:3px;">⬤ PASSIVE</span>' : '') +
+        '</div>' +
+        '<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:' + (ab.effect||ab.notes||archPills ? '8px' : '0') + ';">' +
+          (rcNum > 0 ? '<span style="font-family:\'EB Garamond\',serif;font-size:12px;color:var(--txt-dim);">RC <strong style="color:rgba(61,214,219,.8);">' + rcNum + '</strong></span>' : '') +
+          (ipNum > 0 ? '<span style="font-family:\'EB Garamond\',serif;font-size:12px;color:var(--txt-dim);">INS+ <strong style="color:rgba(208,112,48,.8);">' + ipNum + '</strong></span>' : '') +
+          (ab.cost   ? '<span style="font-family:\'EB Garamond\',serif;font-size:12px;color:var(--txt-dim);">' + _escHtml(ab.cost) + '</span>' : '') +
+          (ab.range  ? '<span style="font-family:\'EB Garamond\',serif;font-size:12px;color:var(--txt-dim);">' + _escHtml(ab.range) + '</span>' : '') +
+          (ab.target ? '<span style="font-family:\'EB Garamond\',serif;font-size:12px;color:var(--txt-dim);">' + _escHtml(ab.target) + '</span>' : '') +
+          (ab.duration && ab.duration !== 'Instant' ? '<span style="font-family:\'EB Garamond\',serif;font-size:12px;color:var(--txt-dim);">' + _escHtml(ab.duration) + '</span>' : '') +
+        '</div>' +
+        (archPills ? '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">' + archPills + '</div>' : '') +
+        (ab.effect ? '<div style="font-family:\'EB Garamond\',serif;font-size:12px;color:rgba(208,208,232,.75);line-height:1.5;margin-bottom:' + (ab.notes?'4px':'0') + ';">' + _escHtml(ab.effect) + '</div>' : '') +
+        (ab.notes  ? '<div style="font-family:\'EB Garamond\',serif;font-size:12px;font-style:italic;color:rgba(208,208,232,.5);line-height:1.5;">' + _escHtml(ab.notes) + '</div>' : '') +
+      '</div>' +
+      '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">' +
+        (!isPassive ? '<button type="button" class="sig-cast-btn" onclick="castCompletedAbility(\'' + ab.id + '\')" style="font-size:7.5px;padding:5px 12px;letter-spacing:1.5px;">⟳ Cast</button>' : '') +
+        '<button type="button" onclick="removeCompletedAbility(\'' + ab.id + '\')" title="Remove from Ability List" style="font-family:\'Cinzel\',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(200,32,48,.3);border-radius:4px;color:rgba(200,32,48,.6);cursor:pointer;white-space:nowrap;">✕ Remove</button>' +
+      '</div>';
+    grid.appendChild(div);
+  });
 }
 
 // ═══════════════════════════════════════════════════
@@ -25621,6 +25771,7 @@ function _loadStateObject(loaded){
   renderInitList();
   if(typeof renderSavedContext==='function') renderSavedContext();
   if(typeof renderSpellList==='function') renderSpellList();
+  if(typeof renderAbilityList==='function') renderAbilityList();
   // Restore companion biome display if tab was previously opened
   if(companionsBuilt) _refreshAllCompCards();
   // Restore attuned sigil panel
