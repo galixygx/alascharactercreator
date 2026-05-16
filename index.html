@@ -26467,35 +26467,51 @@ function submitReport(type){
     ].join('\n');
   }
 
+  // Log to Agent ALAS
+  if(typeof AgentAlas !== 'undefined'){
+    AgentAlas.logEvent('player_report_submitted', {
+      reportType: type,
+      charName,
+      user: AUTH.currentUser ? AUTH.currentUser.key : 'anonymous',
+      preview: text.substring(0, 200)
+    });
+  }
+  // Log to user auth log
+  if(AUTH.currentUser && typeof AUTH.appendLog === 'function'){
+    AUTH.appendLog({ type: 'report_submitted', reportType: type, charName });
+  }
+
   document.getElementById('rpt-form-bug').style.display     = 'none';
   document.getElementById('rpt-form-feature').style.display = 'none';
 
   const accentCol = type === 'bug' ? '#c82030' : '#3dd6db';
-  const accentBdr = type === 'bug' ? 'rgba(200,32,48,.35)' : 'rgba(61,214,219,.3)';
-  const label     = type === 'bug' ? 'Bug Report'           : 'Feature Request';
+  const label     = type === 'bug' ? 'Bug Report' : 'Feature Request';
 
-  document.getElementById('rpt-preview').innerHTML = `
-    <div style="padding:20px 22px;background:rgba(10,10,18,.97);border:1px solid ${accentBdr};border-radius:8px;">
-      <div style="font-family:'Cinzel Decorative',serif;font-size:12px;color:${accentCol};margin-bottom:12px;">📋 Your ${label} — Ready to Copy</div>
-      <textarea id="rptCopyText" readonly style="width:100%;box-sizing:border-box;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1);color:rgba(220,220,240,.9);font-family:'Courier New',monospace;font-size:11px;line-height:1.6;padding:12px;border-radius:5px;resize:vertical;min-height:320px;outline:none;">${text}</textarea>
-      <div style="margin-top:14px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-        <button id="rptCopyBtn" onclick="copyReport()" style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;padding:11px 28px;background:${accentCol};border:none;border-radius:6px;color:#fff;cursor:pointer;text-transform:uppercase;">📋 Copy</button>
-        <button onclick="closeReportForm()" style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;padding:9px 18px;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:5px;color:var(--txt-dim);cursor:pointer;">← New Report</button>
-        <span style="font-family:'EB Garamond',serif;font-size:11.5px;color:var(--txt-dim);font-style:italic;flex:1;min-width:200px;"><strong style="color:rgba(201,162,39,.8);">NOTE:</strong> Copy this and send to your Chronicle Sovereign.</span>
-      </div>
-    </div>`;
-  document.getElementById('rpt-preview').style.display = 'block';
+  // Populate and open the modal overlay
+  const overlay = document.getElementById('reportPreviewOverlay');
+  document.getElementById('rptModalAccent').style.color  = accentCol;
+  document.getElementById('rptModalLabel').textContent   = `📋 Your ${label} — Ready to Copy`;
+  document.getElementById('rptModalCopyText').value      = text;
+  document.getElementById('rptModalCopyBtn').style.background = accentCol;
+  if(overlay) overlay.style.display = 'flex';
+}
+
+function closeReportPreview(){
+  const overlay = document.getElementById('reportPreviewOverlay');
+  if(overlay) overlay.style.display = 'none';
 }
 
 function copyReport(){
-  const ta = document.getElementById('rptCopyText');
+  const ta  = document.getElementById('rptModalCopyText');
+  const btn = document.getElementById('rptModalCopyBtn');
   if(!ta) return;
+  const finish = () => {
+    if(btn){ btn.textContent = '✓ Copied!'; setTimeout(()=>{ btn.textContent = '📋 Copy'; }, 2000); }
+    showToast('Report copied!');
+  };
   try {
-    navigator.clipboard.writeText(ta.value).then(()=>{
-      const btn = document.getElementById('rptCopyBtn');
-      if(btn){ btn.textContent = '✓ Copied!'; setTimeout(()=>{ btn.textContent = '📋 Copy'; }, 2000); }
-    }).catch(()=>{ ta.select(); document.execCommand('copy'); showToast('Report copied!'); });
-  } catch(e){ ta.select(); document.execCommand('copy'); showToast('Report copied!'); }
+    navigator.clipboard.writeText(ta.value).then(finish).catch(()=>{ ta.select(); document.execCommand('copy'); finish(); });
+  } catch(e){ ta.select(); document.execCommand('copy'); finish(); }
 }</script>
 
     <!-- ═══════════ SETTINGS MODAL ═══════════ -->
@@ -26972,6 +26988,26 @@ function ucConvert(from, val){
 <!-- ════════════════════════════════════════════════════════════
      ALAS AUTH SYSTEM — Login / Register Modals
 ════════════════════════════════════════════════════════════ -->
+
+<!-- Report Preview Modal -->
+<div id="reportPreviewOverlay" onclick="if(event.target===this)closeReportPreview()" style="display:none;position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,.78);align-items:center;justify-content:center;padding:20px;box-sizing:border-box;">
+  <div style="position:relative;width:100%;max-width:600px;max-height:90vh;background:rgba(10,10,20,.98);border:1px solid rgba(255,255,255,.12);border-radius:10px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.7);">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.08);">
+      <div id="rptModalAccent" style="font-family:'Cinzel Decorative',serif;font-size:12px;letter-spacing:1px;">
+        <span id="rptModalLabel">📋 Report — Ready to Copy</span>
+      </div>
+      <button onclick="closeReportPreview()" style="background:none;border:none;color:rgba(200,200,220,.5);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;">✕</button>
+    </div>
+    <div style="padding:18px 20px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:14px;">
+      <textarea id="rptModalCopyText" readonly style="width:100%;box-sizing:border-box;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.1);color:rgba(220,220,240,.9);font-family:'Courier New',monospace;font-size:11px;line-height:1.65;padding:13px;border-radius:5px;resize:vertical;min-height:300px;outline:none;"></textarea>
+      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+        <button id="rptModalCopyBtn" onclick="copyReport()" style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;padding:11px 28px;border:none;border-radius:6px;color:#fff;cursor:pointer;text-transform:uppercase;">📋 Copy</button>
+        <button onclick="closeReportPreview();closeReportForm();" style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;padding:9px 18px;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:5px;color:var(--txt-dim);cursor:pointer;">← New Report</button>
+        <span style="font-family:'EB Garamond',serif;font-size:11.5px;color:var(--txt-dim);font-style:italic;flex:1;min-width:180px;"><strong style="color:rgba(201,162,39,.8);">NOTE:</strong> Copy this and send to your Chronicle Sovereign.</span>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Auth modal -->
 <div id="authOverlay" onclick="if(event.target===this)closeAuthModal()">
