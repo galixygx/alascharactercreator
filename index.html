@@ -9089,6 +9089,13 @@
                                         <input class="cstat-inp" id="hitDie" placeholder="d8" oninput="saveAll()">
                                     </div>
                                 </div>
+                                <!-- Active Effect Combat Bonuses indicator -->
+                                <div id="effCombatBonusBar" style="display:none;margin-top:8px;padding:6px 12px;background:rgba(61,214,219,.07);border:1px solid rgba(61,214,219,.25);border-radius:5px;font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:rgba(61,214,219,.85);display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
+                                  <span style="opacity:.6;font-size:7px;letter-spacing:1.5px;">⚡ ACTIVE EFFECT BONUSES:</span>
+                                  <span id="effBonAtk" style="display:none;">ATK <span id="effBonAtkVal" style="font-weight:700;"></span></span>
+                                  <span id="effBonDmg" style="display:none;">DMG <span id="effBonDmgVal" style="font-weight:700;"></span></span>
+                                  <span id="effBonInit" style="display:none;">INIT <span id="effBonInitVal" style="font-weight:700;"></span></span>
+                                </div>
                                 <div class="alas-heavy-card" id="alasHeavyCombat" style="display:none;">
                                     <div class="alas-heavy-lbl">⚔ Alas Heavy Content</div>
                                     <div class="alas-heavy-grid">
@@ -12571,6 +12578,21 @@ function updateCalcs(){
   const passPercSetBonus=(setStatBon['ab_WIS']||0)+(setStatBon['sk_Perception']||0)+(effBon['WIS']||0)+getManualAbilityMod('WIS')+(spellAbilityBon['ab_WIS']||0)+(equippedItemBon['ab_WIS']||0)+(spellAbilityBon['sk_Perception']||0)+(equippedItemBon['sk_Perception']||0);
   const passPerc=10+getMod('WIS')+(percProf?prof:0)+(percExp?prof:0)+passPercSetBonus;
   document.getElementById('passPerc').textContent=passPerc;
+  // Combat effect bonus bar (ex_atk, ex_dmg, ex_init from spells/abilities)
+  const exAtk  = (spellAbilityBon.ex_atk||0)  + (equippedItemBon.ex_atk||0)  + (setStatBon.ex_atk||0);
+  const exDmg  = (spellAbilityBon.ex_dmg||0)  + (equippedItemBon.ex_dmg||0)  + (setStatBon.ex_dmg||0);
+  const exInit = (spellAbilityBon.ex_init||0) + (equippedItemBon.ex_init||0) + (setStatBon.ex_init||0);
+  const bar = document.getElementById('effCombatBonusBar');
+  if(bar){
+    const anyBonus = exAtk || exDmg || exInit;
+    bar.style.display = anyBonus ? 'flex' : 'none';
+    const atkEl  = document.getElementById('effBonAtk');  const atkV = document.getElementById('effBonAtkVal');
+    const dmgEl  = document.getElementById('effBonDmg');  const dmgV = document.getElementById('effBonDmgVal');
+    const initEl = document.getElementById('effBonInit'); const initV = document.getElementById('effBonInitVal');
+    if(atkEl)  { atkEl.style.display  = exAtk  ? '' : 'none'; if(atkV)  atkV.textContent  = (exAtk>=0?'+':'')+exAtk; }
+    if(dmgEl)  { dmgEl.style.display  = exDmg  ? '' : 'none'; if(dmgV)  dmgV.textContent  = (exDmg>=0?'+':'')+exDmg; }
+    if(initEl) { initEl.style.display = exInit ? '' : 'none'; if(initV) initV.textContent = (exInit>=0?'+':'')+exInit; }
+  }
   // Refresh effects section header live
   updateEffectsHeader();
   // Armor AC (from equipped items)
@@ -14184,21 +14206,28 @@ function completeAbility(card){
     showToast('"' + name + '" is already in your Ability List.'); return;
   }
 
+  const aePanel = card.querySelector('.ab-ae-panel .eff-stat-panel');
+  const hasAE   = card.dataset.hasActiveEffect === '1';
+  const aeStats = aePanel ? JSON.stringify(collectEffectStats(aePanel)) : '{}';
+
   const entry = {
-    id:         Date.now() + '_' + Math.random().toString(36).slice(2,6),
-    name:       name,
-    actionType: (sels[0]||{}).value || 'Action',
-    cost:       (inps[1]||{}).value || '',
-    recharge:   (sels[1]||{}).value || 'Per Turn',
-    range:      (sels[2]||{}).value || 'Self',
-    target:     (sels[3]||{}).value || 'Single Target',
-    duration:   (sels[4]||{}).value || 'Instant',
-    rc:         (card.querySelector('.ab-rc-inp')||{}).value || '0',
-    ip:         (card.querySelector('.ab-ip-inp')||{}).value || '0',
-    archetype:  card.dataset.archetype || '',
-    effect:     (tas[0]||{}).value || '',
-    counterplay:(tas[1]||{}).value || '',
-    notes:      (tas[2]||{}).value || '',
+    id:              Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    name:            name,
+    actionType:      (sels[0]||{}).value || 'Action',
+    cost:            (inps[1]||{}).value || '',
+    recharge:        (sels[1]||{}).value || 'Per Turn',
+    range:           (sels[2]||{}).value || 'Self',
+    target:          (sels[3]||{}).value || 'Single Target',
+    duration:        (sels[4]||{}).value || 'Instant',
+    rc:              (card.querySelector('.ab-rc-inp')||{}).value || '0',
+    ip:              (card.querySelector('.ab-ip-inp')||{}).value || '0',
+    archetype:       card.dataset.archetype || '',
+    effect:          (tas[0]||{}).value || '',
+    counterplay:     (tas[1]||{}).value || '',
+    notes:           (tas[2]||{}).value || '',
+    hasActiveEffect: hasAE ? '1' : '0',
+    aeStats:         aeStats,
+    isActive:        hasAE,
   };
 
   state.completedAbilities.push(entry);
@@ -14217,6 +14246,7 @@ function removeCompletedAbility(id){
   _debouncedSave();
   renderAbilityList();
   updateAbilityLimitDisplay();
+  updateCalcs();
   if(ab) showToast('"' + ab.name + '" removed from Ability List.');
 }
 
@@ -14261,13 +14291,18 @@ function renderAbilityList(){
     const isPassive = ab.actionType === 'Passive';
     const rcNum     = parseInt(ab.rc) || 0;
     const ipNum     = parseInt(ab.ip) || 0;
+    const hasAE     = ab.hasActiveEffect === '1';
+    const isActive  = !!(ab.isActive);
+    const effBtnStyle = isActive
+      ? 'background:rgba(61,214,219,.15);border-color:rgba(61,214,219,.6);color:rgba(61,214,219,.9);'
+      : 'background:transparent;border-color:rgba(255,255,255,.15);color:var(--txt-dim);';
 
     const archPills = (ab.archetype||'').split(',').filter(Boolean).map(function(a){
       return '<span style="display:inline-block;padding:1px 7px;background:rgba(201,162,39,.1);border:1px solid rgba(201,162,39,.3);border-radius:3px;font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:.5px;color:var(--gold-d);">' + a + '</span>';
     }).join('');
 
     const div = document.createElement('div');
-    div.style.cssText = 'background:rgba(10,10,18,.6);border:1px solid rgba(255,255,255,.08);border-left:3px solid ' + col + ';border-radius:6px;padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;';
+    div.style.cssText = 'background:rgba(10,10,18,.6);border:1px solid ' + (isActive&&hasAE?'rgba(61,214,219,.25)':'rgba(255,255,255,.08)') + ';border-left:3px solid ' + col + ';border-radius:6px;padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;';
     div.innerHTML =
       '<div>' +
         '<div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap;">' +
@@ -14275,6 +14310,7 @@ function renderAbilityList(){
           '<span style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:1px;color:' + col + ';opacity:.8;padding:1px 6px;border:1px solid rgba(255,255,255,.15);border-radius:3px;">' + _escHtml(ab.actionType) + '</span>' +
           (ab.recharge ? '<span style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:.5px;color:var(--txt-dim);padding:1px 6px;border:1px solid rgba(255,255,255,.08);border-radius:3px;">' + _escHtml(ab.recharge) + '</span>' : '') +
           (isPassive ? '<span style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:1px;color:var(--gold-d);padding:1px 6px;border:1px solid rgba(201,162,39,.3);border-radius:3px;">⬤ PASSIVE</span>' : '') +
+          (hasAE && isActive ? '<span style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:1px;color:rgba(61,214,219,.9);padding:1px 6px;border:1px solid rgba(61,214,219,.35);border-radius:3px;">⚡ EFFECT ACTIVE</span>' : '') +
         '</div>' +
         '<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:' + (ab.effect||ab.notes||archPills ? '8px' : '0') + ';">' +
           (rcNum > 0 ? '<span style="font-family:\'EB Garamond\',serif;font-size:12px;color:var(--txt-dim);">RC <strong style="color:rgba(61,214,219,.8);">' + rcNum + '</strong></span>' : '') +
@@ -14290,6 +14326,7 @@ function renderAbilityList(){
       '</div>' +
       '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">' +
         (!isPassive ? '<button type="button" class="sig-cast-btn" onclick="castCompletedAbility(\'' + ab.id + '\')" style="font-size:7.5px;padding:5px 12px;letter-spacing:1.5px;">⟳ Cast</button>' : '') +
+        (hasAE ? '<button type="button" onclick="toggleCompletedAbilityActive(\'' + ab.id + '\')" style="font-family:\'Cinzel\',serif;font-size:7.5px;padding:4px 10px;border:1px solid;border-radius:4px;cursor:pointer;white-space:nowrap;' + effBtnStyle + '">' + (isActive ? '⚡ Effect On' : '○ Effect Off') + '</button>' : '') +
         '<button type="button" onclick="removeCompletedAbility(\'' + ab.id + '\')" title="Remove from Ability List" style="font-family:\'Cinzel\',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(200,32,48,.3);border-radius:4px;color:rgba(200,32,48,.6);cursor:pointer;white-space:nowrap;">✕ Remove</button>' +
       '</div>';
     grid.appendChild(div);
@@ -16918,8 +16955,9 @@ function triggerCardSave(card){
 /** Aggregate stat bonuses from active spells (hasActiveEffect=1, not daily-spent) and abilities. */
 function getSpellAbilityEffectBonuses(){
   const bonuses={};
-  // Spells
-  document.querySelectorAll('#sigilsList .item-card').forEach(card=>{
+
+  // Builder spell cards (sigilsList DOM)
+  document.querySelectorAll('#sigilsList .item-card').forEach(function(card){
     const hasAE=card.dataset.hasActiveEffect==='1';
     const availBtn=card.querySelector('.sig-avail-btn');
     const isSpent=availBtn&&availBtn.getAttribute('data-spent')==='1';
@@ -16927,18 +16965,53 @@ function getSpellAbilityEffectBonuses(){
     const panel=card.querySelector('.eff-stat-panel');
     if(!panel) return;
     const stats=collectEffectStats(panel);
-    for(const [k,v] of Object.entries(stats)) bonuses[k]=(bonuses[k]||0)+v;
+    for(const k in stats) bonuses[k]=(bonuses[k]||0)+stats[k];
   });
-  // Abilities
-  document.querySelectorAll('#abilitiesList .item-card').forEach(card=>{
-    const hasAE=card.dataset.hasActiveEffect==='1';
-    if(!hasAE) return;
+
+  // Builder ability cards (abilitiesList DOM)
+  document.querySelectorAll('#abilitiesList .item-card').forEach(function(card){
+    if(card.dataset.hasActiveEffect!=='1') return;
     const panel=card.querySelector('.eff-stat-panel');
     if(!panel) return;
     const stats=collectEffectStats(panel);
-    for(const [k,v] of Object.entries(stats)) bonuses[k]=(bonuses[k]||0)+v;
+    for(const k in stats) bonuses[k]=(bonuses[k]||0)+stats[k];
   });
+
+  // Completed spells (Spell List — state-driven)
+  (state.completedSpells||[]).forEach(function(sp){
+    if(!sp.isActive) return;
+    var stats; try{ stats=JSON.parse(sp.aeStats||'{}'); }catch(e){ stats={}; }
+    for(const k in stats) bonuses[k]=(bonuses[k]||0)+(stats[k]||0);
+  });
+
+  // Completed abilities (Ability List — state-driven)
+  (state.completedAbilities||[]).forEach(function(ab){
+    if(!ab.isActive) return;
+    var stats; try{ stats=JSON.parse(ab.aeStats||'{}'); }catch(e){ stats={}; }
+    for(const k in stats) bonuses[k]=(bonuses[k]||0)+(stats[k]||0);
+  });
+
   return bonuses;
+}
+
+function toggleCompletedSpellActive(id){
+  const sp=(state.completedSpells||[]).find(function(s){ return s.id===id; });
+  if(!sp) return;
+  sp.isActive=!sp.isActive;
+  _debouncedSave();
+  renderSpellList();
+  updateCalcs();
+  showToast(sp.name+' effect '+(sp.isActive?'activated':'deactivated')+'.');
+}
+
+function toggleCompletedAbilityActive(id){
+  const ab=(state.completedAbilities||[]).find(function(a){ return a.id===id; });
+  if(!ab) return;
+  ab.isActive=!ab.isActive;
+  _debouncedSave();
+  renderAbilityList();
+  updateCalcs();
+  showToast(ab.name+' effect '+(ab.isActive?'activated':'deactivated')+'.');
 }
 
 /** Aggregate stat bonuses from equipped inventory items. */
@@ -26036,24 +26109,31 @@ function completeSpell(card){
   const durVal   = (sels[2]||{}).value || 'Instant';
   const rangeVal = (sels[3]||{}).value || '—';
 
+  const aePanel = card.querySelector('.sp-ae-panel .eff-stat-panel');
+  const hasAE   = card.dataset.hasActiveEffect === '1';
+  const aeStats = aePanel ? JSON.stringify(collectEffectStats(aePanel)) : '{}';
+
   const entry = {
-    id:            Date.now() + '_' + Math.random().toString(36).slice(2,6),
-    name:          (nameEl  ||{}).value || 'Unnamed Spell',
-    spellLevel:    card.dataset.spellLevel || '1',
-    aff:           (affSel  ||{}).value || '—',
-    rc:            (rcEl    ||{}).value || '0',
-    ip:            (ipEl    ||{}).value || '0',
-    element:       card.dataset.element  || '—',
-    dmgDie:        card.dataset.dmgDie   || 'none',
-    dmgCount:      card.dataset.dmgCount || '1',
-    dmgType:       card.dataset.dmgType  || '—',
-    ct:            ctVal,
-    dur:           durVal,
-    range:         rangeVal,
-    conditions:    card.dataset.conditions || '',
-    notes:         (notesEl ||{}).value || '',
-    unstableMagic: unstableMagic,
-    unstableTable: unstableTable,
+    id:              Date.now() + '_' + Math.random().toString(36).slice(2,6),
+    name:            (nameEl  ||{}).value || 'Unnamed Spell',
+    spellLevel:      card.dataset.spellLevel || '1',
+    aff:             (affSel  ||{}).value || '—',
+    rc:              (rcEl    ||{}).value || '0',
+    ip:              (ipEl    ||{}).value || '0',
+    element:         card.dataset.element  || '—',
+    dmgDie:          card.dataset.dmgDie   || 'none',
+    dmgCount:        card.dataset.dmgCount || '1',
+    dmgType:         card.dataset.dmgType  || '—',
+    ct:              ctVal,
+    dur:             durVal,
+    range:           rangeVal,
+    conditions:      card.dataset.conditions || '',
+    notes:           (notesEl ||{}).value || '',
+    unstableMagic:   unstableMagic,
+    unstableTable:   unstableTable,
+    hasActiveEffect: hasAE ? '1' : '0',
+    aeStats:         aeStats,
+    isActive:        hasAE,
   };
 
   if(!Array.isArray(state.completedSpells)) state.completedSpells = [];
@@ -26076,6 +26156,7 @@ function removeCompletedSpell(id){
   state.completedSpells = state.completedSpells.filter(s => s.id !== id);
   _debouncedSave();
   renderSpellList();
+  updateCalcs();
   if(sp) showToast(`"${sp.name}" removed from Spell List.`);
 }
 
@@ -26120,15 +26201,22 @@ function renderSpellList(){
       `<span style="display:inline-block;padding:1px 6px;background:rgba(200,32,48,.12);border:1px solid rgba(200,32,48,.3);border-radius:3px;font-size:10px;color:#c84050;">${c}</span>`
     ).join('') : '';
 
+    const hasAE   = sp.hasActiveEffect === '1';
+    const isActive = !!(sp.isActive);
+    const effBtnStyle = isActive
+      ? 'background:rgba(61,214,219,.15);border-color:rgba(61,214,219,.6);color:rgba(61,214,219,.9);'
+      : 'background:transparent;border-color:rgba(255,255,255,.15);color:var(--txt-dim);';
+
     const div = document.createElement('div');
-    div.style.cssText = `background:rgba(10,10,18,.6);border:1px solid rgba(255,255,255,.08);border-left:3px solid ${col};border-radius:6px;padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;`;
+    div.style.cssText = `background:rgba(10,10,18,.6);border:1px solid ${isActive&&hasAE?'rgba(61,214,219,.25)':'rgba(255,255,255,.08)'};border-left:3px solid ${col};border-radius:6px;padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;`;
     div.innerHTML = `
       <div>
         <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
           <span style="font-family:'Cinzel Decorative',serif;font-size:12px;color:${col};">${sp.name}</span>
           <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:rgba(201,162,39,.7);padding:1px 6px;border:1px solid rgba(201,162,39,.25);border-radius:3px;">LVL ${sp.spellLevel}</span>
           <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:${col};opacity:.7;">${sp.aff}</span>
-          ${sp.unstableMagic ? `<span title="Unstable Magic: rolls 1d6 on cast" style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:rgba(208,112,48,.85);padding:1px 6px;border:1px solid rgba(208,112,48,.3);border-radius:3px;">⚡ UNSTABLE</span>` : ''}
+          ${sp.unstableMagic ? `<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:rgba(208,112,48,.85);padding:1px 6px;border:1px solid rgba(208,112,48,.3);border-radius:3px;">⚡ UNSTABLE</span>` : ''}
+          ${hasAE && isActive ? `<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:rgba(61,214,219,.9);padding:1px 6px;border:1px solid rgba(61,214,219,.35);border-radius:3px;">⚡ EFFECT ACTIVE</span>` : ''}
         </div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:${sp.notes||conds?'8px':'0'};">
           <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">RC <strong style="color:rgba(61,214,219,.8);">${sp.rc}</strong></span>
@@ -26144,6 +26232,7 @@ function renderSpellList(){
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
         <button type="button" class="sig-cast-btn" onclick="castCompletedSpell('${sp.id}')" style="font-size:7.5px;padding:5px 12px;letter-spacing:1.5px;">⟳ Cast</button>
+        ${hasAE ? `<button type="button" onclick="toggleCompletedSpellActive('${sp.id}')" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;border:1px solid;border-radius:4px;cursor:pointer;white-space:nowrap;${effBtnStyle}">${isActive ? '⚡ Effect On' : '○ Effect Off'}</button>` : ''}
         <button type="button" onclick="removeCompletedSpell('${sp.id}')" title="Remove from Spell List" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(200,32,48,.3);border-radius:4px;color:rgba(200,32,48,.6);cursor:pointer;white-space:nowrap;">✕ Remove</button>
       </div>`;
     grid.appendChild(div);
