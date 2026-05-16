@@ -8522,6 +8522,134 @@
         .apikey-inp:focus { border-color: rgba(160,96,224,.6); }
         .apikey-btns { display: flex; gap: 10px; }
     </style>
+
+    <!-- ── Site Protection ─────────────────────────────────────── -->
+    <script>
+    (function(){
+        'use strict';
+
+        // ─ Bypass checks — skip all protection when any condition is true ─
+        try{
+            var _h = window.location.hostname;
+            var _proto = window.location.protocol;
+            var _ref = document.referrer || '';
+
+            // 1. Creator's device — galixy device token (set on first galixy login)
+            if(localStorage.getItem('alas_gx_tok')) return;
+
+            // 2. Active galixy session in sessionStorage
+            var _sess = sessionStorage.getItem('alas_session');
+            if(_sess){ var _sd = JSON.parse(_sess); if(_sd && _sd.key === 'galixy') return; }
+
+            // 3. Local development (Claude Code preview, localhost server)
+            if(_h === 'localhost' || _h === '127.0.0.1' || _h === '') return;
+
+            // 4. Local network / file protocol
+            if(_proto === 'file:') return;
+
+            // 5. Claude Artifacts / Claude.ai iframe environment
+            if(_h.endsWith('.claude.ai') || _h === 'claude.ai') return;
+            if(_ref.includes('claude.ai') || _ref.includes('anthropic.com')) return;
+
+            // 6. Any *.anthropic.com preview or sandbox
+            if(_h.endsWith('.anthropic.com')) return;
+        }catch(e){}
+
+        // ─ Block DevTools keyboard shortcuts ─────────────────────
+        document.addEventListener('keydown', function(e){
+            var k = e.key;
+            // F12
+            if(k === 'F12'){ e.preventDefault(); e.stopPropagation(); return false; }
+            // Ctrl+Shift+I / J / C / K  (DevTools, Console, Inspector, Sources)
+            if(e.ctrlKey && e.shiftKey && /^[IJCKijck]$/.test(k)){ e.preventDefault(); e.stopPropagation(); return false; }
+            // Ctrl+U  (View Source)
+            if(e.ctrlKey && /^[Uu]$/.test(k)){ e.preventDefault(); e.stopPropagation(); return false; }
+            // ⌘+Option+I  (Mac DevTools)
+            if(e.metaKey && e.altKey && /^[Ii]$/.test(k)){ e.preventDefault(); e.stopPropagation(); return false; }
+        }, true);
+
+        // ─ Block right-click context menu ─────────────────────────
+        document.addEventListener('contextmenu', function(e){ e.preventDefault(); return false; }, true);
+
+        // ─ DevTools detection + overlay ───────────────────────────
+        var _dtOpen = false;
+
+        function _guardShow(){
+            var el = document.getElementById('_siteGuard');
+            if(!el){
+                el = document.createElement('div');
+                el.id = '_siteGuard';
+                el.setAttribute('style',
+                    'position:fixed;inset:0;z-index:2147483647;' +
+                    'background:rgba(10,8,6,.98);' +
+                    'display:flex;flex-direction:column;' +
+                    'align-items:center;justify-content:center;' +
+                    "gap:14px;text-align:center;cursor:default;user-select:none;" +
+                    "font-family:'Cinzel',Georgia,serif;"
+                );
+                el.innerHTML =
+                    '<div style="font-size:40px;opacity:.45;line-height:1">⚔</div>' +
+                    '<div style="font-size:10px;letter-spacing:4px;color:#c9a227;text-transform:uppercase">Alas — Protected Site</div>' +
+                    '<div style="width:52px;height:1px;background:rgba(201,162,39,.28);margin:2px 0"></div>' +
+                    '<div style="font-size:9px;letter-spacing:.8px;color:rgba(255,255,255,.26);' +
+                         'max-width:380px;line-height:2.2;font-family:Georgia,serif;font-style:italic">' +
+                        'Developer tools have been detected.<br>' +
+                        'This application and all of its contents are the exclusive<br>' +
+                        'intellectual property of their creators.<br>' +
+                        'Unauthorized inspection, copying, or reproduction is prohibited.' +
+                    '</div>' +
+                    '<div style="font-size:7px;letter-spacing:3px;color:rgba(255,255,255,.1);text-transform:uppercase;margin-top:4px">' +
+                        'Close developer tools to continue' +
+                    '</div>';
+                (document.body || document.documentElement).appendChild(el);
+            }
+            el.style.display = 'flex';
+        }
+
+        function _guardHide(){
+            var el = document.getElementById('_siteGuard');
+            if(el) el.style.display = 'none';
+        }
+
+        // Poll window size — devtools docked to side/bottom creates a gap
+        function _pollSize(){
+            var wg = (window.outerWidth  - window.innerWidth)  > 160;
+            var hg = (window.outerHeight - window.innerHeight) > 200;
+            var open = wg || hg;
+            if(open  && !_dtOpen){ _dtOpen = true;  _guardShow(); }
+            if(!open &&  _dtOpen){ _dtOpen = false; _guardHide(); }
+        }
+        setInterval(_pollSize, 900);
+
+        // Console-property getter trick — fires only when devtools evaluates the object
+        // (catches devtools that was already open before the page loaded)
+        var _sentinel = Object.defineProperty({}, '_', {
+            get: function(){ _dtOpen = true; _guardShow(); return 0; }
+        });
+
+        // ─ Branded console message ────────────────────────────────
+        window.addEventListener('load', function(){
+            setTimeout(function(){
+                try{ console.clear(); }catch(er){}
+                console.log(
+                    '%c⚔  ALAS CHARACTER CREATOR',
+                    'font-size:20px;color:#c9a227;font-weight:bold;font-family:Georgia,serif;padding:4px 0'
+                );
+                console.log(
+                    '%cThis application is the intellectual property of its creators.\n' +
+                    'Unauthorized copying, reproduction, or distribution of any part\n' +
+                    'of this code or its contents is strictly prohibited.\n\n' +
+                    'If you have a legitimate inquiry, please contact the creators.',
+                    'font-size:11px;color:#555;font-family:Georgia,serif;line-height:1.7'
+                );
+                console.log(_sentinel); // triggers the getter if devtools console is open
+            }, 600);
+        });
+
+    })();
+    </script>
+    <!-- ─────────────────────────────────────────────────────────── -->
+
 </head>
 <body>
 
@@ -9095,6 +9223,7 @@
                                   <span id="effBonAtk" style="display:none;">ATK <span id="effBonAtkVal" style="font-weight:700;"></span></span>
                                   <span id="effBonDmg" style="display:none;">DMG <span id="effBonDmgVal" style="font-weight:700;"></span></span>
                                   <span id="effBonInit" style="display:none;">INIT <span id="effBonInitVal" style="font-weight:700;"></span></span>
+                                  <span id="effBonAc" style="display:none;">AC <span id="effBonAcVal" style="font-weight:700;"></span></span>
                                 </div>
                                 <div class="alas-heavy-card" id="alasHeavyCombat" style="display:none;">
                                     <div class="alas-heavy-lbl">⚔ Alas Heavy Content</div>
@@ -12578,20 +12707,23 @@ function updateCalcs(){
   const passPercSetBonus=(setStatBon['ab_WIS']||0)+(setStatBon['sk_Perception']||0)+(effBon['WIS']||0)+getManualAbilityMod('WIS')+(spellAbilityBon['ab_WIS']||0)+(equippedItemBon['ab_WIS']||0)+(spellAbilityBon['sk_Perception']||0)+(equippedItemBon['sk_Perception']||0);
   const passPerc=10+getMod('WIS')+(percProf?prof:0)+(percExp?prof:0)+passPercSetBonus;
   document.getElementById('passPerc').textContent=passPerc;
-  // Combat effect bonus bar (ex_atk, ex_dmg, ex_init from spells/abilities)
+  // Combat effect bonus bar (ex_atk, ex_dmg, ex_init, ex_ac from spells/abilities)
   const exAtk  = (spellAbilityBon.ex_atk||0)  + (equippedItemBon.ex_atk||0)  + (setStatBon.ex_atk||0);
   const exDmg  = (spellAbilityBon.ex_dmg||0)  + (equippedItemBon.ex_dmg||0)  + (setStatBon.ex_dmg||0);
   const exInit = (spellAbilityBon.ex_init||0) + (equippedItemBon.ex_init||0) + (setStatBon.ex_init||0);
+  const exAc   = (spellAbilityBon.ex_ac||0)   + (equippedItemBon.ex_ac||0)   + (setStatBon.ex_ac||0);
   const bar = document.getElementById('effCombatBonusBar');
   if(bar){
-    const anyBonus = exAtk || exDmg || exInit;
+    const anyBonus = exAtk || exDmg || exInit || exAc;
     bar.style.display = anyBonus ? 'flex' : 'none';
     const atkEl  = document.getElementById('effBonAtk');  const atkV = document.getElementById('effBonAtkVal');
     const dmgEl  = document.getElementById('effBonDmg');  const dmgV = document.getElementById('effBonDmgVal');
     const initEl = document.getElementById('effBonInit'); const initV = document.getElementById('effBonInitVal');
+    const acEl   = document.getElementById('effBonAc');   const acV  = document.getElementById('effBonAcVal');
     if(atkEl)  { atkEl.style.display  = exAtk  ? '' : 'none'; if(atkV)  atkV.textContent  = (exAtk>=0?'+':'')+exAtk; }
     if(dmgEl)  { dmgEl.style.display  = exDmg  ? '' : 'none'; if(dmgV)  dmgV.textContent  = (exDmg>=0?'+':'')+exDmg; }
     if(initEl) { initEl.style.display = exInit ? '' : 'none'; if(initV) initV.textContent = (exInit>=0?'+':'')+exInit; }
+    if(acEl)   { acEl.style.display   = exAc   ? '' : 'none'; if(acV)   acV.textContent   = (exAc>=0?'+':'')+exAc; }
   }
   // Refresh effects section header live
   updateEffectsHeader();
@@ -12628,7 +12760,11 @@ function updateArmorAC(){
   updateAllSetStatuses();
   const setBonus=getSetAcBonus();
   const effBon=getActiveEffectBonuses();
-  const totalAC=baseAC+armorBonus+shieldBonus+setBonus+(effBon.ac||0)+(state.acMod||0);
+  const _spBonAC = getSpellAbilityEffectBonuses ? getSpellAbilityEffectBonuses() : {};
+  const _eqBonAC = getEquippedItemEffectBonuses ? getEquippedItemEffectBonuses() : {};
+  const _setBonAC = getActiveSetStatBonuses ? getActiveSetStatBonuses() : {};
+  const exAcBonus = (_spBonAC.ex_ac||0) + (_eqBonAC.ex_ac||0) + (_setBonAC.ex_ac||0);
+  const totalAC=baseAC+armorBonus+shieldBonus+setBonus+(effBon.ac||0)+exAcBonus+(state.acMod||0);
   document.getElementById('combatAC').value=totalAC;
   document.getElementById('armorAC').textContent=totalAC;
 }
@@ -16847,6 +16983,7 @@ function statKeyDisplay(key){
   if(key==='ex_atk')  return 'Attack Roll';
   if(key==='ex_dmg')  return 'Damage';
   if(key==='ex_speed') return 'Speed (ft)';
+  if(key==='ex_ac')   return 'AC';
   return key;
 }
 
@@ -16895,7 +17032,7 @@ function buildEffectStatPanel(activeStats, isOpen){
 
   // Die Rolls & Combat
   html+='<div class="eff-stat-group-hdr">Die Rolls &amp; Combat</div><div class="eff-stat-grid">';
-  [['ex_init','Initiative'],['ex_atk','Attack Roll'],['ex_dmg','Damage'],['ex_speed','Speed (ft)']].forEach(([key,label])=>{
+  [['ex_init','Initiative'],['ex_atk','Attack Roll'],['ex_dmg','Damage'],['ex_speed','Speed (ft)'],['ex_ac','AC']].forEach(([key,label])=>{
     const on=key in activeStats; const val=activeStats[key]||0;
     html+=`<div class="eff-stat-item${on?' stat-on':''}" data-stat-key="${key}">
       <input type="checkbox" class="eff-stat-chk" ${on?'checked':''} onchange="onEffStatToggle(this)">
@@ -17080,7 +17217,7 @@ function buildStatPanelHTML(activeStats){
 
   // Die Rolls & Combat extras
   html+='<div class="stat-group-hdr">Die Rolls &amp; Combat</div><div class="stat-bonus-grid">';
-  [['ex_init','Initiative'],['ex_atk','Attack Roll'],['ex_dmg','Damage'],['ex_speed','Speed (ft)']].forEach(([key,label])=>{
+  [['ex_init','Initiative'],['ex_atk','Attack Roll'],['ex_dmg','Damage'],['ex_speed','Speed (ft)'],['ex_ac','AC']].forEach(([key,label])=>{
     const on=key in activeStats; const val=activeStats[key]||0;
     html+=`<div class="stat-bonus-item${on?' stat-on':''}" data-stat-key="${key}">
       <input type="checkbox" class="stat-chk" ${on?'checked':''} onchange="onStatToggle(this)">
@@ -24522,92 +24659,122 @@ function _renderAllUsersPanel(){
 }
 
 // ─── Traffic Log Renderer ────────────────────────────────────────────────────
-function _renderTrafficLog(){
+async function _renderTrafficLog(){
   const el = document.getElementById('trafficLogPanel');
   if(!el) return;
-  const log = AUTH.getTrafficLog().slice().reverse(); // newest first
+  el.innerHTML = '<div style="color:var(--txt-dim);font-size:11px;font-style:italic;padding:10px 0">Loading…</div>';
 
-  if(!log.length){
-    el.innerHTML = '<div style="color:var(--txt-dim);font-size:11px;font-style:italic;padding:10px 0">No traffic logged yet. Visits, logins, and registrations will appear here.</div>';
-    return;
+  const fbCfg = FB.getConfig();
+  let log = [];
+  let srcMode = 'local';
+
+  if(fbCfg && fbCfg.url && fbCfg.secret){
+    const fbData = await FB.readAll();
+    if(fbData !== null){ log = fbData; srcMode = 'firebase'; }
+    else { log = AUTH.getTrafficLog().slice().reverse(); srcMode = 'fallback'; }
+  } else {
+    log = AUTH.getTrafficLog().slice().reverse();
   }
 
   const now = Date.now();
-  const dayMs  = 86400000;
-  const weekMs = 7 * dayMs;
+  const weekMs = 7 * 86400000;
   const todayStart = new Date(); todayStart.setHours(0,0,0,0);
 
-  const visits    = log.filter(e=>e.event==='visit');
-  const logins    = log.filter(e=>e.event==='login');
-  const regs      = log.filter(e=>e.event==='register');
-  const todayV    = visits.filter(e=>e.ts>=todayStart.getTime()).length;
-  const weekV     = visits.filter(e=>e.ts>=now-weekMs).length;
+  const visits      = log.filter(e=>e.event==='visit');
+  const logins      = log.filter(e=>e.event==='login');
+  const regs        = log.filter(e=>e.event==='register');
+  const todayV      = visits.filter(e=>e.ts>=todayStart.getTime()).length;
+  const weekV       = visits.filter(e=>e.ts>=now-weekMs).length;
+  const uniqueIPs   = [...new Set(log.map(e=>e.ip).filter(ip=>ip&&ip!=='?'))].length;
   const uniqueUsers = [...new Set(log.filter(e=>e.user&&e.user!=='anonymous').map(e=>e.user))].length;
 
-  const eventIcon = e => e.event==='visit'?'🌐':e.event==='login'?'◈':e.event==='register'?'✦':e.event==='logout'?'○':'•';
-  const eventCol  = e => e.event==='login'?'var(--res)':e.event==='register'?'var(--gold)':e.event==='visit'?'var(--txt-dim)':'rgba(255,255,255,.3)';
-  const fmtTime   = ts => { const d=new Date(ts); return d.toLocaleDateString()+' '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); };
+  const eventIcon = e => ({visit:'🌐',login:'◈',register:'✦',logout:'○'}[e.event])||'•';
+  const eventCol  = e => ({visit:'var(--txt-dim)',login:'var(--res)',register:'var(--gold)'}[e.event])||'rgba(255,255,255,.3)';
+  const fmtTime   = ts => { const d=new Date(ts); return d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); };
   const shortUA   = ua => {
     if(!ua) return '—';
-    if(/Mobile|Android|iPhone/.test(ua)) return '📱 Mobile';
-    if(/Chrome/.test(ua)) return '🌐 Chrome';
-    if(/Firefox/.test(ua)) return '🦊 Firefox';
-    if(/Safari/.test(ua)) return '🧭 Safari';
-    if(/Edge/.test(ua)) return '🔵 Edge';
-    return ua.substring(0,28);
+    if(/Mobile|Android|iPhone|iPad/i.test(ua)) return '📱 Mobile';
+    if(/Edg\//i.test(ua)) return '🔵 Edge';
+    if(/Chrome/i.test(ua)) return '🌐 Chrome';
+    if(/Firefox/i.test(ua)) return '🦊 Firefox';
+    if(/Safari/i.test(ua)) return '🧭 Safari';
+    return ua.substring(0,26);
   };
+  const statCard = (label, val, col) => `
+    <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px;text-align:center">
+      <div style="font-size:22px;color:${col};font-family:'Cinzel',serif;font-weight:700">${val}</div>
+      <div style="font-size:7.5px;color:var(--txt-dim);letter-spacing:1px;margin-top:3px;text-transform:uppercase">${label}</div>
+    </div>`;
+
+  const fbBanner = (fbCfg && fbCfg.url) ? `
+    <div style="background:rgba(61,214,219,.07);border:1px solid rgba(61,214,219,.25);border-radius:6px;padding:9px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+      <span style="font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:1px;color:var(--res)">📡 FIREBASE CONNECTED</span>
+      <span style="font-size:7.5px;color:var(--txt-dim)">${srcMode==='firebase'?'Showing real-time cross-device data from all visitors':'Firebase unreachable — showing local data'}</span>
+      <button class="dm-tool-btn" onclick="_showFBConfig()" style="margin-left:auto;font-size:7.5px;padding:3px 9px">⚙ Edit</button>
+    </div>` : `
+    <div style="background:rgba(255,180,0,.06);border:1px solid rgba(255,180,0,.22);border-radius:8px;padding:14px 16px;margin-bottom:16px">
+      <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:var(--gold);margin-bottom:6px">📡 ENABLE CROSS-DEVICE VISITOR TRACKING</div>
+      <div style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);line-height:1.6;margin-bottom:10px">
+        Currently showing <strong style="color:var(--txt-lbl)">local data only</strong> (visits recorded in this browser only). Connect a free Firebase project to track every visitor from any device and any IP address — in real time.
+      </div>
+      <button class="dm-tool-btn" onclick="_showFBConfig()" style="background:rgba(201,162,39,.15);border-color:rgba(201,162,39,.4)">⚡ Connect Firebase (Free)</button>
+    </div>`;
 
   el.innerHTML = `
-    <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--gold-d);margin-bottom:14px">📡 SITE TRAFFIC LOG</div>
-
-    <!-- Stats grid -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;">
-      <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px;text-align:center">
-        <div style="font-size:22px;color:var(--gold);font-family:'Cinzel',serif;font-weight:700">${todayV}</div>
-        <div style="font-size:7.5px;color:var(--txt-dim);letter-spacing:1px;margin-top:3px;text-transform:uppercase">Today's Visits</div>
-      </div>
-      <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px;text-align:center">
-        <div style="font-size:22px;color:var(--res);font-family:'Cinzel',serif;font-weight:700">${weekV}</div>
-        <div style="font-size:7.5px;color:var(--txt-dim);letter-spacing:1px;margin-top:3px;text-transform:uppercase">This Week</div>
-      </div>
-      <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px;text-align:center">
-        <div style="font-size:22px;color:var(--ins);font-family:'Cinzel',serif;font-weight:700">${logins.length}</div>
-        <div style="font-size:7.5px;color:var(--txt-dim);letter-spacing:1px;margin-top:3px;text-transform:uppercase">Total Logins</div>
-      </div>
-      <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px;text-align:center">
-        <div style="font-size:22px;color:var(--cor);font-family:'Cinzel',serif;font-weight:700">${regs.length}</div>
-        <div style="font-size:7.5px;color:var(--txt-dim);letter-spacing:1px;margin-top:3px;text-transform:uppercase">Registrations</div>
-      </div>
+    <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--gold-d);margin-bottom:14px">
+      📡 SITE TRAFFIC
+      <span style="font-size:7px;letter-spacing:1px;margin-left:8px;color:${srcMode==='firebase'?'var(--res)':'var(--txt-dim)'}">${srcMode==='firebase'?'● LIVE — All Devices':'○ LOCAL BROWSER ONLY'}</span>
     </div>
 
-    <!-- Unique users bar -->
-    <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+    ${fbBanner}
+
+    <div style="display:grid;grid-template-columns:repeat(${uniqueIPs>0?5:4},1fr);gap:8px;margin-bottom:18px">
+      ${statCard("Today's Visits", todayV, 'var(--gold)')}
+      ${statCard('This Week', weekV, 'var(--res)')}
+      ${statCard('Total Logins', logins.length, 'var(--ins)')}
+      ${statCard('Registrations', regs.length, 'var(--cor)')}
+      ${uniqueIPs>0?statCard('Unique IPs', uniqueIPs, 'rgba(61,214,219,.85)'):''}
+    </div>
+
+    <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
       <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:var(--gold-d)">UNIQUE SIGNED-IN USERS</span>
-      <span style="font-family:'Cinzel',serif;font-size:16px;color:var(--gold);margin-left:auto">${uniqueUsers}</span>
+      <span style="font-family:'Cinzel',serif;font-size:18px;color:var(--gold);margin-left:auto">${uniqueUsers}</span>
     </div>
 
-    <!-- Event log -->
-    <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:var(--txt-lbl);margin-bottom:6px">RECENT EVENTS (newest first)</div>
-    <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;overflow:hidden;max-height:420px;overflow-y:auto">
-      ${log.slice(0,150).map(e=>`
+    <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:var(--txt-lbl);margin-bottom:6px">RECENT EVENTS — ${log.length} total (newest first)</div>
+    <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;overflow:hidden;max-height:440px;overflow-y:auto">
+      ${log.length ? log.slice(0,150).map(e=>`
         <div style="display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:start;padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03)">
           <span style="font-size:11px;opacity:.8;padding-top:1px">${eventIcon(e)}</span>
           <div>
             <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:.8px;color:${eventCol(e)}">
-              ${e.event.toUpperCase()}
-              ${e.user&&e.user!=='anonymous'?`<span style="color:var(--gold);margin-left:6px">${_escHtml(e.user)}</span>`:'<span style="color:rgba(255,255,255,.2);margin-left:6px">anonymous</span>'}
-              ${e.displayName?`<span style="color:var(--txt-dim);font-size:7.5px"> (${_escHtml(e.displayName)})</span>`:''}
+              ${_escHtml((e.event||'').toUpperCase())}
+              ${e.user&&e.user!=='anonymous'
+                ?`<span style="color:var(--gold);margin-left:6px">${_escHtml(e.user)}</span>`
+                :'<span style="color:rgba(255,255,255,.2);margin-left:6px">anon</span>'}
+              ${e.displayName?`<span style="color:var(--txt-dim);font-size:7.5px"> · ${_escHtml(e.displayName)}</span>`:''}
+              ${e.display&&e.display!==e.user?`<span style="color:var(--txt-dim);font-size:7.5px"> · ${_escHtml(e.display)}</span>`:''}
             </div>
-            <div style="font-size:8px;color:rgba(255,255,255,.22);margin-top:2px">${shortUA(e.ua)} · ${_escHtml(e.ref||'direct')}</div>
+            <div style="font-size:8px;color:rgba(255,255,255,.2);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap">
+              <span>${shortUA(e.ua)}</span>
+              ${e.ip&&e.ip!=='?'?`<span style="font-family:monospace;font-size:7px;background:rgba(255,255,255,.05);padding:1px 5px;border-radius:3px">${_escHtml(e.ip)}</span>`:''}
+              ${e.city&&e.city!=='?'?`<span>${_escHtml(e.city)}, ${_escHtml(e.country||'')}</span>`:''}
+              <span style="opacity:.6">${_escHtml(e.ref||'direct')}</span>
+            </div>
           </div>
           <div style="font-size:8px;color:var(--txt-dim);white-space:nowrap;text-align:right">${fmtTime(e.ts)}</div>
-        </div>`).join('')}
+        </div>`).join('')
+      : '<div style="padding:20px;text-align:center;color:var(--txt-dim);font-size:11px;font-style:italic">No traffic recorded yet.</div>'}
     </div>
-    <div style="display:flex;gap:8px;margin-top:12px">
+
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center">
       <button class="dm-tool-btn" onclick="_renderTrafficLog()">↻ Refresh</button>
-      <button class="dm-tool-btn danger" onclick="if(confirm('Clear all traffic data? This cannot be undone.')){localStorage.removeItem(AUTH.TRAFFIC_KEY);_renderTrafficLog();}">Clear Log</button>
+      ${srcMode==='firebase'?`<button class="dm-tool-btn danger" onclick="if(confirm('Delete ALL Firebase traffic data? Cannot be undone.')){FB.deleteAll().then(()=>_renderTrafficLog());}">✕ Clear Cloud Log</button>`:''}
+      <button class="dm-tool-btn danger" onclick="if(confirm('Clear local traffic log?')){localStorage.removeItem(AUTH.TRAFFIC_KEY);_renderTrafficLog();}">✕ Clear Local Log</button>
     </div>
-    <div style="font-size:8px;color:var(--txt-dim);font-style:italic;margin-top:8px">Traffic is stored locally in this browser. Logs are shared across accounts on the same device. Max 500 entries retained.</div>
+    <div style="font-size:8px;color:var(--txt-dim);font-style:italic;margin-top:8px">
+      ${srcMode==='firebase'?'Tracking real-time traffic from all browsers and IP addresses via Firebase.':'Local traffic only — this browser. Connect Firebase above to see all visitors.'}
+    </div>
   `;
 }
 
@@ -27569,6 +27736,181 @@ const AUTH = {
   },
 };
 
+// ═══════════════════════════════════════════════════════════════
+// FIREBASE REALTIME DATABASE — cross-device traffic tracking
+// ═══════════════════════════════════════════════════════════════
+const FB = {
+  CFG_KEY: 'alas_fb_cfg_v1',
+
+  getConfig(){
+    try{ return JSON.parse(localStorage.getItem(this.CFG_KEY)||'null'); }
+    catch{ return null; }
+  },
+  saveConfig(cfg){ localStorage.setItem(this.CFG_KEY, JSON.stringify(cfg)); },
+  clearConfig(){ localStorage.removeItem(this.CFG_KEY); },
+
+  _url(path){
+    const cfg = this.getConfig();
+    if(!cfg||!cfg.url||!cfg.secret) return null;
+    const base = cfg.url.replace(/\/+$/, '');
+    return `${base}/alas_traffic/${path}.json?auth=${encodeURIComponent(cfg.secret)}`;
+  },
+
+  async push(data){
+    const url = this._url('events');
+    if(!url) return false;
+    try{
+      const r = await fetch(url, {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({...data, _v:1})
+      });
+      return r.ok;
+    }catch(e){ return false; }
+  },
+
+  async readAll(){
+    const url = this._url('events');
+    if(!url) return null;
+    try{
+      const r = await fetch(url);
+      if(!r.ok) return null;
+      const obj = await r.json();
+      if(!obj||typeof obj!=='object') return [];
+      return Object.values(obj).sort((a,b)=>(b.ts||0)-(a.ts||0));
+    }catch(e){ return null; }
+  },
+
+  async deleteAll(){
+    const url = this._url('events');
+    if(!url) return false;
+    try{
+      const r = await fetch(url, {method:'DELETE'});
+      return r.ok;
+    }catch(e){ return false; }
+  },
+
+  async testConnection(){
+    const cfg = this.getConfig();
+    if(!cfg||!cfg.url||!cfg.secret) return {ok:false, msg:'No configuration saved.'};
+    const base = cfg.url.replace(/\/+$/, '');
+    const url = `${base}/alas_traffic/_test.json?auth=${encodeURIComponent(cfg.secret)}`;
+    try{
+      const r = await fetch(url, {
+        method:'PUT', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ts:Date.now(), ping:true})
+      });
+      if(r.ok) return {ok:true};
+      const txt = await r.text();
+      return {ok:false, msg:txt};
+    }catch(e){ return {ok:false, msg:String(e.message)}; }
+  }
+};
+
+// ── Geo / IP resolver (cached per session) ─────────────────────
+let _geoCache = null;
+async function _getVisitorGeo(){
+  if(_geoCache) return _geoCache;
+  try{
+    const ctrl = new AbortController();
+    const timer = setTimeout(()=>ctrl.abort(), 4000);
+    const r = await fetch('https://ipapi.co/json/', {signal: ctrl.signal});
+    clearTimeout(timer);
+    if(!r.ok){ _geoCache={}; return {}; }
+    const d = await r.json();
+    _geoCache = { ip: d.ip||'?', country: d.country_name||'?', city: d.city||'?', region: d.region||'' };
+    return _geoCache;
+  }catch(e){ _geoCache={}; return {}; }
+}
+
+// ── Cloud traffic event logger ──────────────────────────────────
+async function _logTrafficCloud(eventType, extra){
+  if(!FB.getConfig()) return;
+  try{
+    const geo = await _getVisitorGeo();
+    await FB.push({
+      ts:      Date.now(),
+      event:   eventType,
+      user:    AUTH.currentUser ? AUTH.currentUser.key : 'anonymous',
+      display: AUTH.currentUser ? (AUTH.currentUser.name||'') : '',
+      ua:      (navigator.userAgent||'').substring(0,140),
+      ref:     document.referrer ? document.referrer.substring(0,100) : 'direct',
+      ip:      geo.ip||'?',
+      country: geo.country||'?',
+      city:    geo.city||'?',
+      ...(extra||{})
+    });
+  }catch(e){}
+}
+
+// ── Firebase config modal ───────────────────────────────────────
+function _showFBConfig(){
+  const existing = document.getElementById('fbConfigModal');
+  if(existing){ existing.remove(); return; }
+  const cfg = FB.getConfig()||{};
+  const modal = document.createElement('div');
+  modal.id = 'fbConfigModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(4px)';
+  modal.innerHTML = `
+    <div style="background:var(--surf);border:1px solid var(--bdr-g);border-radius:10px;padding:24px;max-width:520px;width:95%;font-family:'Cinzel',serif;max-height:90vh;overflow-y:auto">
+      <div style="font-size:11px;letter-spacing:2px;color:var(--gold);margin-bottom:4px">📡 FIREBASE SETUP</div>
+      <div style="font-size:12px;color:var(--txt-dim);font-family:'EB Garamond',serif;font-style:italic;margin-bottom:18px">Connect a free Firebase Realtime Database to track every visitor across all browsers and IP addresses.</div>
+
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--bdr);border-radius:6px;padding:14px;margin-bottom:18px;font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-lbl);line-height:1.75">
+        <strong style="color:var(--gold-d);font-family:'Cinzel',serif;font-size:8.5px;letter-spacing:1.5px">HOW TO SET UP (FREE — 5 MINUTES)</strong><br><br>
+        1. Go to <a href="https://console.firebase.google.com" target="_blank" style="color:var(--res);text-decoration:none">console.firebase.google.com</a> and sign in<br>
+        2. Click <strong>Add project</strong> → name it anything → choose the <strong>Spark (free)</strong> plan<br>
+        3. In the left sidebar click <strong>Build → Realtime Database</strong> → Create database<br>
+        4. Pick any region → select <strong>Start in test mode</strong> → Enable<br>
+        5. Copy the <strong>Database URL</strong> shown at the top (e.g. <span style="font-family:monospace;font-size:10px;color:var(--res)">https://my-project-rtdb.firebaseio.com</span>)<br>
+        6. Go to ⚙ Project Settings → Service accounts → Database secrets → click <strong>Show</strong> or <strong>Add secret</strong> → copy it<br>
+        7. Paste both fields below and click <strong>Test &amp; Save</strong>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+        <div>
+          <div style="font-size:7.5px;letter-spacing:1.5px;color:var(--txt-lbl);margin-bottom:5px">DATABASE URL</div>
+          <input id="fbCfgUrl" type="url" placeholder="https://your-project-rtdb.firebaseio.com"
+            style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--bdr);border-radius:5px;padding:9px 11px;color:var(--txt);font-size:11px;font-family:monospace;outline:none"
+            value="${_escHtml(cfg.url||'')}">
+        </div>
+        <div>
+          <div style="font-size:7.5px;letter-spacing:1.5px;color:var(--txt-lbl);margin-bottom:5px">DATABASE SECRET</div>
+          <input id="fbCfgSecret" type="password" placeholder="Your Firebase database secret key"
+            style="width:100%;box-sizing:border-box;background:rgba(255,255,255,.06);border:1px solid var(--bdr);border-radius:5px;padding:9px 11px;color:var(--txt);font-size:11px;font-family:monospace;outline:none"
+            value="${_escHtml(cfg.secret||'')}">
+        </div>
+      </div>
+
+      <div id="fbTestResult" style="font-size:10px;margin-bottom:14px;min-height:18px;font-family:'EB Garamond',serif"></div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <button class="dm-tool-btn" onclick="_fbTestAndSave()" style="background:rgba(201,162,39,.15);border-color:rgba(201,162,39,.4)">⚡ Test &amp; Save</button>
+        ${cfg.url?`<button class="dm-tool-btn danger" onclick="FB.clearConfig();document.getElementById('fbConfigModal').remove();_renderTrafficLog();">✕ Disconnect</button>`:''}
+        <button class="dm-tool-btn" onclick="document.getElementById('fbConfigModal').remove()" style="margin-left:auto">Cancel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', e=>{ if(e.target===modal) modal.remove(); });
+}
+
+async function _fbTestAndSave(){
+  const urlEl = document.getElementById('fbCfgUrl');
+  const secEl = document.getElementById('fbCfgSecret');
+  const resEl = document.getElementById('fbTestResult');
+  const url = (urlEl||{}).value||'';
+  const secret = (secEl||{}).value||'';
+  if(!url||!secret){ if(resEl) resEl.innerHTML='<span style="color:var(--cor)">Please fill in both fields.</span>'; return; }
+  if(resEl) resEl.innerHTML='<span style="color:var(--txt-dim)">Testing connection…</span>';
+  FB.saveConfig({url:url.trim(), secret:secret.trim()});
+  const test = await FB.testConnection();
+  if(test.ok){
+    if(resEl) resEl.innerHTML='<span style="color:var(--res)">✓ Connected successfully!</span>';
+    setTimeout(()=>{ document.getElementById('fbConfigModal')?.remove(); _renderTrafficLog(); }, 900);
+  } else {
+    if(resEl) resEl.innerHTML=`<span style="color:var(--cor)">✕ Failed: ${_escHtml(test.msg||'Unknown error. Check your URL and secret.')}</span>`;
+  }
+}
+
 // ── Auth modal helpers ────────────────────────────────────────
 function openAuthModal(){
   AUTH._authMode='login';
@@ -27600,7 +27942,9 @@ function authSubmit(){
   if(!username||!password){ errEl.textContent='Please enter username and password.'; return; }
   const result=AUTH._authMode==='register'?AUTH.register(username,password):AUTH.login(username,password);
   if(!result.ok){ errEl.textContent=result.msg; return; }
-  AUTH.logTraffic(AUTH._authMode==='register'?'register':'login', {displayName:username.trim()});
+  const _evType = AUTH._authMode==='register'?'register':'login';
+  AUTH.logTraffic(_evType, {displayName:username.trim()});
+  _logTrafficCloud(_evType, {displayName:username.trim()});
   closeAuthModal();
   launchFireworks();
   _authLoginSuccess();
@@ -28010,6 +28354,7 @@ function _escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
   AUTH.restoreSession();
   AUTH.ensureGalixyRank();
   AUTH.logTraffic('visit');
+  _logTrafficCloud('visit');
   // Always hide Keeper-only elements by default (CSS .galixy-only sets display:none)
   // They get shown by _postLoginSetup() only for Galixy
   if(AUTH.currentUser){
