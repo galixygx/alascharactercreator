@@ -8659,9 +8659,12 @@
 
             </div>
             <div class="ts-actions">
-                <button class="ts-btn ts-btn-primary" onclick="titleScreenLoad()">⬤ Load Character</button>
-                <button class="ts-btn ts-btn-secondary" onclick="titleScreenNew()">✦ Create New Character</button>
                 <button class="ts-btn ts-btn-login" onclick="openAuthModal()" id="tsLoginBtn">◈ Sign In / Register</button>
+                <div id="tsCharBtns" style="display:none;flex-direction:column;gap:10px;width:100%;margin-top:6px;">
+                    <button class="ts-btn ts-btn-primary" onclick="titleScreenLoad()">⬤ Load Character</button>
+                    <button class="ts-btn ts-btn-secondary" onclick="titleScreenNew()">✦ Create New Character</button>
+                </div>
+                <div id="tsAuthNote" style="font-family:'EB Garamond',serif;font-size:11px;font-style:italic;color:rgba(200,160,255,.45);text-align:center;margin-top:8px;">Sign in to access your character — or register to create one</div>
             </div>
             <div id="tsUserBadge"></div>
             <div class="ts-version">Alas Character Creator V4</div>
@@ -24114,6 +24117,7 @@ function keeperTab(id, btn){
   if(id==='encounter') renderEncounterList();
   if(id==='world'||id==='notes') loadKeeperState();
   if(id==='players') keeperRenderPlayers();
+  if(id==='traffic') _renderTrafficLog();
 }
 
 function saveKeeperState(){
@@ -24219,6 +24223,96 @@ function _renderAllUsersPanel(){
     <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;overflow:hidden">${rows}</div>
     <div style="font-size:8px;color:var(--txt-dim);font-style:italic;margin-top:5px">Active = last activity &lt;15 min · AFK = &lt;1 hr · Inactive = &gt;1 hr</div>
   </div>`;
+}
+
+// ─── Traffic Log Renderer ────────────────────────────────────────────────────
+function _renderTrafficLog(){
+  const el = document.getElementById('trafficLogPanel');
+  if(!el) return;
+  const log = AUTH.getTrafficLog().slice().reverse(); // newest first
+
+  if(!log.length){
+    el.innerHTML = '<div style="color:var(--txt-dim);font-size:11px;font-style:italic;padding:10px 0">No traffic logged yet. Visits, logins, and registrations will appear here.</div>';
+    return;
+  }
+
+  const now = Date.now();
+  const dayMs  = 86400000;
+  const weekMs = 7 * dayMs;
+  const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+
+  const visits    = log.filter(e=>e.event==='visit');
+  const logins    = log.filter(e=>e.event==='login');
+  const regs      = log.filter(e=>e.event==='register');
+  const todayV    = visits.filter(e=>e.ts>=todayStart.getTime()).length;
+  const weekV     = visits.filter(e=>e.ts>=now-weekMs).length;
+  const uniqueUsers = [...new Set(log.filter(e=>e.user&&e.user!=='anonymous').map(e=>e.user))].length;
+
+  const eventIcon = e => e.event==='visit'?'🌐':e.event==='login'?'◈':e.event==='register'?'✦':e.event==='logout'?'○':'•';
+  const eventCol  = e => e.event==='login'?'var(--res)':e.event==='register'?'var(--gold)':e.event==='visit'?'var(--txt-dim)':'rgba(255,255,255,.3)';
+  const fmtTime   = ts => { const d=new Date(ts); return d.toLocaleDateString()+' '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); };
+  const shortUA   = ua => {
+    if(!ua) return '—';
+    if(/Mobile|Android|iPhone/.test(ua)) return '📱 Mobile';
+    if(/Chrome/.test(ua)) return '🌐 Chrome';
+    if(/Firefox/.test(ua)) return '🦊 Firefox';
+    if(/Safari/.test(ua)) return '🧭 Safari';
+    if(/Edge/.test(ua)) return '🔵 Edge';
+    return ua.substring(0,28);
+  };
+
+  el.innerHTML = `
+    <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--gold-d);margin-bottom:14px">📡 SITE TRAFFIC LOG</div>
+
+    <!-- Stats grid -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:18px;">
+      <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px;text-align:center">
+        <div style="font-size:22px;color:var(--gold);font-family:'Cinzel',serif;font-weight:700">${todayV}</div>
+        <div style="font-size:7.5px;color:var(--txt-dim);letter-spacing:1px;margin-top:3px;text-transform:uppercase">Today's Visits</div>
+      </div>
+      <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px;text-align:center">
+        <div style="font-size:22px;color:var(--res);font-family:'Cinzel',serif;font-weight:700">${weekV}</div>
+        <div style="font-size:7.5px;color:var(--txt-dim);letter-spacing:1px;margin-top:3px;text-transform:uppercase">This Week</div>
+      </div>
+      <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px;text-align:center">
+        <div style="font-size:22px;color:var(--ins);font-family:'Cinzel',serif;font-weight:700">${logins.length}</div>
+        <div style="font-size:7.5px;color:var(--txt-dim);letter-spacing:1px;margin-top:3px;text-transform:uppercase">Total Logins</div>
+      </div>
+      <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px;text-align:center">
+        <div style="font-size:22px;color:var(--cor);font-family:'Cinzel',serif;font-weight:700">${regs.length}</div>
+        <div style="font-size:7.5px;color:var(--txt-dim);letter-spacing:1px;margin-top:3px;text-transform:uppercase">Registrations</div>
+      </div>
+    </div>
+
+    <!-- Unique users bar -->
+    <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+      <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:1.5px;color:var(--gold-d)">UNIQUE SIGNED-IN USERS</span>
+      <span style="font-family:'Cinzel',serif;font-size:16px;color:var(--gold);margin-left:auto">${uniqueUsers}</span>
+    </div>
+
+    <!-- Event log -->
+    <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:var(--txt-lbl);margin-bottom:6px">RECENT EVENTS (newest first)</div>
+    <div style="background:var(--surf2);border:1px solid var(--bdr-g);border-radius:6px;overflow:hidden;max-height:420px;overflow-y:auto">
+      ${log.slice(0,150).map(e=>`
+        <div style="display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:start;padding:7px 12px;border-bottom:1px solid rgba(255,255,255,.03)">
+          <span style="font-size:11px;opacity:.8;padding-top:1px">${eventIcon(e)}</span>
+          <div>
+            <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:.8px;color:${eventCol(e)}">
+              ${e.event.toUpperCase()}
+              ${e.user&&e.user!=='anonymous'?`<span style="color:var(--gold);margin-left:6px">${_escHtml(e.user)}</span>`:'<span style="color:rgba(255,255,255,.2);margin-left:6px">anonymous</span>'}
+              ${e.displayName?`<span style="color:var(--txt-dim);font-size:7.5px"> (${_escHtml(e.displayName)})</span>`:''}
+            </div>
+            <div style="font-size:8px;color:rgba(255,255,255,.22);margin-top:2px">${shortUA(e.ua)} · ${_escHtml(e.ref||'direct')}</div>
+          </div>
+          <div style="font-size:8px;color:var(--txt-dim);white-space:nowrap;text-align:right">${fmtTime(e.ts)}</div>
+        </div>`).join('')}
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="dm-tool-btn" onclick="_renderTrafficLog()">↻ Refresh</button>
+      <button class="dm-tool-btn danger" onclick="if(confirm('Clear all traffic data? This cannot be undone.')){localStorage.removeItem(AUTH.TRAFFIC_KEY);_renderTrafficLog();}">Clear Log</button>
+    </div>
+    <div style="font-size:8px;color:var(--txt-dim);font-style:italic;margin-top:8px">Traffic is stored locally in this browser. Logs are shared across accounts on the same device. Max 500 entries retained.</div>
+  `;
 }
 
 // ─── Encounter Manager ───────────────────────────────────────────────────────
@@ -26558,6 +26652,7 @@ function copyReport(){
                 <button class="keeper-tab-btn active" onclick="keeperTab('party',this)">⚔ Party</button>
                 <button class="keeper-tab-btn" onclick="keeperTab('players',this)" id="keeperTabPlayers">👥 Players</button>
                 <button class="keeper-tab-btn" onclick="keeperTab('agent',this)">◈ Agent Alas</button>
+                <button class="keeper-tab-btn" onclick="keeperTab('traffic',this)">📡 Traffic</button>
                 <button class="keeper-tab-btn" onclick="keeperTab('world',this)">🌐 World State</button>
                 <button class="keeper-tab-btn" onclick="keeperTab('encounter',this)">⚡ Encounter</button>
                 <button class="keeper-tab-btn" onclick="keeperTab('notes',this)">📜 Keeper Notes</button>
@@ -26604,6 +26699,11 @@ function copyReport(){
                     </div>
 
                     <div id="agentAlasReport"><div style="color:var(--txt-dim);font-size:11px">Loading Agent Alas report…</div></div>
+                </div>
+
+                <!-- ── TRAFFIC TAB ── -->
+                <div class="keeper-tab-panel" id="ktab-traffic" style="padding:16px;overflow-y:auto">
+                    <div id="trafficLogPanel"><div style="color:var(--txt-dim);font-size:11px;font-style:italic">Loading traffic log…</div></div>
                 </div>
 
                 <!-- ── WORLD STATE TAB ── -->
@@ -27158,6 +27258,26 @@ const AUTH = {
   getApiKey(){ return localStorage.getItem(this.APIKEY)||''; },
   setApiKey(k){ localStorage.setItem(this.APIKEY,k.trim()); },
   isGalixy(){ return this.currentUser && this.currentUser.key==='galixy'; },
+
+  // ── Traffic log ──────────────────────────────────────────────
+  TRAFFIC_KEY: 'alas_traffic_v1',
+  logTraffic(eventType, extra){
+    try{
+      const log = JSON.parse(localStorage.getItem(this.TRAFFIC_KEY)||'[]');
+      log.push({
+        ts:    Date.now(),
+        event: eventType,
+        user:  this.currentUser ? this.currentUser.key : 'anonymous',
+        ua:    (navigator.userAgent||'').substring(0,100),
+        ref:   document.referrer ? document.referrer.substring(0,80) : 'direct',
+        ...(extra||{})
+      });
+      localStorage.setItem(this.TRAFFIC_KEY, JSON.stringify(log.slice(-500)));
+    }catch(e){}
+  },
+  getTrafficLog(){
+    try{ return JSON.parse(localStorage.getItem(this.TRAFFIC_KEY)||'[]'); }catch{ return []; }
+  },
   isOwner(){ return this.currentUser && this.getUserRank(this.currentUser.key)==='owner'; },
 
   getUserRank(key){ const u=this.getUsers(); return (u[key]||{}).rank||'user'; },
@@ -27211,6 +27331,7 @@ function authSubmit(){
   if(!username||!password){ errEl.textContent='Please enter username and password.'; return; }
   const result=AUTH._authMode==='register'?AUTH.register(username,password):AUTH.login(username,password);
   if(!result.ok){ errEl.textContent=result.msg; return; }
+  AUTH.logTraffic(AUTH._authMode==='register'?'register':'login', {displayName:username.trim()});
   closeAuthModal();
   launchFireworks();
   _authLoginSuccess();
@@ -27270,6 +27391,11 @@ function authSignOut(){
   if(loginBtn){ loginBtn.textContent='◈ Sign In / Register'; loginBtn.onclick=openAuthModal; }
   const badge=document.getElementById('tsUserBadge');
   if(badge) badge.style.display='none';
+  // Re-hide character buttons until next sign-in
+  const charBtns=document.getElementById('tsCharBtns');
+  if(charBtns) charBtns.style.display='none';
+  const authNote=document.getElementById('tsAuthNote');
+  if(authNote) authNote.style.display='block';
   showToast('Signed out.');
 }
 
@@ -27286,6 +27412,12 @@ function _postLoginSetup(){
     const rankLabel = rank==='owner' ? ' [OWNER · Keeper]' : (rank==='admin' ? ' [Admin]' : (rank==='assistant' ? ' [Assistant]' : ''));
     nameEl.textContent='◈ '+user.name + rankLabel;
   }
+  // Reveal character access buttons for any signed-in user
+  const _charBtns = document.getElementById('tsCharBtns');
+  if(_charBtns){ _charBtns.style.display = 'flex'; }
+  const _authNote = document.getElementById('tsAuthNote');
+  if(_authNote){ _authNote.style.display = 'none'; }
+
   // Keeper-only elements — only show to Galixy
   if(AUTH.isGalixy()){
     document.querySelectorAll('.galixy-only').forEach(el=>{ el.style.display='block'; });
@@ -27608,6 +27740,7 @@ function _escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
 (function(){
   AUTH.restoreSession();
   AUTH.ensureGalixyRank();
+  AUTH.logTraffic('visit');
   // Always hide Keeper-only elements by default (CSS .galixy-only sets display:none)
   // They get shown by _postLoginSetup() only for Galixy
   if(AUTH.currentUser){
@@ -27617,12 +27750,16 @@ function _escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
       if(origAfter) origAfter();
       _postLoginSetup();
     };
-    // Patch title screen login button
+    // Patch title screen login button and reveal character buttons
     const patch=()=>{
       const btn=document.getElementById('tsLoginBtn');
       if(btn){ btn.textContent='◈ '+AUTH.currentUser.name; btn.onclick=authSignOut; }
       const badge=document.getElementById('tsUserBadge');
       if(badge){ badge.textContent='◈ Signed in as '+AUTH.currentUser.name; badge.style.display='block'; }
+      const charBtns=document.getElementById('tsCharBtns');
+      if(charBtns) charBtns.style.display='flex';
+      const authNote=document.getElementById('tsAuthNote');
+      if(authNote) authNote.style.display='none';
     };
     if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',patch); else patch();
   }
