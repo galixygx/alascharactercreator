@@ -961,6 +961,26 @@
         input.eff-stat-val { width: 42px; background: var(--surf2); border: 1px solid var(--bdr); color: var(--gold); font-family: 'Raleway',sans-serif; font-size: 11px; font-weight: 600; text-align: center; padding: 1px 3px; border-radius: 3px; outline: none; }
         input.eff-stat-val:focus { border-color: var(--gold-d); }
 
+        /* ─── SET STAT PANEL SYSTEM ─── */
+        .set-tier-top { display:flex; align-items:flex-end; gap:8px; flex-wrap:wrap; }
+        .set-stat-toggle-btn { display:flex; align-items:center; gap:6px; cursor:pointer; background:var(--surf2); border:1px solid var(--bdr); border-radius:4px; padding:4px 10px; font-family:'Cinzel',serif; font-size:7px; letter-spacing:1.5px; color:var(--gold-d); text-transform:uppercase; transition:border-color .15s; }
+        .set-stat-toggle-btn:hover, .set-stat-toggle-btn.open { border-color:var(--gold-d); color:var(--gold); }
+        .set-stat-arr { margin-left:auto; font-size:8px; }
+        .set-stat-panel { display:none; margin-top:8px; padding:10px; background:var(--surf); border:1px solid var(--bdr); border-radius:5px; }
+        .stat-group-hdr { font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:2px; color:var(--txt-dim); text-transform:uppercase; margin:8px 0 4px; padding-bottom:3px; border-bottom:1px solid var(--bdr); }
+        .stat-group-hdr:first-child { margin-top:0; }
+        .stat-bonus-grid { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:2px; }
+        .stat-bonus-item { display:flex; align-items:center; gap:4px; padding:3px 6px; background:var(--surf2); border:1px solid var(--bdr); border-radius:4px; cursor:pointer; transition:border-color .1s,background .1s; }
+        .stat-bonus-item.stat-on { border-color:rgba(201,162,39,.5); background:rgba(201,162,39,.07); }
+        .stat-chk { width:10px; height:10px; cursor:pointer; accent-color:var(--gold-d); }
+        .stat-bonus-name { font-family:'Cinzel',serif; font-size:7px; letter-spacing:.5px; color:var(--txt-lbl); white-space:nowrap; }
+        .stat-bonus-item.stat-on .stat-bonus-name { color:var(--gold-l); }
+        input.stat-val-inp { width:42px; background:var(--surf); border:1px solid var(--bdr); color:var(--gold); font-family:'Raleway',sans-serif; font-size:11px; font-weight:600; text-align:center; padding:1px 3px; border-radius:3px; outline:none; }
+        input.stat-val-inp:focus { border-color:var(--gold-d); }
+
+        /* ─── SPELL/ABILITY ACTIVE EFFECT PANELS ─── */
+        .sp-ae-panel, .ab-ae-panel { margin-top:6px; padding:8px; background:var(--surf); border:1px solid var(--bdr); border-radius:5px; }
+
         /* ─── SKILLS TAB ─── */
         .passive-bar {
             display: flex;
@@ -2210,8 +2230,8 @@
 
         .set-add-btn {
             background: var(--surf);
-            border: 1px dashed #4a3a88;
-            color: #8060c0;
+            border: 1px dashed var(--bdr-g);
+            color: var(--gold-d);
             font-family: 'Cinzel',serif;
             font-size: 8.5px;
             letter-spacing: 2px;
@@ -2226,18 +2246,18 @@
 
             .set-add-btn:hover {
                 background: var(--surf2);
-                color: #a080e0;
-                border-color: #7060b0;
+                color: var(--gold);
+                border-color: var(--gold-d);
             }
 
         .sets-sec-hdr {
             font-family: 'Cinzel',serif;
             font-size: 9px;
             letter-spacing: 3px;
-            color: #a080e0;
+            color: var(--gold-d);
             text-transform: uppercase;
             padding-bottom: 7px;
-            border-bottom: 1px solid #3a2a58;
+            border-bottom: 1px solid var(--bdr-g);
             margin-bottom: 12px;
             margin-top: 18px;
         }
@@ -9038,6 +9058,10 @@
                                     <div class="cstat">
                                         <div class="cstat-lbl">Armor Class</div>
                                         <input class="cstat-inp" type="number" id="combatAC" value="10" oninput="saveAll()">
+                                        <div class="ab-mods-wrap" title="Manual AC modifier — stacks with all armor, shield &amp; set bonuses">
+                                            <span class="ab-mods-lbl">MODS</span>
+                                            <input class="ab-mods-inp" type="number" id="combatAcMod" value="0" min="-20" max="20" oninput="onCombatModInput()">
+                                        </div>
                                     </div>
                                     <div class="cstat cstat-speed-multi">
                                         <div class="cstat-lbl">Speed</div>
@@ -9052,6 +9076,10 @@
                                     <div class="cstat">
                                         <div class="cstat-lbl">Initiative</div>
                                         <div class="cstat-inp" style="font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;" id="initVal">+0</div>
+                                        <div class="ab-mods-wrap" title="Manual Initiative modifier — stacks with DEX mod &amp; all bonuses">
+                                            <span class="ab-mods-lbl">MODS</span>
+                                            <input class="ab-mods-inp" type="number" id="combatInitMod" value="0" min="-20" max="20" oninput="onCombatModInput()">
+                                        </div>
                                     </div>
                                     <div class="cstat">
                                         <div class="cstat-lbl">Hit Die</div>
@@ -11888,7 +11916,7 @@ let state = {
   saveProficiencies:[],
   skillProf:{},skillExp:{},
   savesOverride:{},
-  combatAC:10,combatSpeed:'30 ft.',hitDie:'',
+  combatAC:10,combatSpeed:'30 ft.',hitDie:'',acMod:0,initMod:0,
   goldGP:0,goldSP:0,goldCP:0,gemsHeld:0,
   noteBackstory:'',noteSession:'',noteAllies:'',noteGoals:'',noteScars:'',
   sigils:[], features:[], inventory:[], factions:[], languages:[], sigilOrigin:'', knownClassSigils:{}, shopCustomItems:{},
@@ -11942,6 +11970,8 @@ function saveAll(){
   // Save manual ability mods from MODS inputs
   if(!state.abilityMods) state.abilityMods={};
   ABILITIES.forEach(ab=>{const el=document.getElementById('abmods_'+ab);if(el)state.abilityMods[ab]=parseInt(el.value)||0;});
+  state.acMod = parseInt(document.getElementById('combatAcMod')?.value)||0;
+  state.initMod = parseInt(document.getElementById('combatInitMod')?.value)||0;
   updateCalcs();
   const _spIn=document.getElementById('combatSpeed');
   const _spSb=document.getElementById('charSpeed');
@@ -11980,6 +12010,8 @@ function ensureStateDefaults(){
   if(!state.knownClassSigils || typeof state.knownClassSigils !== 'object') state.knownClassSigils = {};
   if(!Array.isArray(state.completedSpells)) state.completedSpells = [];
   (state.sigils||[]).forEach(s=>{ if(s.dailySpent===undefined) s.dailySpent=false; });
+  if(state.acMod===undefined) state.acMod=0;
+  if(state.initMod===undefined) state.initMod=0;
 }
 
 // ═══════════════════════════════════════════════════
@@ -12363,7 +12395,7 @@ function updateCalcs(){
   const spellAbilityBon = getSpellAbilityEffectBonuses();
   const equippedItemBon = getEquippedItemEffectBonuses();
   const setStatBonEarly = getActiveSetStatBonuses();
-  const totalInit = dex + biomeInit + getManualAbilityMod('DEX') + (spellAbilityBon.ex_init||0) + (equippedItemBon.ex_init||0) + (setStatBonEarly.ex_init||0);
+  const totalInit = dex + biomeInit + getManualAbilityMod('DEX') + (spellAbilityBon.ex_init||0) + (equippedItemBon.ex_init||0) + (setStatBonEarly.ex_init||0) + (state.initMod||0);
   document.getElementById('initDisplay').textContent = fmtMod(totalInit);
   document.getElementById('initVal').textContent = fmtMod(totalInit);
   // Update Alas Heavy dice pool in Attributes tab
@@ -12488,7 +12520,7 @@ function updateArmorAC(){
   updateAllSetStatuses();
   const setBonus=getSetAcBonus();
   const effBon=getActiveEffectBonuses();
-  const totalAC=baseAC+armorBonus+shieldBonus+setBonus+(effBon.ac||0);
+  const totalAC=baseAC+armorBonus+shieldBonus+setBonus+(effBon.ac||0)+(state.acMod||0);
   document.getElementById('combatAC').value=totalAC;
   document.getElementById('armorAC').textContent=totalAC;
 }
@@ -12793,6 +12825,14 @@ function buildAbilityGrid(){
     `;
     g.appendChild(card);
   });
+}
+
+function onCombatModInput(){
+  state.acMod = parseInt(document.getElementById('combatAcMod')?.value)||0;
+  state.initMod = parseInt(document.getElementById('combatInitMod')?.value)||0;
+  updateArmorAC();
+  updateCalcs();
+  _debouncedSave();
 }
 
 function onAbilityModInput(inp,ab){
@@ -23076,6 +23116,8 @@ function restoreSimpleInputs(){
   ABILITIES.forEach(ab=>{const el=document.getElementById('ab_'+ab);if(el)el.value=state[ab]||10;});
   // Restore manual ability MODS
   if(state.abilityMods){ABILITIES.forEach(ab=>{const el=document.getElementById('abmods_'+ab);if(el)el.value=state.abilityMods[ab]||0;});}
+  const acModEl=document.getElementById('combatAcMod'); if(acModEl) acModEl.value=state.acMod||0;
+  const initModEl=document.getElementById('combatInitMod'); if(initModEl) initModEl.value=state.initMod||0;
   // Restore alternate movement speeds
   ['swimSpeed','flySpeed','climbSpeed','burrowSpeed'].forEach(id=>{const el=document.getElementById(id);if(el&&state[id]!==undefined)el.value=state[id];});
   const asSel = document.getElementById('attunedSigil'); if(asSel){ asSel.value = state.attunedSigil||''; renderAttunedSigilPanel(state.attunedSigil||''); }
