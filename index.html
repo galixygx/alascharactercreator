@@ -9793,11 +9793,84 @@
                       <div style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);line-height:1.5">Have an idea for a new function or improvement? Submit your request with details.</div>
                     </div>
                   </div>
-                  <!-- Forms (shown one at a time) -->
-                  <div id="rpt-form-bug" style="display:none;margin-top:20px;"></div>
-                  <div id="rpt-form-feature" style="display:none;margin-top:20px;"></div>
-                  <!-- Preview/copy panel -->
-                  <div id="rpt-preview" style="display:none;margin-top:20px;"></div>
+
+                  <!-- Bug Report Form (static) -->
+                  <div id="rpt-form-bug" style="display:none;margin-top:20px;">
+                    <div style="padding:20px 22px;background:rgba(200,32,48,.08);border:1px solid rgba(200,32,48,.35);border-radius:8px;">
+                      <div style="font-family:'Cinzel Decorative',serif;font-size:13px;color:#c82030;margin-bottom:16px;">🐛 Bug Report</div>
+                      <div style="display:flex;flex-direction:column;gap:12px;">
+                        <div class="c-fld"><span class="c-fld-lbl">Bug Category</span>
+                          <select class="c-sel" id="rptBugCat">
+                            <option>UI / Display</option><option>Calculation / Stat Error</option>
+                            <option>Save / Load Issue</option><option>Tab or Button Not Working</option>
+                            <option>Creature / Spell Data</option><option>Roll System</option><option>Other</option>
+                          </select>
+                        </div>
+                        <div class="c-fld"><span class="c-fld-lbl">Tab / Section Where Bug Occurs</span>
+                          <input class="c-inp" id="rptBugTab" placeholder="e.g. Sigils, Creatures, Attributes…">
+                        </div>
+                        <div class="c-fld"><span class="c-fld-lbl">Severity</span>
+                          <select class="c-sel" id="rptBugSev">
+                            <option>Low — Minor cosmetic issue</option>
+                            <option>Medium — Function works but incorrectly</option>
+                            <option>High — Feature is broken / unusable</option>
+                            <option>Critical — Causes data loss or crash</option>
+                          </select>
+                        </div>
+                        <div class="c-fld"><span class="c-fld-lbl">Steps to Reproduce</span>
+                          <textarea class="c-ta" id="rptBugSteps" placeholder="1. Go to… 2. Click… 3. See error…" style="min-height:90px"></textarea>
+                        </div>
+                        <div class="c-fld"><span class="c-fld-lbl">Expected Behaviour</span>
+                          <textarea class="c-ta" id="rptBugExpected" placeholder="What should have happened…" style="min-height:70px"></textarea>
+                        </div>
+                        <div class="c-fld"><span class="c-fld-lbl">Additional Comments</span>
+                          <textarea class="c-ta" id="rptBugComments" placeholder="Any extra context, screenshots description, workarounds tried…" style="min-height:90px"></textarea>
+                        </div>
+                      </div>
+                      <div style="margin-top:18px;display:flex;gap:10px;">
+                        <button id="rptBugSubmitBtn" onclick="submitReport('bug')" style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;padding:11px 28px;background:#c82030;border:none;border-radius:6px;color:#fff;cursor:pointer;text-transform:uppercase;">Submit</button>
+                        <button onclick="closeReportForm()" style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;padding:9px 18px;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:5px;color:var(--txt-dim);cursor:pointer;">← Back</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Feature Request Form (static) -->
+                  <div id="rpt-form-feature" style="display:none;margin-top:20px;">
+                    <div style="padding:20px 22px;background:rgba(61,214,219,.06);border:1px solid rgba(61,214,219,.3);border-radius:8px;">
+                      <div style="font-family:'Cinzel Decorative',serif;font-size:13px;color:#3dd6db;margin-bottom:16px;">✨ Feature Request</div>
+                      <div style="display:flex;flex-direction:column;gap:12px;">
+                        <div class="c-fld"><span class="c-fld-lbl">Feature Category</span>
+                          <select class="c-sel" id="rptFeatCat">
+                            <option>New Tab / Section</option><option>New Mechanic / Rule</option>
+                            <option>UI Improvement</option><option>Roll System Enhancement</option>
+                            <option>Creature / Spell Data</option><option>Quality of Life</option><option>Other</option>
+                          </select>
+                        </div>
+                        <div class="c-fld"><span class="c-fld-lbl">Relevant Tab / Section</span>
+                          <input class="c-inp" id="rptFeatTab" placeholder="e.g. Sigils, Notes, Creatures…">
+                        </div>
+                        <div class="c-fld"><span class="c-fld-lbl">Priority</span>
+                          <select class="c-sel" id="rptFeatPri">
+                            <option>Nice to Have</option><option>Would Improve Gameplay</option>
+                            <option>Important for Our Campaign</option><option>Essential — Blocking Gameplay</option>
+                          </select>
+                        </div>
+                        <div class="c-fld"><span class="c-fld-lbl">Feature Description</span>
+                          <textarea class="c-ta" id="rptFeatDesc" placeholder="Describe what you want — be as specific as possible…" style="min-height:110px"></textarea>
+                        </div>
+                        <div class="c-fld"><span class="c-fld-lbl">Why Is This Needed?</span>
+                          <textarea class="c-ta" id="rptFeatWhy" placeholder="How would this improve play? What problem does it solve?" style="min-height:80px"></textarea>
+                        </div>
+                        <div class="c-fld"><span class="c-fld-lbl">Additional Comments</span>
+                          <textarea class="c-ta" id="rptFeatComments" placeholder="Examples, references, or any other details…" style="min-height:90px"></textarea>
+                        </div>
+                      </div>
+                      <div style="margin-top:18px;display:flex;gap:10px;">
+                        <button id="rptFeatSubmitBtn" onclick="submitReport('feature')" style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;padding:11px 28px;background:#3dd6db;border:none;border-radius:6px;color:#0a0a12;cursor:pointer;text-transform:uppercase;">Submit</button>
+                        <button onclick="closeReportForm()" style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;padding:9px 18px;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:5px;color:var(--txt-dim);cursor:pointer;">← Back</button>
+                      </div>
+                    </div>
+                  </div>
                 </div><!-- /tab-report -->
 
             </div><!-- /tab-content -->
@@ -26315,117 +26388,39 @@ function renderSavedContext(){
 // ═══════════════════════════════════════════════════════════════
 
 function openReportForm(type){
-  // Hide both forms and preview, show only the chosen one
-  document.getElementById('rpt-form-bug').style.display     = 'none';
-  document.getElementById('rpt-form-feature').style.display = 'none';
-  document.getElementById('rpt-preview').style.display      = 'none';
-
-  const accentCol = type === 'bug' ? '#c82030' : '#3dd6db';
-  const accentBg  = type === 'bug' ? 'rgba(200,32,48,.08)'  : 'rgba(61,214,219,.06)';
-  const accentBdr = type === 'bug' ? 'rgba(200,32,48,.35)'  : 'rgba(61,214,219,.3)';
-  const title     = type === 'bug' ? '🐛 Bug Report'        : '✨ Feature Request';
-
-  const bugFields = `
-    <div class="c-fld"><span class="c-fld-lbl">Bug Category</span>
-      <select class="c-sel" id="rptBugCat">
-        <option>UI / Display</option><option>Calculation / Stat Error</option>
-        <option>Save / Load Issue</option><option>Tab or Button Not Working</option>
-        <option>Creature / Spell Data</option><option>Roll System</option><option>Other</option>
-      </select>
-    </div>
-    <div class="c-fld"><span class="c-fld-lbl">Tab / Section Where Bug Occurs</span>
-      <input class="c-inp" id="rptBugTab" placeholder="e.g. Sigils, Creatures, Attributes…">
-    </div>
-    <div class="c-fld"><span class="c-fld-lbl">Severity</span>
-      <select class="c-sel" id="rptBugSev">
-        <option>Low — Minor cosmetic issue</option>
-        <option>Medium — Function works but incorrectly</option>
-        <option>High — Feature is broken / unusable</option>
-        <option>Critical — Causes data loss or crash</option>
-      </select>
-    </div>
-    <div class="c-fld"><span class="c-fld-lbl">Steps to Reproduce</span>
-      <textarea class="c-ta" id="rptBugSteps" placeholder="1. Go to… 2. Click… 3. See error…" style="min-height:90px"></textarea>
-    </div>
-    <div class="c-fld"><span class="c-fld-lbl">Expected Behaviour</span>
-      <textarea class="c-ta" id="rptBugExpected" placeholder="What should have happened…" style="min-height:70px"></textarea>
-    </div>
-    <div class="c-fld"><span class="c-fld-lbl">Additional Comments</span>
-      <textarea class="c-ta" id="rptBugComments" placeholder="Any extra context, screenshots description, workarounds tried…" style="min-height:110px"></textarea>
-    </div>`;
-
-  const featFields = `
-    <div class="c-fld"><span class="c-fld-lbl">Feature Category</span>
-      <select class="c-sel" id="rptFeatCat">
-        <option>New Tab / Section</option><option>New Mechanic / Rule</option>
-        <option>UI Improvement</option><option>Roll System Enhancement</option>
-        <option>Creature / Spell Data</option><option>Quality of Life</option><option>Other</option>
-      </select>
-    </div>
-    <div class="c-fld"><span class="c-fld-lbl">Relevant Tab / Section</span>
-      <input class="c-inp" id="rptFeatTab" placeholder="e.g. Sigils, Notes, Creatures…">
-    </div>
-    <div class="c-fld"><span class="c-fld-lbl">Priority</span>
-      <select class="c-sel" id="rptFeatPri">
-        <option>Nice to Have</option><option>Would Improve Gameplay</option>
-        <option>Important for Our Campaign</option><option>Essential — Blocking Gameplay</option>
-      </select>
-    </div>
-    <div class="c-fld"><span class="c-fld-lbl">Feature Description</span>
-      <textarea class="c-ta" id="rptFeatDesc" placeholder="Describe what you want — be as specific as possible…" style="min-height:110px"></textarea>
-    </div>
-    <div class="c-fld"><span class="c-fld-lbl">Why Is This Needed?</span>
-      <textarea class="c-ta" id="rptFeatWhy" placeholder="How would this improve play? What problem does it solve?" style="min-height:80px"></textarea>
-    </div>
-    <div class="c-fld"><span class="c-fld-lbl">Additional Comments</span>
-      <textarea class="c-ta" id="rptFeatComments" placeholder="Examples, references, or any other details…" style="min-height:110px"></textarea>
-    </div>`;
-
-  const fields = type === 'bug' ? bugFields : featFields;
-  const submitFn = type === 'bug' ? 'submitReport("bug")' : 'submitReport("feature")';
-  const formId   = type === 'bug' ? 'rpt-form-bug'         : 'rpt-form-feature';
-
-  document.getElementById(formId).innerHTML = `
-    <div style="padding:20px 22px;background:${accentBg};border:1px solid ${accentBdr};border-radius:8px;">
-      <div style="font-family:'Cinzel Decorative',serif;font-size:13px;color:${accentCol};margin-bottom:16px;">${title}</div>
-      <div style="display:flex;flex-direction:column;gap:12px;">${fields}</div>
-      <div style="margin-top:18px;display:flex;gap:10px;">
-        <button onclick="${submitFn}" style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;padding:11px 28px;background:${accentCol};border:none;border-radius:6px;color:#fff;cursor:pointer;text-transform:uppercase;">Submit</button>
-        <button onclick="closeReportForm()" style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;padding:9px 18px;background:transparent;border:1px solid rgba(255,255,255,.15);border-radius:5px;color:var(--txt-dim);cursor:pointer;">← Back</button>
-      </div>
-    </div>`;
-
-  document.getElementById(formId).style.display = 'block';
+  document.getElementById('rpt-choice').style.display  = 'none';
+  document.getElementById('rpt-form-bug').style.display     = type === 'bug'     ? 'block' : 'none';
+  document.getElementById('rpt-form-feature').style.display = type === 'feature' ? 'block' : 'none';
 }
 
 function closeReportForm(){
+  document.getElementById('rpt-choice').style.display       = 'flex';
   document.getElementById('rpt-form-bug').style.display     = 'none';
   document.getElementById('rpt-form-feature').style.display = 'none';
-  document.getElementById('rpt-preview').style.display      = 'none';
 }
 
 function submitReport(type){
-  const charName = (state.name || 'Unknown Character');
-  const now = new Date().toLocaleString();
+  const charName = state.name || 'Unknown Character';
+  const now      = new Date().toLocaleString();
   let text = '';
 
   if(type === 'bug'){
-    const cat      = document.getElementById('rptBugCat')?.value      || '';
-    const tab      = document.getElementById('rptBugTab')?.value      || '';
-    const sev      = document.getElementById('rptBugSev')?.value      || '';
-    const steps    = document.getElementById('rptBugSteps')?.value    || '';
-    const expected = document.getElementById('rptBugExpected')?.value || '';
-    const comments = document.getElementById('rptBugComments')?.value || '';
+    const cat      = (document.getElementById('rptBugCat')     ||{}).value || '';
+    const tab      = (document.getElementById('rptBugTab')     ||{}).value || '';
+    const sev      = (document.getElementById('rptBugSev')     ||{}).value || '';
+    const steps    = (document.getElementById('rptBugSteps')   ||{}).value || '';
+    const expected = (document.getElementById('rptBugExpected')||{}).value || '';
+    const comments = (document.getElementById('rptBugComments')||{}).value || '';
     text = [
       '══════════════════════════════════════',
       '  ALAS — BUG REPORT',
       '══════════════════════════════════════',
-      `Character : ${charName}`,
-      `Submitted : ${now}`,
+      'Character : ' + charName,
+      'Submitted : ' + now,
       '──────────────────────────────────────',
-      `Category  : ${cat}`,
-      `Tab/Section: ${tab}`,
-      `Severity  : ${sev}`,
+      'Category  : ' + cat,
+      'Tab/Section: ' + tab,
+      'Severity  : ' + sev,
       '──────────────────────────────────────',
       'STEPS TO REPRODUCE:',
       steps || '(none provided)',
@@ -26438,22 +26433,22 @@ function submitReport(type){
       '══════════════════════════════════════',
     ].join('\n');
   } else {
-    const cat      = document.getElementById('rptFeatCat')?.value      || '';
-    const tab      = document.getElementById('rptFeatTab')?.value      || '';
-    const pri      = document.getElementById('rptFeatPri')?.value      || '';
-    const desc     = document.getElementById('rptFeatDesc')?.value     || '';
-    const why      = document.getElementById('rptFeatWhy')?.value      || '';
-    const comments = document.getElementById('rptFeatComments')?.value || '';
+    const cat      = (document.getElementById('rptFeatCat')     ||{}).value || '';
+    const tab      = (document.getElementById('rptFeatTab')     ||{}).value || '';
+    const pri      = (document.getElementById('rptFeatPri')     ||{}).value || '';
+    const desc     = (document.getElementById('rptFeatDesc')    ||{}).value || '';
+    const why      = (document.getElementById('rptFeatWhy')     ||{}).value || '';
+    const comments = (document.getElementById('rptFeatComments')||{}).value || '';
     text = [
       '══════════════════════════════════════',
       '  ALAS — FEATURE REQUEST',
       '══════════════════════════════════════',
-      `Character : ${charName}`,
-      `Submitted : ${now}`,
+      'Character : ' + charName,
+      'Submitted : ' + now,
       '──────────────────────────────────────',
-      `Category  : ${cat}`,
-      `Tab/Section: ${tab}`,
-      `Priority  : ${pri}`,
+      'Category  : ' + cat,
+      'Tab/Section: ' + tab,
+      'Priority  : ' + pri,
       '──────────────────────────────────────',
       'FEATURE DESCRIPTION:',
       desc || '(none provided)',
@@ -26468,32 +26463,30 @@ function submitReport(type){
   }
 
   // Log to Agent ALAS
-  if(typeof AgentAlas !== 'undefined'){
-    AgentAlas.logEvent('player_report_submitted', {
-      reportType: type,
-      charName,
-      user: AUTH.currentUser ? AUTH.currentUser.key : 'anonymous',
-      preview: text.substring(0, 200)
-    });
-  }
-  // Log to user auth log
-  if(AUTH.currentUser && typeof AUTH.appendLog === 'function'){
-    AUTH.appendLog({ type: 'report_submitted', reportType: type, charName });
-  }
+  try {
+    if(typeof AgentAlas !== 'undefined'){
+      AgentAlas.logEvent('player_report_submitted', {
+        reportType: type, charName,
+        user: AUTH.currentUser ? AUTH.currentUser.key : 'anonymous',
+        preview: text.substring(0, 200)
+      });
+    }
+    if(AUTH.currentUser && typeof AUTH.appendLog === 'function'){
+      AUTH.appendLog({ type: 'report_submitted', reportType: type, charName });
+    }
+  } catch(e){}
 
-  document.getElementById('rpt-form-bug').style.display     = 'none';
-  document.getElementById('rpt-form-feature').style.display = 'none';
-
+  // Show modal popup
   const accentCol = type === 'bug' ? '#c82030' : '#3dd6db';
   const label     = type === 'bug' ? 'Bug Report' : 'Feature Request';
-
-  // Populate and open the modal overlay
-  const overlay = document.getElementById('reportPreviewOverlay');
-  document.getElementById('rptModalAccent').style.color  = accentCol;
-  document.getElementById('rptModalLabel').textContent   = `📋 Your ${label} — Ready to Copy`;
-  document.getElementById('rptModalCopyText').value      = text;
-  document.getElementById('rptModalCopyBtn').style.background = accentCol;
-  if(overlay) overlay.style.display = 'flex';
+  const overlay   = document.getElementById('reportPreviewOverlay');
+  const labelEl   = document.getElementById('rptModalLabel');
+  const textEl    = document.getElementById('rptModalCopyText');
+  const copyBtn   = document.getElementById('rptModalCopyBtn');
+  if(labelEl)  { labelEl.textContent = '📋 Your ' + label + ' — Ready to Copy'; labelEl.style.color = accentCol; }
+  if(textEl)   { textEl.value = text; }
+  if(copyBtn)  { copyBtn.style.background = accentCol; }
+  if(overlay)  { overlay.style.display = 'flex'; }
 }
 
 function closeReportPreview(){
@@ -26505,12 +26498,12 @@ function copyReport(){
   const ta  = document.getElementById('rptModalCopyText');
   const btn = document.getElementById('rptModalCopyBtn');
   if(!ta) return;
-  const finish = () => {
-    if(btn){ btn.textContent = '✓ Copied!'; setTimeout(()=>{ btn.textContent = '📋 Copy'; }, 2000); }
-    showToast('Report copied!');
+  const finish = function(){
+    if(btn){ btn.textContent = '✓ Copied!'; setTimeout(function(){ btn.textContent = '📋 Copy'; }, 2000); }
+    if(typeof showToast === 'function') showToast('Report copied!');
   };
   try {
-    navigator.clipboard.writeText(ta.value).then(finish).catch(()=>{ ta.select(); document.execCommand('copy'); finish(); });
+    navigator.clipboard.writeText(ta.value).then(finish).catch(function(){ ta.select(); document.execCommand('copy'); finish(); });
   } catch(e){ ta.select(); document.execCommand('copy'); finish(); }
 }</script>
 
