@@ -9125,13 +9125,9 @@
                 <!-- ─── SKILLS ─── -->
                 <!-- ─── SKILLS & FEATURES (MERGED) ─── -->
                 <div class="tab-panel" id="tab-skills">
-                    <!-- ── SECTION 1: RACIAL SKILLS ──────────────────── -->
-                    <div class="sec-hdr" style="margin-bottom:8px;">Racial Skills</div>
-                    <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:12px;">
-                        Innate abilities granted by bloodline — populate automatically when you choose a Race.
-                    </div>
-                    <div id="racialSkillsDisplay">
-                        <div class="racial-skills-empty">Select a Race in the sidebar to load your Racial Skills.</div>
+                    <!-- ── SECTION 1: RACIAL FEATURES (unified) ─────── -->
+                    <div id="racialTraitsDisplay">
+                        <div class="racial-skills-empty">Select a Race in the sidebar to load your Racial Features.</div>
                     </div>
 
                     <!-- ── DIVIDER ─────────────────────────────────────── -->
@@ -9139,9 +9135,6 @@
 
                     <!-- ── SECTION 2: BACKGROUND FEATURE ─────────────── -->
                     <div id="backgroundFeatureDisplay"></div>
-
-                    <!-- ── SECTION 3: RACIAL TRAITS ───────────────────── -->
-                    <div id="racialTraitsDisplay"></div>
 
                     <!-- ── SECTION 4: CLASS INFO & PROGRESSION ───────── -->
                     <div id="classInfoDisplay"></div>
@@ -13055,7 +13048,7 @@ function updateRacialTraitsDisplay(){
   const race=document.getElementById('charRace').value;
   const panel=document.getElementById('racialTraitsDisplay');
   if(!panel) return;
-  if(!race||!RACES[race]){panel.innerHTML='';return;}
+  if(!race||!RACES[race]){panel.innerHTML='<div class="racial-skills-empty">Select a Race in the sidebar to load your Racial Features.</div>';return;}
 
   const skills = RACIAL_SKILLS[race] || [];
   if(skills.length === 0){
