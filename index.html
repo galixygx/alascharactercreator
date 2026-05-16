@@ -12395,7 +12395,10 @@ function updateCalcs(){
   const spellAbilityBon = getSpellAbilityEffectBonuses();
   const equippedItemBon = getEquippedItemEffectBonuses();
   const setStatBonEarly = getActiveSetStatBonuses();
-  const totalInit = dex + biomeInit + getManualAbilityMod('DEX') + (spellAbilityBon.ex_init||0) + (equippedItemBon.ex_init||0) + (setStatBonEarly.ex_init||0) + (state.initMod||0);
+  const totalInit = dex + biomeInit + getManualAbilityMod('DEX')
+    + (spellAbilityBon['ab_DEX']||0) + (equippedItemBon['ab_DEX']||0) + (setStatBonEarly['ab_DEX']||0)
+    + (spellAbilityBon.ex_init||0) + (equippedItemBon.ex_init||0) + (setStatBonEarly.ex_init||0)
+    + (state.initMod||0);
   document.getElementById('initDisplay').textContent = fmtMod(totalInit);
   document.getElementById('initVal').textContent = fmtMod(totalInit);
   // Update Alas Heavy dice pool in Attributes tab
@@ -12427,8 +12430,8 @@ function updateCalcs(){
     document.getElementById('spModDisplay').textContent='—';
     document.getElementById('spDcDisplay').textContent='—';
   }
-  // Gather cumulative set stat bonuses + active effect bonuses + new sources
-  const setStatBon=getActiveSetStatBonuses();
+  // Gather cumulative set stat bonuses (reuse early result) + active effect bonuses
+  const setStatBon=setStatBonEarly;
   const effBon=getActiveEffectBonuses();
   // Ability mods — tinted gold when any bonus is active
   ABILITIES.forEach(ab=>{
@@ -12830,7 +12833,6 @@ function buildAbilityGrid(){
 function onCombatModInput(){
   state.acMod = parseInt(document.getElementById('combatAcMod')?.value)||0;
   state.initMod = parseInt(document.getElementById('combatInitMod')?.value)||0;
-  updateArmorAC();
   updateCalcs();
   _debouncedSave();
 }
