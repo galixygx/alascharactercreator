@@ -945,10 +945,10 @@
         input.speed-inp:focus { border-bottom-color: var(--gold-d); }
 
         /* ── Effect Stat Panel (spells, abilities, inventory) ── */
-        .eff-stat-toggle-btn { display: flex; align-items: center; gap: 6px; cursor: pointer; background: var(--surf2); border: 1px solid var(--bdr); border-radius: 4px; padding: 5px 10px; margin-top: 8px; font-family: 'Cinzel',serif; font-size: 7px; letter-spacing: 1.5px; color: var(--gold-d); text-transform: uppercase; transition: border-color .15s; width: 100%; }
-        .eff-stat-toggle-btn:hover { border-color: var(--gold-d); }
+        .eff-stat-toggle-btn { display: flex; align-items: center; gap: 6px; cursor: pointer; background: rgba(201,162,39,.04); border: 1px solid rgba(201,162,39,.35); border-radius: 4px; padding: 6px 10px; margin-top: 8px; font-family: 'Cinzel',serif; font-size: 7px; letter-spacing: 1.5px; color: var(--gold-d); text-transform: uppercase; transition: all .15s; width: 100%; }
+        .eff-stat-toggle-btn:hover { border-color: var(--gold); color: var(--gold); background: rgba(201,162,39,.08); box-shadow: 0 0 8px rgba(201,162,39,.12); }
         .eff-stat-toggle-btn .eff-arr { margin-left: auto; font-size: 8px; }
-        .eff-stat-panel { display: none; margin-top: 6px; padding: 10px; background: var(--surf2); border: 1px solid var(--bdr); border-radius: 5px; }
+        .eff-stat-panel { display: none; margin-top: 6px; padding: 10px; background: var(--surf2); border: 1px solid rgba(201,162,39,.2); border-radius: 5px; }
         .eff-stat-panel.open { display: block; }
         .eff-stat-group-hdr { font-family: 'Cinzel',serif; font-size: 6.5px; letter-spacing: 2px; color: var(--txt-dim); text-transform: uppercase; margin: 8px 0 4px; padding-bottom: 3px; border-bottom: 1px solid var(--bdr); }
         .eff-stat-group-hdr:first-child { margin-top: 0; }
@@ -963,10 +963,10 @@
 
         /* ─── SET STAT PANEL SYSTEM ─── */
         .set-tier-top { display:flex; align-items:flex-end; gap:8px; flex-wrap:wrap; }
-        .set-stat-toggle-btn { display:flex; align-items:center; gap:6px; cursor:pointer; background:var(--surf2); border:1px solid var(--bdr); border-radius:4px; padding:4px 10px; font-family:'Cinzel',serif; font-size:7px; letter-spacing:1.5px; color:var(--gold-d); text-transform:uppercase; transition:border-color .15s; }
-        .set-stat-toggle-btn:hover, .set-stat-toggle-btn.open { border-color:var(--gold-d); color:var(--gold); }
+        .set-stat-toggle-btn { display:flex; align-items:center; gap:6px; cursor:pointer; background:rgba(201,162,39,.04); border:1px solid rgba(201,162,39,.4); border-radius:4px; padding:5px 10px; font-family:'Cinzel',serif; font-size:7px; letter-spacing:1.5px; color:var(--gold-d); text-transform:uppercase; transition:all .15s; }
+        .set-stat-toggle-btn:hover, .set-stat-toggle-btn.open { border-color:var(--gold); color:var(--gold); background:rgba(201,162,39,.09); box-shadow:0 0 8px rgba(201,162,39,.12); }
         .set-stat-arr { margin-left:auto; font-size:8px; }
-        .set-stat-panel { display:none; margin-top:8px; padding:10px; background:var(--surf); border:1px solid var(--bdr); border-radius:5px; }
+        .set-stat-panel { display:none; margin-top:8px; padding:10px; background:var(--surf); border:1px solid rgba(201,162,39,.18); border-radius:5px; }
         .stat-group-hdr { font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:2px; color:var(--txt-dim); text-transform:uppercase; margin:8px 0 4px; padding-bottom:3px; border-bottom:1px solid var(--bdr); }
         .stat-group-hdr:first-child { margin-top:0; }
         .stat-bonus-grid { display:flex; flex-wrap:wrap; gap:4px; margin-bottom:2px; }
@@ -979,7 +979,7 @@
         input.stat-val-inp:focus { border-color:var(--gold-d); }
 
         /* ─── SPELL/ABILITY ACTIVE EFFECT PANELS ─── */
-        .sp-ae-panel, .ab-ae-panel { margin-top:6px; padding:8px; background:var(--surf); border:1px solid var(--bdr); border-radius:5px; }
+        .sp-ae-panel, .ab-ae-panel { margin-top:6px; padding:10px; background:rgba(201,162,39,.03); border:1px solid rgba(201,162,39,.25); border-radius:5px; }
 
         /* ─── SKILLS TAB ─── */
         .passive-bar {
@@ -9066,11 +9066,11 @@
                                     <div class="cstat cstat-speed-multi">
                                         <div class="cstat-lbl">Speed</div>
                                         <div class="speed-multi-grid">
-                                            <div class="speed-row"><span class="speed-type-lbl">Walk</span><input class="speed-inp" id="combatSpeed" placeholder="30 ft" readonly title="Walking speed computed from race, equipped items, sigils, features and class progression."></div>
-                                            <div class="speed-row"><span class="speed-type-lbl">Swim</span><input class="speed-inp" id="swimSpeed" type="text" placeholder="—" oninput="saveAll()" title="Swim speed (editable)"></div>
-                                            <div class="speed-row"><span class="speed-type-lbl">Fly</span><input class="speed-inp" id="flySpeed" type="text" placeholder="—" oninput="saveAll()" title="Fly speed (editable)"></div>
-                                            <div class="speed-row"><span class="speed-type-lbl">Climb</span><input class="speed-inp" id="climbSpeed" type="text" placeholder="—" oninput="saveAll()" title="Climb speed (editable)"></div>
-                                            <div class="speed-row"><span class="speed-type-lbl">Burrow</span><input class="speed-inp" id="burrowSpeed" type="text" placeholder="—" oninput="saveAll()" title="Burrow speed (editable)"></div>
+                                            <div class="speed-row"><span class="speed-type-lbl" style="color:var(--gold-d);" title="Auto-computed from Race, equipped items, sigils & class features">Walk ⟳</span><input class="speed-inp" id="combatSpeed" placeholder="30 ft" readonly title="Walking speed — auto-computed from race, equipped items, sigils, features and class progression."></div>
+                                            <div class="speed-row"><span class="speed-type-lbl">Swim</span><input class="speed-inp" id="swimSpeed" type="text" placeholder="—" oninput="saveAll()" title="Swim speed — type a value e.g. 30 ft"></div>
+                                            <div class="speed-row"><span class="speed-type-lbl">Fly</span><input class="speed-inp" id="flySpeed" type="text" placeholder="—" oninput="saveAll()" title="Fly speed — type a value e.g. 60 ft"></div>
+                                            <div class="speed-row"><span class="speed-type-lbl">Climb</span><input class="speed-inp" id="climbSpeed" type="text" placeholder="—" oninput="saveAll()" title="Climb speed — type a value e.g. 30 ft"></div>
+                                            <div class="speed-row"><span class="speed-type-lbl">Burrow</span><input class="speed-inp" id="burrowSpeed" type="text" placeholder="—" oninput="saveAll()" title="Burrow speed — type a value e.g. 15 ft"></div>
                                         </div>
                                     </div>
                                     <div class="cstat">
@@ -13556,7 +13556,7 @@ function addSpell(data){
     <div class="sp-section">
       <div class="sp-section-ttl" style="margin-bottom:0;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:7.5px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;font-family:'Cinzel',serif;">
-          <input type="checkbox" ${hasAE?'checked':''} onchange="spellTogglePill(this,'hasActiveEffect',this.checked?'1':'0',null);this.closest('.sp-section').querySelector('.sp-ae-panel').style.display=this.checked?'block':'none';updateCalcs()">
+          <input type="checkbox" ${hasAE?'checked':''} onchange="spellTogglePill(this,'hasActiveEffect',this.checked?'1':'0',null);this.closest('.sp-section').querySelector('.sp-ae-panel').style.display=this.checked?'block':'none';if(this.checked){const p=this.closest('.sp-ae-panel').querySelector('.eff-stat-panel');if(p){p.classList.add('open');const arr=this.closest('.sp-ae-panel').querySelector('.eff-arr');if(arr)arr.textContent='▲';}}updateCalcs()">
           Has Active Effect — auto-applies stat bonuses while active
         </label>
       </div>
@@ -13575,11 +13575,11 @@ function addSpell(data){
           </div>
         </div>
         <!-- EFFECTS Toggle Panel -->
-        <button type="button" class="eff-stat-toggle-btn" onclick="const p=this.nextElementSibling;p.classList.toggle('open');this.querySelector('.eff-arr').textContent=p.classList.contains('open')?'▲':'▼'">
-          <span>⚡ EFFECTS — Stat Modifiers (auto-apply while active)</span>
-          <span class="eff-arr">▼</span>
+        <button type="button" class="eff-stat-toggle-btn" style="border-color:rgba(201,162,39,.45);color:var(--gold-d);margin-top:8px;" onclick="const p=this.nextElementSibling;p.classList.toggle('open');this.querySelector('.eff-arr').textContent=p.classList.contains('open')?'▲':'▼'">
+          <span>⚡ EFFECTS — Stat Modifiers (auto-apply while spell is active)</span>
+          <span class="eff-arr">${hasAE?'▲':'▼'}</span>
         </button>
-        ${buildEffectStatPanel(aeStats)}
+        ${buildEffectStatPanel(aeStats, hasAE)}
       </div>
     </div>
 
@@ -14011,16 +14011,16 @@ function addAbility(data){
     <div class="sp-section" style="margin-top:8px;">
       <div class="sp-section-ttl" style="margin-bottom:0;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:7.5px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;font-family:'Cinzel',serif;">
-          <input type="checkbox" ${abHasAE?'checked':''} onchange="this.closest('.item-card').dataset.hasActiveEffect=this.checked?'1':'0';this.closest('.sp-section').querySelector('.ab-ae-panel').style.display=this.checked?'block':'none';saveCards('abilitiesList','abilities');updateCalcs()">
+          <input type="checkbox" ${abHasAE?'checked':''} onchange="this.closest('.item-card').dataset.hasActiveEffect=this.checked?'1':'0';this.closest('.sp-section').querySelector('.ab-ae-panel').style.display=this.checked?'block':'none';if(this.checked){const p=this.closest('.ab-ae-panel').querySelector('.eff-stat-panel');if(p){p.classList.add('open');const arr=this.closest('.ab-ae-panel').querySelector('.eff-arr');if(arr)arr.textContent='▲';}}saveCards('abilitiesList','abilities');updateCalcs()">
           Has Active Effect — auto-applies stat bonuses while active
         </label>
       </div>
       <div class="ab-ae-panel" style="display:${abHasAE?'block':'none'};margin-top:6px;">
-        <button type="button" class="eff-stat-toggle-btn" onclick="const p=this.nextElementSibling;p.classList.toggle('open');this.querySelector('.eff-arr').textContent=p.classList.contains('open')?'▲':'▼'">
-          <span>⚡ EFFECTS — Stat Modifiers (auto-apply while active)</span>
-          <span class="eff-arr">▼</span>
+        <button type="button" class="eff-stat-toggle-btn" style="border-color:rgba(201,162,39,.45);color:var(--gold-d);" onclick="const p=this.nextElementSibling;p.classList.toggle('open');this.querySelector('.eff-arr').textContent=p.classList.contains('open')?'▲':'▼'">
+          <span>⚡ EFFECTS — Stat Modifiers (auto-apply while ability is active)</span>
+          <span class="eff-arr">${abHasAE?'▲':'▼'}</span>
         </button>
-        ${buildEffectStatPanel(abAeStats)}
+        ${buildEffectStatPanel(abAeStats, abHasAE)}
       </div>
     </div>
 
@@ -14688,11 +14688,11 @@ function addInventory(data){
     </div>
     <div class="c-fld"><span class="c-fld-lbl">Notes / Properties</span><textarea class="c-ta inv-notes" placeholder="Damage dice, weight, special properties…" oninput="saveCards('inventoryList','inventory')">${data.notes||''}</textarea></div>
     <!-- EFFECTS Toggle Panel — applied automatically when Equipped -->
-    <button type="button" class="eff-stat-toggle-btn" onclick="const p=this.nextElementSibling;p.classList.toggle('open');this.querySelector('.eff-arr').textContent=p.classList.contains('open')?'▲':'▼'">
+    <button type="button" class="eff-stat-toggle-btn" style="border-color:rgba(201,162,39,.45);color:var(--gold-d);margin-top:10px;" onclick="const p=this.nextElementSibling;p.classList.toggle('open');this.querySelector('.eff-arr').textContent=p.classList.contains('open')?'▲':'▼'">
       <span>⚡ EFFECTS — Stat Modifiers (auto-apply when Equipped)</span>
-      <span class="eff-arr">▼</span>
+      <span class="eff-arr">${data.equipped?'▲':'▼'}</span>
     </button>
-    ${buildEffectStatPanel(invStats)}
+    ${buildEffectStatPanel(invStats, !!data.equipped)}
   `;
   list.appendChild(card);
   onInvTypeChange(card.querySelector('.inv-type'));
@@ -16557,9 +16557,9 @@ function statKeyDisplay(key){
 // ═══════════════════════════════════════════════════
 // EFFECT STAT PANEL — shared by Spells, Abilities, Inventory
 // ═══════════════════════════════════════════════════
-function buildEffectStatPanel(activeStats){
+function buildEffectStatPanel(activeStats, isOpen){
   activeStats=activeStats||{};
-  let html='<div class="eff-stat-panel">';
+  let html=`<div class="eff-stat-panel${isOpen?' open':''}">`;
 
   // Ability Scores
   html+='<div class="eff-stat-group-hdr">Ability Scores</div><div class="eff-stat-grid">';
@@ -16804,7 +16804,7 @@ function refreshTierBtnLabel(row){
   const stats=collectTierStats(row);
   const count=Object.keys(stats).length;
   const lbl=btn.querySelector('.set-stat-btn-lbl');
-  if(lbl)lbl.textContent='Stat Bonuses'+(count?' ('+count+')':'');
+  if(lbl)lbl.textContent='⚡ EFFECTS'+(count?' ('+count+' active)':' — Stat Bonuses');
 }
 
 function toggleStatPanel(btn){
@@ -16859,23 +16859,24 @@ function addSet(data){
     <button class="c-remove" onclick="this.parentElement.remove();updateCalcs();updateArmorAC();saveSets()" title="Remove Set">×</button>
 
     <!-- ── SET HEADER ── -->
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bdr-g);">
+    <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bdr-g);">
       <div style="flex:1;">
-        <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;margin-bottom:4px;">Armor / Equipment Set</div>
-        <input class="c-inp set-name-inp" value="${setName}" placeholder="Set Name — e.g. Frostbound, Sunforged…"
-          style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;font-weight:600;width:100%;"
+        <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:2px;color:var(--gold);text-transform:uppercase;margin-bottom:5px;">⚔ Equipment Set</div>
+        <input class="c-inp set-name-inp" value="${setName}" placeholder="Set name — e.g. Frostbound Plate, Sunforged Regalia…"
+          style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;font-weight:600;width:100%;border-color:rgba(201,162,39,.4);"
           oninput="updateSetStatus(this.closest('.set-card'));updateArmorAC();saveSets()">
+        <div style="font-family:'EB Garamond',serif;font-size:10.5px;font-style:italic;color:var(--txt-dim);margin-top:5px;">Tag inventory items with this exact name in their <strong style="color:var(--txt-lbl)">Set</strong> field — pieces are counted automatically.</div>
       </div>
-      <div style="text-align:center;min-width:80px;">
-        <div style="font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;margin-bottom:3px;">Total Pieces</div>
-        <select class="c-sel set-total-sel" style="text-align:center;font-size:12px;font-weight:700;" onchange="rebuildSetTiers(this.closest('.set-card'))">
+      <div style="text-align:center;min-width:88px;flex-shrink:0;">
+        <div style="font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;margin-bottom:4px;">Total Pieces</div>
+        <select class="c-sel set-total-sel" style="text-align:center;font-size:13px;font-weight:700;border-color:rgba(201,162,39,.3);" onchange="rebuildSetTiers(this.closest('.set-card'))">
           ${pieceOpts}
         </select>
       </div>
     </div>
 
     <!-- ── STATUS BAR ── -->
-    <div class="set-status-bar" style="margin-bottom:10px;">
+    <div class="set-status-bar" style="margin-bottom:12px;">
       <div class="set-eq-block">
         <div class="set-equipped-count">0</div>
         <div class="set-status-label">Equipped</div>
@@ -16885,22 +16886,22 @@ function addSet(data){
       <div class="set-status-badge set-badge-inactive">Inactive</div>
     </div>
 
-    <!-- ── DETECTION MODE ── -->
-    <div style="margin-bottom:12px;">
-      <div style="font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:2px;color:var(--txt-dim);text-transform:uppercase;margin-bottom:5px;">Detection Mode — how equipped pieces are counted</div>
-      <div class="set-override-row" style="gap:4px;">
-        <button class="ov-btn${(data.override||'auto')==='auto'?' active':''}" onclick="setOverride(this,'auto')" title="Count pieces automatically from Equipped items sharing this Set name">⟳ Auto</button>
-        <button class="ov-btn${(data.override||'auto')==='partial'?' active-partial active':''}" onclick="setOverride(this,'partial')" title="Force partial set bonus regardless of equipped count">◑ Partial</button>
-        <button class="ov-btn${(data.override||'auto')==='full'?' active':''}" onclick="setOverride(this,'full')" title="Force full set bonus regardless of equipped count">★ Full Set</button>
-        <button class="ov-btn${(data.override||'auto')==='off'?' active-off active':''}" onclick="setOverride(this,'off')" title="Disable set bonuses entirely">✕ Off</button>
+    <!-- ── BONUS MODE ── -->
+    <div style="margin-bottom:14px;padding:9px 11px;background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;">
+      <div style="font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;margin-bottom:7px;">Bonus Mode — how set bonuses are triggered</div>
+      <div class="set-override-row" style="gap:5px;flex-wrap:wrap;">
+        <button class="ov-btn${(data.override||'auto')==='auto'?' active':''}" onclick="setOverride(this,'auto')" title="Auto: count equipped items tagged with this set name">⟳ Auto-Detect</button>
+        <button class="ov-btn${(data.override||'auto')==='partial'?' active-partial active':''}" onclick="setOverride(this,'partial')" title="Force 2-piece partial bonus regardless of equipped count">◑ Force Partial</button>
+        <button class="ov-btn${(data.override||'auto')==='full'?' active':''}" onclick="setOverride(this,'full')" title="Force all bonuses active regardless of equipped count">★ Force Full</button>
+        <button class="ov-btn${(data.override||'auto')==='off'?' active-off active':''}" onclick="setOverride(this,'off')" title="Disable — no bonuses applied from this set">✕ Disabled</button>
       </div>
     </div>
 
     <!-- ── TIER BONUSES ── -->
     <div class="set-tiers-wrap">
       <div class="set-tiers-hdr">
-        <span>Set Bonuses</span>
-        <span style="font-family:'EB Garamond',serif;font-size:10px;font-style:italic;color:var(--txt-dim);font-weight:normal;letter-spacing:0;text-transform:none;">— unlock at each piece threshold</span>
+        <span>⚡ Set Bonuses</span>
+        <span style="font-family:'EB Garamond',serif;font-size:10px;font-style:italic;color:var(--txt-dim);font-weight:normal;letter-spacing:0;text-transform:none;">— auto-apply to stats as pieces are equipped</span>
       </div>
       <div class="set-tiers-inner">${buildSetTierRowsHTML(totalPieces,tiers)}</div>
     </div>
@@ -16930,8 +16931,8 @@ function buildSetTierRowsHTML(total,tiers){
             <span class="c-fld-lbl">Notes / Special</span>
             <input class="c-inp set-notes-inp" value="${t.notes||''}" placeholder="Resistances, special rules…" oninput="saveSets()">
           </div>
-          <button class="set-stat-toggle-btn" onclick="toggleStatPanel(this)" title="Toggle stat bonus editor">
-            <span class="set-stat-btn-lbl">Stat Bonuses${statCount?' ('+statCount+')':''}</span>
+          <button class="set-stat-toggle-btn" onclick="toggleStatPanel(this)" title="Toggle EFFECTS stat bonus editor — bonuses auto-apply to Ability Scores, Saves, Skills, Initiative & Die Rolls when this tier is active" style="border-color:rgba(201,162,39,.4);color:var(--gold-d);">
+            <span class="set-stat-btn-lbl">⚡ EFFECTS${statCount?' ('+statCount+' active)':' — Stat Bonuses'}</span>
             <span class="set-stat-arr">▼</span>
           </button>
         </div>
