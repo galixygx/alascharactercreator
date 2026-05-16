@@ -9202,7 +9202,7 @@
                 <div class="tab-panel" id="tab-abilities">
                     <div class="sec-hdr">Combat Abilities &amp; Techniques</div>
                     <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:14px;">
-                        Martial techniques, resonance arts, class maneuvers, and trained combat forms. Abilities use Stamina, Focus, or other non-RC resources — not the Resonance Pool. Use the Tactical Builder to design balanced custom abilities following the Four-Pillar system.
+                        Martial techniques, resonance arts, class maneuvers, and trained combat forms. Abilities may use Stamina, Focus, RC, or other resources. Set an RC Cost to enable the Cast button (spends from your Resonance Pool). Passive abilities are always active and cannot be cast. Use the Tactical Builder to design balanced abilities following the Four-Pillar system.
                     </div>
                     <div class="card-list" id="abilitiesList"></div>
                     <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
@@ -13905,7 +13905,7 @@ function addAbility(data){
     <!-- Row 1: Identity -->
     <div class="c-row c-4col ab-card-row">
       <div class="c-fld"><span class="c-fld-lbl">Ability Name</span><input class="c-inp" value="${data.name||''}" placeholder="Name…" oninput="saveCards('abilitiesList','abilities')"></div>
-      <div class="c-fld"><span class="c-fld-lbl">Action Type</span><select class="c-sel" onchange="saveCards('abilitiesList','abilities')">
+      <div class="c-fld"><span class="c-fld-lbl">Action Type</span><select class="c-sel" onchange="saveCards('abilitiesList','abilities');abUpdateCastRow(this.closest('.item-card'))">
         ${['Action','Bonus Action','Reaction','Free Action','Passive','Special'].map(v=>`<option${(data.actionType||'Action')===v?' selected':''}>${v}</option>`).join('')}
       </select></div>
       <div class="c-fld"><span class="c-fld-lbl">Resource Cost</span><input class="c-inp" value="${data.cost||''}" placeholder="e.g. 2 Stamina, 1 Focus…" oninput="saveCards('abilitiesList','abilities')"></div>
@@ -13925,6 +13925,26 @@ function addAbility(data){
       <div class="c-fld"><span class="c-fld-lbl">Duration</span><select class="c-sel" onchange="saveCards('abilitiesList','abilities')">
         ${['Instant','1 Round','Until End of Turn','Until Start of Next Turn','1 Minute','10 Minutes','1 Hour','Sustained','Until Broken'].map(v=>`<option${(data.duration||'Instant')===v?' selected':''}>${v}</option>`).join('')}
       </select></div>
+    </div>
+
+    <!-- RC Cost & Cast (hidden for Passive) -->
+    <div class="ab-cast-section" style="margin-bottom:8px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px;">
+        <div class="c-fld"><span class="c-fld-lbl">RC Cost <small style="opacity:.6;font-size:7px">(Resonance Pool)</small></span>
+          <input class="c-inp ab-rc-inp" type="number" value="${data.rc||0}" min="0" oninput="saveCards('abilitiesList','abilities')">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">Instability+</span>
+          <input class="c-inp ab-ip-inp" type="number" value="${data.ip||0}" min="0" oninput="saveCards('abilitiesList','abilities')">
+        </div>
+      </div>
+      <div class="ab-cast-row sig-cast-row" style="${(data.actionType||'Action')==='Passive'?'display:none;':''}">
+        <span class="sig-cast-rc-lbl">Cast — spends RC from Resonance Pool</span>
+        <button type="button" class="sig-cast-btn" onclick="castAbility(this)">⟳ Cast</button>
+      </div>
+      <div class="ab-passive-badge" style="display:${(data.actionType||'Action')==='Passive'?'flex':'none'};align-items:center;gap:8px;padding:5px 10px;background:rgba(201,162,39,.06);border:1px solid rgba(201,162,39,.2);border-radius:4px;">
+        <span style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;color:var(--gold-d);">⬤ PASSIVE — Always Active</span>
+        <span style="font-family:'EB Garamond',serif;font-size:11px;font-style:italic;color:var(--txt-dim);">Passive abilities cannot be cast</span>
+      </div>
     </div>
 
     <!-- Archetype Role -->
@@ -14009,18 +14029,18 @@ function addAbility(data){
 
     <!-- Active Effect Toggle + Stat Panel -->
     <div class="sp-section" style="margin-top:8px;">
-      <div class="sp-section-ttl" style="margin-bottom:0;">
+      <div class="sp-section-ttl" style="margin-bottom:4px;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:7.5px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;font-family:'Cinzel',serif;">
-          <input type="checkbox" ${abHasAE?'checked':''} onchange="this.closest('.item-card').dataset.hasActiveEffect=this.checked?'1':'0';this.closest('.sp-section').querySelector('.ab-ae-panel').style.display=this.checked?'block':'none';if(this.checked){const p=this.closest('.ab-ae-panel').querySelector('.eff-stat-panel');if(p){p.classList.add('open');const arr=this.closest('.ab-ae-panel').querySelector('.eff-arr');if(arr)arr.textContent='▲';}}saveCards('abilitiesList','abilities');updateCalcs()">
-          Has Active Effect — auto-applies stat bonuses while active
+          <input type="checkbox" ${abHasAE?'checked':''} onchange="this.closest('.item-card').dataset.hasActiveEffect=this.checked?'1':'0';saveCards('abilitiesList','abilities');updateCalcs()">
+          Has Active Effect — check to auto-apply stat bonuses below
         </label>
       </div>
-      <div class="ab-ae-panel" style="display:${abHasAE?'block':'none'};margin-top:6px;">
+      <div class="ab-ae-panel" style="margin-top:6px;">
         <button type="button" class="eff-stat-toggle-btn" style="border-color:rgba(201,162,39,.45);color:var(--gold-d);" onclick="const p=this.nextElementSibling;p.classList.toggle('open');this.querySelector('.eff-arr').textContent=p.classList.contains('open')?'▲':'▼'">
           <span>⚡ EFFECTS — Stat Modifiers (auto-apply while ability is active)</span>
-          <span class="eff-arr">${abHasAE?'▲':'▼'}</span>
+          <span class="eff-arr">▲</span>
         </button>
-        ${buildEffectStatPanel(abAeStats, abHasAE)}
+        ${buildEffectStatPanel(abAeStats, true)}
       </div>
     </div>
 
@@ -14035,6 +14055,26 @@ function abilitySetAttr(card, attr, val){
   if(!card) return;
   card.dataset[attr] = val;
   saveCards('abilitiesList','abilities');
+}
+
+function castAbility(btn){
+  const card = btn.closest('.item-card');
+  if(!card) return;
+  const name = (card.querySelector('.c-inp')||{}).value || 'Ability';
+  const rc   = parseInt((card.querySelector('.ab-rc-inp')||{}).value) || 0;
+  const ip   = parseInt((card.querySelector('.ab-ip-inp')||{}).value) || 0;
+  castSigilByRC(rc, ip, name, 'Common', card);
+}
+
+function abUpdateCastRow(card){
+  if(!card) return;
+  const sel = card.querySelector('.c-sel');
+  const actionType = sel ? sel.value : 'Action';
+  const castRow    = card.querySelector('.ab-cast-row');
+  const passiveBadge = card.querySelector('.ab-passive-badge');
+  const isPassive  = actionType === 'Passive';
+  if(castRow)      castRow.style.display      = isPassive ? 'none' : '';
+  if(passiveBadge) passiveBadge.style.display = isPassive ? 'flex' : 'none';
 }
 
 // ═══════════════════════════════════════════════════
@@ -17212,6 +17252,8 @@ function saveCards(listId, stateKey){
       d.archetype   = card.dataset.archetype||'';
       d.costType    = card.dataset.costType||'';
       d.hasActiveEffect = card.dataset.hasActiveEffect||'0';
+      d.rc          = (card.querySelector('.ab-rc-inp')||{}).value||'0';
+      d.ip          = (card.querySelector('.ab-ip-inp')||{}).value||'0';
       d.effect      = (tas[0]||{}).value||'';
       d.counterplay = (tas[1]||{}).value||'';
       d.notes       = (tas[2]||{}).value||'';
