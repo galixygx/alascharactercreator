@@ -776,6 +776,38 @@
             margin-top: 3px;
         }
 
+        /* ── Ability Manual MODS box ── */
+        .ab-mods-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px solid var(--bdr);
+        }
+        .ab-mods-lbl {
+            font-family: 'Cinzel',serif;
+            font-size: 6px;
+            letter-spacing: 1.5px;
+            color: var(--txt-dim);
+            text-transform: uppercase;
+        }
+        input.ab-mods-inp {
+            width: 42px;
+            background: var(--surf2);
+            border: 1px solid var(--bdr);
+            color: var(--gold-l);
+            font-family: 'Raleway',sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            text-align: center;
+            padding: 2px 3px;
+            border-radius: 3px;
+            outline: none;
+        }
+        input.ab-mods-inp:focus { border-color: var(--gold-d); }
+
         .attr-right {
             display: flex;
             flex-direction: column;
@@ -902,6 +934,32 @@
             text-align: center;
             outline: none;
         }
+
+        /* ── Speed multi-type box ── */
+        .cstat-speed-multi { text-align: left; }
+        .speed-multi-grid { display: flex; flex-direction: column; gap: 4px; margin-top: 5px; }
+        .speed-row { display: flex; align-items: center; gap: 6px; }
+        .speed-type-lbl { font-family: 'Cinzel',serif; font-size: 6.5px; letter-spacing: 1px; color: var(--txt-dim); width: 38px; flex-shrink: 0; text-transform: uppercase; }
+        input.speed-inp { flex: 1; background: transparent; border: none; border-bottom: 1px solid var(--bdr); color: var(--txt); font-family: 'Raleway',sans-serif; font-size: 13px; font-weight: 700; text-align: center; outline: none; padding: 1px 3px; min-width: 0; }
+        input.speed-inp[readonly] { color: var(--txt-lbl); }
+        input.speed-inp:focus { border-bottom-color: var(--gold-d); }
+
+        /* ── Effect Stat Panel (spells, abilities, inventory) ── */
+        .eff-stat-toggle-btn { display: flex; align-items: center; gap: 6px; cursor: pointer; background: var(--surf2); border: 1px solid var(--bdr); border-radius: 4px; padding: 5px 10px; margin-top: 8px; font-family: 'Cinzel',serif; font-size: 7px; letter-spacing: 1.5px; color: var(--gold-d); text-transform: uppercase; transition: border-color .15s; width: 100%; }
+        .eff-stat-toggle-btn:hover { border-color: var(--gold-d); }
+        .eff-stat-toggle-btn .eff-arr { margin-left: auto; font-size: 8px; }
+        .eff-stat-panel { display: none; margin-top: 6px; padding: 10px; background: var(--surf2); border: 1px solid var(--bdr); border-radius: 5px; }
+        .eff-stat-panel.open { display: block; }
+        .eff-stat-group-hdr { font-family: 'Cinzel',serif; font-size: 6.5px; letter-spacing: 2px; color: var(--txt-dim); text-transform: uppercase; margin: 8px 0 4px; padding-bottom: 3px; border-bottom: 1px solid var(--bdr); }
+        .eff-stat-group-hdr:first-child { margin-top: 0; }
+        .eff-stat-grid { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 2px; }
+        .eff-stat-item { display: flex; align-items: center; gap: 4px; padding: 3px 6px; background: var(--surf); border: 1px solid var(--bdr); border-radius: 4px; cursor: pointer; transition: border-color .1s, background .1s; }
+        .eff-stat-item.stat-on { border-color: rgba(201,162,39,.5); background: rgba(201,162,39,.07); }
+        .eff-stat-item input[type="checkbox"] { width: 10px; height: 10px; cursor: pointer; accent-color: var(--gold-d); }
+        .eff-stat-name { font-family: 'Cinzel',serif; font-size: 7px; letter-spacing: .5px; color: var(--txt-lbl); white-space: nowrap; }
+        .eff-stat-item.stat-on .eff-stat-name { color: var(--gold-l); }
+        input.eff-stat-val { width: 42px; background: var(--surf2); border: 1px solid var(--bdr); color: var(--gold); font-family: 'Raleway',sans-serif; font-size: 11px; font-weight: 600; text-align: center; padding: 1px 3px; border-radius: 3px; outline: none; }
+        input.eff-stat-val:focus { border-color: var(--gold-d); }
 
         /* ─── SKILLS TAB ─── */
         .passive-bar {
@@ -8981,9 +9039,15 @@
                                         <div class="cstat-lbl">Armor Class</div>
                                         <input class="cstat-inp" type="number" id="combatAC" value="10" oninput="saveAll()">
                                     </div>
-                                    <div class="cstat">
+                                    <div class="cstat cstat-speed-multi">
                                         <div class="cstat-lbl">Speed</div>
-                                        <input class="cstat-inp" id="combatSpeed" placeholder="30 ft" readonly title="Walking speed is computed from race, equipped items (notes), sigils, features, racial skills, and unlocked class progression.">
+                                        <div class="speed-multi-grid">
+                                            <div class="speed-row"><span class="speed-type-lbl">Walk</span><input class="speed-inp" id="combatSpeed" placeholder="30 ft" readonly title="Walking speed computed from race, equipped items, sigils, features and class progression."></div>
+                                            <div class="speed-row"><span class="speed-type-lbl">Swim</span><input class="speed-inp" id="swimSpeed" type="text" placeholder="—" oninput="saveAll()" title="Swim speed (editable)"></div>
+                                            <div class="speed-row"><span class="speed-type-lbl">Fly</span><input class="speed-inp" id="flySpeed" type="text" placeholder="—" oninput="saveAll()" title="Fly speed (editable)"></div>
+                                            <div class="speed-row"><span class="speed-type-lbl">Climb</span><input class="speed-inp" id="climbSpeed" type="text" placeholder="—" oninput="saveAll()" title="Climb speed (editable)"></div>
+                                            <div class="speed-row"><span class="speed-type-lbl">Burrow</span><input class="speed-inp" id="burrowSpeed" type="text" placeholder="—" oninput="saveAll()" title="Burrow speed (editable)"></div>
+                                        </div>
                                     </div>
                                     <div class="cstat">
                                         <div class="cstat-lbl">Initiative</div>
@@ -10662,7 +10726,7 @@ const PLACES_DATA = {
     priceMultiplier:1.0,
     desc:'The major port city at the base of the Obsidian Spire, serving as Eldrathia\'s commercial face. Sea trade flows through Eldoria freely. Passage beyond the port toward the Spire requires Drakonian Council authorization.',
     extendedLore:'Warehouses crowd the harbor like barnacles: salt-stained stone stalls, bright awnings, and shouting in a dozen dialects. Customs houses weigh rumor as carefully as cargo — exotic catches, strange salvage, and charter paperwork share the same docks. Above it all, the Obsidian Spire disappears into cloud; most traders never need ask what lies beyond the lower tiers.',
-    npcs:[{name:'Vyreth Coilborn',race:'Drakonian (Deepcoil)',role:'Drakonian Council — Trade Administrator'},{name:'Tess Corwen',race:'Human',role:'Sea Trader Consortium — Harbor Master'},{name:'Ashven',race:'Drakonian (Aetherwing)',role:'Dragon Amber Exchange — Specialist'},{name:'Captain GrizzleBeard',race:'Human',role:'Merchant vessel captain'}],
+    npcs:[{name:'Vyreth Coilborn',race:'Drakonian (Deepcoil)',role:'Drakonian Council — Trade Administrator'},{name:'Tess Corwen',race:'Human',role:'Sea Trader Consortium — Harbor Master'},{name:'Ashven',race:'Drakonian (Aetherwing)',role:'Dragon Amber Exchange — Specialist'},{name:'Captain GrizzleBeard',race:'Human',role:'Merchant vessel captain'},{name:'Veliora Avenstone',race:'Half-Elf',role:'The Gilded Pearl — Gem Assessor and Proprietor'},{name:'Magister Pellinorith',race:'Human',role:'Arcane Anthologies — Proprietor'},{name:'Enigmatic Ruler',race:'Unknown',role:'Citadel of Secrets — Sovereign (Identity Unknown)'}],
     districts:[
       {name:'The Harbor Market',shops:[
         {id:'eldoria_draconic',name:'The Obsidian Exchange',type:'specialty',icon:'🐉',keeper:{name:'Ashven',race:'Drakonian (Aetherwing)'},desc:'Draconic resonance materials and specialty gems. Ashven holds a Drakonian Council charter — the only commercially licensed draconic materials dealer in Eldoria. Not everything on the shelves is from a peaceful source.',items:[
@@ -10688,6 +10752,29 @@ const PLACES_DATA = {
           {name:'Waterproof Document Tube (Sealed)',price:120,desc:'Brass-sealed leather tube that keeps contents dry indefinitely. Standard for carrying maps, contracts, and scrolls at sea.',stats:'Capacity: 10 documents / 3 scrolls | Waterproof: indefinite | Weight: 0.5 lb. (empty)',invType:'gear',ac:0},
           {name:'Compass (Maritime Grade)',price:400,desc:'Tess\'s most-sold item — a gimbaled maritime compass that remains accurate in rough seas. Advantage on sea navigation checks.',stats:'Effect: advantage on maritime navigation checks | Works in all weather | Gimbaled: no rough sea penalty | Weight: 0.5 lb.',invType:'gear',ac:0},
           {name:'Mariner\'s Tool Kit',price:2200,desc:'A complete maritime maintenance kit — caulking tools, line repair tools, pitch pot, and sail needles. Required for maintaining a vessel at sea.',stats:'Proficiency use: repair ship hull and rigging | 20 uses | Weight: 8 lb.',invType:'gear',ac:0},
+        ]},
+        {id:'eldoria_trade_gems',name:'The Gilded Pearl',type:'gems',icon:'🦪',keeper:{name:'Veliora Avenstone',race:'Half-Elf'},desc:'The premier gem shop of Eldoria. Veliora holds Gem Court assessor credentials. The dome display case rotates — three featured gems at all times. A backroom handles bespoke enchanted jewelry commissions. Every stone Veliora sells carries her authentication mark.',items:[
+          {name:'Fire Opal (Phoenix Core)',price:14000,desc:'Rumoured to hold phoenix ashes within its shifting depths. Fire and Chaos affinity. Veliora authenticates every piece in the dome personally.',stats:'Tier: Rare | Affinity: Fire / Chaos | 1 attunement slot | +2 Fire Sigil rolls | +1 Instability per casting session when attuned',invType:'gem',ac:0},
+          {name:'Deep Sapphire (Tide-Tuned)',price:18000,desc:'A flagship sapphire authenticated by Veliora — the third tide-tuned sapphire she has certified in her career. Water Primary affinity; internal hue responds to nearby tidal forces.',stats:'Tier: Ultra Rare | Affinity: Water (Primary) | 1 attunement slot | +3 Water Sigil rolls and save DC | Hue shifts near tidal sources',invType:'gem',ac:0},
+          {name:'Black Diamond (Aura of Secrecy)',price:22000,desc:'A black diamond that radiates an aura of secrecy. Shadow affinity. Veliora keeps it in the dome and recommends buyers know exactly what they are acquiring.',stats:'Tier: Ultra Rare | Affinity: Shadow | 1 attunement slot | Advantage: saves vs divination targeting bearer | Detectable by Nethymir-trained Vein-Sense',invType:'gem',ac:0},
+          {name:'Dragon\'s Eye Garnet',price:1500,desc:'A deep red garnet with an eye-like internal inclusion. Linked to draconic essence. Advantage against fear when attuned.',stats:'Tier: Uncommon | Affinity: Fire / Force | 1 attunement slot | Advantage: saves vs frightened',invType:'gem',ac:0},
+          {name:'Timeless Black Onyx',price:5000,desc:'A deep black onyx that absorbs and reflects light simultaneously. Connected to temporal resonance; protective against negative energy and Corruption accumulation.',stats:'Tier: Rare | Affinity: Shadow / Time | 1 attunement slot | Resistance: necrotic damage | Advantage: saves vs Corruption accumulation effects',invType:'gem',ac:0},
+          {name:'Prismatic Tourmaline Cascade',price:2000,desc:'A collection of multicolored tourmalines in a cascading arrangement. Represents diverse affinity — functions as a focus for any single Sigil affinity the bearer chooses on attunement.',stats:'Tier: Uncommon | Affinity: Any (choose on attunement) | 1 attunement slot | +1 to chosen Sigil affinity rolls',invType:'gem',ac:0},
+        ]},
+        {id:'eldoria_trade_books',name:'Arcane Anthologies',type:'books',icon:'📚',keeper:{name:'Magister Pellinorith',race:'Human'},desc:'Pellinorith has encyclopedic knowledge of every title in stock. The Codex of Whispered Winds and the Everburning Manuscript are the centrepiece display — neither is for sale. A second level carries rare spell components and blank grimoires. The scent of parchment, incense, and ozone is permanent.',items:[
+          {name:'The Shadowbinder\'s Grimoire',price:2800,desc:'Teaches stealth and shadow manipulation sigil techniques. Pages darken under direct sunlight. Favoured by Veilrunners.',stats:'Shadow / Stealth sigil training | Advantage: Arcana (shadow manipulation) | Training: one Shadow sigil',invType:'gear',ac:0},
+          {name:'The Tome of Elemental Fury',price:4200,desc:'Advanced elemental sigils — firestorms, tidal waves, cyclones. Instability warnings are extensive and specific. For experienced casters only.',stats:'Advanced elemental sigil techniques | Training: one elemental sigil | Instability warnings per entry',invType:'gear',ac:0},
+          {name:'The Frozen Lexicon',price:3600,desc:'A frost mage\'s prized possession. Touching the cover chills the air within two feet. Water-affinity sigil training.',stats:'Water / Cold sigil training | Touch effect: minor cold sensation (cosmetic) | Training: one Water sigil',invType:'gear',ac:0},
+          {name:'The Runewrought Chronicle',price:5000,desc:'Ancient rune magic. Leather cover engraved with shifting runes. The Gem Court\'s approved study text for Sigil Cartographer certification.',stats:'Rune magic principles | Gem Court approved: counts as prerequisite study for Sigil Cartographer certification',invType:'gear',ac:0},
+          {name:'The Blank Arcanum',price:1200,desc:'A magical blank grimoire that bonds with its first writer. Inscribed sigils are permanently recorded with recall advantage for the bonded owner.',stats:'Bonds to first inscriber | Advantage: recall checks for inscribed sigils | Self-expanding capacity',invType:'gear',ac:0},
+          {name:'Secrets of Soul Binding (Full Text)',price:8000,desc:'The complete text including the Pactweaver Imp chapter. Pellinorith vets buyers. The ethical considerations chapter is flagged as required reading.',stats:'Soul binding theory | Pactweaver Imp lore | Advantage: Arcana (soul binding / contract magic) | Pellinorith vets all buyers for this title',invType:'gear',ac:0},
+          {name:'The Starlit Compendium',price:3200,desc:'Focuses on celestial sigil techniques and cosmic divination. Ink sparkles like the night sky when read under starlight.',stats:'Celestial / Light sigil training | Cosmic divination techniques | Training: one Light sigil | Advantage: Arcana (celestial phenomena)',invType:'gear',ac:0},
+        ]},
+        {id:'eldoria_trade_maritime',name:'The Mystic Menagerie',type:'specialty',icon:'🌊',keeper:{name:'Sea-Green Sorcerer',race:'Human'},desc:'A maritime curiosity shop specializing in sea creature artifacts, bioluminescent materials, and deep-ocean resonance components. The crystal vial in the window display contains genuine bioluminescent essence from a deep-sea creature.',items:[
+          {name:'Bioluminescent Essence (vial)',price:600,desc:'Extracted bioluminescent sea creature essence. Functions as Light-affinity sigil focus and as an underwater light source that cannot be extinguished.',stats:'Tier: Uncommon | Affinity: Light / Water | Light: bright 10-ft radius (underwater, 48 hours) | Sigil focus: +1 Light Sigil checks',invType:'gem',ac:0},
+          {name:'Iridescent Sea Pearl',price:2400,desc:'A luminescent pearl from a deep-ocean creature. Water affinity, full Gem Court certification. The only Gem Court-certified pearl source in Eldoria.',stats:'Tier: Uncommon | Affinity: Water | 1 attunement slot | Advantage: Water Sigil checks when attuned',invType:'gem',ac:0},
+          {name:'Sirens\' Serenity Potion',price:480,desc:'An alchemical elixir inspired by the sea — said to bring calmness in the midst of turmoil. Advantage on saves vs fear and charm for one hour.',stats:'Duration: 1 hour | Advantage: saves vs frightened and charmed | One use',invType:'gear',ac:0},
+          {name:'Nautical Chart (Uncharted Waters)',price:1200,desc:'A rare chart of uncharted waters and forgotten islands — sourced from an old sea captain with a patch over one eye who claims to have been there.',stats:'Coverage: uncharted regional waters | Advantage: Navigation checks in covered area | Unverified by Grand Archive',invType:'gear',ac:0},
         ]},
       ]},
       {name:'The Dockside Armory',shops:[
@@ -11050,55 +11137,6 @@ const PLACES_DATA = {
       ]},
     ],
   },
-  'Eldoria (The Trade Port)':{
-    type:'Sea Trade Hub — Independent Port City',
-    economy:'Sea goods and maritime equipment at standard. Exotic sea creature artifacts and specialty gems at 15% premium. Spellbooks at market rate. The castle\'s contents are not for sale.',
-    priceMultiplier:1.0,
-    desc:'A sprawling port city occupying 1,500 acres, guarded by two massive stone walls extending from mountain faces and a colossal mechanized gate operated by two bound Mountain Giants. Seafaring warriors and pirates bring captured sea creatures through these gates. The market layout is deliberate chaos — 1,500 acres of stone stalls, vibrant awnings, and every language spoken on the continent. The Citadel of Secrets looms at the far end. The Gilded Pearl is the premier gem shop. Arcane Anthologies holds the deepest spellbook inventory at any port. The ruler of the Citadel has never declared allegiance.',
-    extendedLore:'Mountain Giants do not hold gates by choice. The founding agreement of Eldoria permits the sea creature trade — and no kingdom has successfully renegotiated it in recorded history. The castle\'s celestial observatory connects to sky and sea simultaneously. The ruler has been observed — regal attire, no heraldry — but never named and never intercepted. Veliora Avenstone at the Gilded Pearl has assessed three tide-tuned sapphires in her career. She remembers each one.',
-    npcs:[
-      {name:'Veliora Avenstone',race:'Half-Elf',role:'The Gilded Pearl — Gem Assessor and Proprietor'},
-      {name:'Magister Pellinorith',race:'Human',role:'Arcane Anthologies — Proprietor'},
-      {name:'Tess Corwen',race:'Human',role:'Sea Trader Consortium — Harbor Master'},
-      {name:'Enigmatic Ruler',race:'Unknown',role:'Citadel of Secrets — Sovereign (Identity Unknown)'},
-    ],
-    districts:[
-      {name:'The Harbor Market',shops:[
-        {id:'eldoria_trade_gems',name:'The Gilded Pearl',type:'gems',icon:'🦪',keeper:{name:'Veliora Avenstone',race:'Half-Elf'},desc:'The premier gem shop of Eldoria. Veliora holds Gem Court assessor credentials. The dome display case rotates — three featured gems at all times. A backroom handles bespoke enchanted jewelry commissions. Every stone Veliora sells carries her authentication mark.',items:[
-          {name:'Fire Opal (Phoenix Core)',price:14000,desc:'Rumoured to hold phoenix ashes within its shifting depths. Fire and Chaos affinity. Veliora authenticates every piece in the dome personally.',stats:'Tier: Rare | Affinity: Fire / Chaos | 1 attunement slot | +2 Fire Sigil rolls | +1 Instability per casting session when attuned',invType:'gem',ac:0},
-          {name:'Deep Sapphire (Tide-Tuned)',price:18000,desc:'A flagship sapphire authenticated by Veliora — the third tide-tuned sapphire she has certified in her career. Water Primary affinity; internal hue responds to nearby tidal forces.',stats:'Tier: Ultra Rare | Affinity: Water (Primary) | 1 attunement slot | +3 Water Sigil rolls and save DC | Hue shifts near tidal sources',invType:'gem',ac:0},
-          {name:'Black Diamond (Aura of Secrecy)',price:22000,desc:'A black diamond that radiates an aura of secrecy. Shadow affinity. Veliora keeps it in the dome and recommends buyers know exactly what they are acquiring.',stats:'Tier: Ultra Rare | Affinity: Shadow | 1 attunement slot | Advantage: saves vs divination targeting bearer | Detectable by Nethymir-trained Vein-Sense',invType:'gem',ac:0},
-          {name:'Dragon\'s Eye Garnet',price:1500,desc:'A deep red garnet with an eye-like internal inclusion. Linked to draconic essence. Advantage against fear when attuned.',stats:'Tier: Uncommon | Affinity: Fire / Force | 1 attunement slot | Advantage: saves vs frightened',invType:'gem',ac:0},
-          {name:'Timeless Black Onyx',price:5000,desc:'A deep black onyx that absorbs and reflects light simultaneously. Connected to temporal resonance; protective against negative energy and Corruption accumulation.',stats:'Tier: Rare | Affinity: Shadow / Time | 1 attunement slot | Resistance: necrotic damage | Advantage: saves vs Corruption accumulation effects',invType:'gem',ac:0},
-          {name:'Prismatic Tourmaline Cascade',price:2000,desc:'A collection of multicolored tourmalines in a cascading arrangement. Represents diverse affinity — functions as a focus for any single Sigil affinity the bearer chooses on attunement.',stats:'Tier: Uncommon | Affinity: Any (choose on attunement) | 1 attunement slot | +1 to chosen Sigil affinity rolls',invType:'gem',ac:0},
-        ]},
-        {id:'eldoria_trade_books',name:'Arcane Anthologies',type:'books',icon:'📚',keeper:{name:'Magister Pellinorith',race:'Human'},desc:'Pellinorith has encyclopedic knowledge of every title in stock. The Codex of Whispered Winds and the Everburning Manuscript are the centrepiece display — neither is for sale. A second level carries rare spell components and blank grimoires. The scent of parchment, incense, and ozone is permanent.',items:[
-          {name:'The Shadowbinder\'s Grimoire',price:2800,desc:'Teaches stealth and shadow manipulation sigil techniques. Pages darken under direct sunlight. Favoured by Veilrunners.',stats:'Shadow / Stealth sigil training | Advantage: Arcana (shadow manipulation) | Training: one Shadow sigil',invType:'gear',ac:0},
-          {name:'The Tome of Elemental Fury',price:4200,desc:'Advanced elemental sigils — firestorms, tidal waves, cyclones. Instability warnings are extensive and specific. For experienced casters only.',stats:'Advanced elemental sigil techniques | Training: one elemental sigil | Instability warnings per entry',invType:'gear',ac:0},
-          {name:'The Frozen Lexicon',price:3600,desc:'A frost mage\'s prized possession. Touching the cover chills the air within two feet. Water-affinity sigil training.',stats:'Water / Cold sigil training | Touch effect: minor cold sensation (cosmetic) | Training: one Water sigil',invType:'gear',ac:0},
-          {name:'The Runewrought Chronicle',price:5000,desc:'Ancient rune magic. Leather cover engraved with shifting runes. The Gem Court\'s approved study text for Sigil Cartographer certification.',stats:'Rune magic principles | Gem Court approved: counts as prerequisite study for Sigil Cartographer certification',invType:'gear',ac:0},
-          {name:'The Blank Arcanum',price:1200,desc:'A magical blank grimoire that bonds with its first writer. Inscribed sigils are permanently recorded with recall advantage for the bonded owner.',stats:'Bonds to first inscriber | Advantage: recall checks for inscribed sigils | Self-expanding capacity',invType:'gear',ac:0},
-          {name:'Secrets of Soul Binding (Full Text)',price:8000,desc:'The complete text including the Pactweaver Imp chapter. Pellinorith vets buyers. The ethical considerations chapter is flagged as required reading.',stats:'Soul binding theory | Pactweaver Imp lore | Advantage: Arcana (soul binding / contract magic) | Pellinorith vets all buyers for this title',invType:'gear',ac:0},
-          {name:'The Starlit Compendium',price:3200,desc:'Focuses on celestial sigil techniques and cosmic divination. Ink sparkles like the night sky when read under starlight.',stats:'Celestial / Light sigil training | Cosmic divination techniques | Training: one Light sigil | Advantage: Arcana (celestial phenomena)',invType:'gear',ac:0},
-        ]},
-        {id:'eldoria_trade_maritime',name:'The Mystic Menagerie',type:'specialty',icon:'🌊',keeper:{name:'Sea-Green Sorcerer',race:'Human'},desc:'A maritime curiosity shop specializing in sea creature artifacts, bioluminescent materials, and deep-ocean resonance components. The crystal vial in the window display contains genuine bioluminescent essence from a deep-sea creature.',items:[
-          {name:'Bioluminescent Essence (vial)',price:600,desc:'Extracted bioluminescent sea creature essence. Functions as Light-affinity sigil focus and as an underwater light source that cannot be extinguished.',stats:'Tier: Uncommon | Affinity: Light / Water | Light: bright 10-ft radius (underwater, 48 hours) | Sigil focus: +1 Light Sigil checks',invType:'gem',ac:0},
-          {name:'Iridescent Sea Pearl',price:2400,desc:'A luminescent pearl from a deep-ocean creature. Water affinity, full Gem Court certification. The only Gem Court-certified pearl source in Eldoria.',stats:'Tier: Uncommon | Affinity: Water | 1 attunement slot | Advantage: Water Sigil checks when attuned',invType:'gem',ac:0},
-          {name:'Sirens\' Serenity Potion',price:480,desc:'An alchemical elixir inspired by the sea — said to bring calmness in the midst of turmoil. Advantage on saves vs fear and charm for one hour.',stats:'Duration: 1 hour | Advantage: saves vs frightened and charmed | One use',invType:'gear',ac:0},
-          {name:'Nautical Chart (Uncharted Waters)',price:1200,desc:'A rare chart of uncharted waters and forgotten islands — sourced from an old sea captain with a patch over one eye who claims to have been there.',stats:'Coverage: uncharted regional waters | Advantage: Navigation checks in covered area | Unverified by Grand Archive',invType:'gear',ac:0},
-        ]},
-      ]},
-      {name:'The Tired Turtle (Merchants Guild — Traveling Tavern)',shops:[
-        {id:'tired_turtle_eldoria_trade',name:'The Tired Turtle',type:'tavern',icon:'🐢',keeper:{name:'Gonda Thresk',race:'Human'},desc:'The Tired Turtle\'s second Eldoria berth — parked near the Harbor Market during the extended stay. The two-week stop fills the Turtle\'s rumor ledger with more entries than any other city. Maritime captains, Drakonian merchants, and Citadel-adjacent observers all drink here. Prices at 80% of local standard. The same establishment as the Dockside Armory stop — just a different end of the port.',items:[
-          {name:'Hot Meal (Turtle Standard)',price:4,desc:'Port city sourcing — fresh and substantial. The Turtle\'s cook has adapted to Eldoria\'s seafood-heavy availability.',stats:'Full meal | Removes Exhaustion 1 | Maritime sourcing',invType:'gear',ac:0,rarity:'Common'},
-          {name:'Sailors\' Grog (Port-Blend)',price:2,desc:'The standard Eldoria port grog. Strong. Honest.',stats:'1 pint | Social lubricant | Weight: 1 lb.',invType:'gear',ac:0,rarity:'Common'},
-          {name:'Guild Road Pass (30-day)',price:150,desc:'Merchants Guild travel endorsement — 50% toll reduction at Guild checkpoints.',stats:'Duration: 30 days | 50% toll reduction | Non-magical document',invType:'gear',ac:0,rarity:'Uncommon'},
-          {name:'Regional Market Report (Current)',price:80,desc:'Full Eldoria port market data — maritime commodity prices, sea creature material values, Citadel authorization status, and the week\'s Drakonian trade corridor report.',stats:'Current city data | Enhanced: maritime, sea creature materials, Drakonian corridor | Weight: negligible',invType:'gear',ac:0,rarity:'Uncommon'},
-          {name:'Rumor Exchange (Information Brokerage)',price:50,desc:'Highest-quality exchange on the circuit. Eldoria\'s commercial density and the two-week stop mean the ledger is dense. Maritime, political, and Citadel-adjacent intelligence available.',stats:'Cost: 50 GP | Highest circuit quality | Maritime and political focus | Anonymity guaranteed',invType:'gear',ac:0,rarity:'Uncommon'},
-        ]}
-      ]},
-    ],
-  },
   'Threshold Point (Dead Lands Border)':{
     type:'Dead Lands Border Settlement — Frontier',
     economy:'Extreme scarcity drives prices 40–80% above standard. Limited stock. No luxury goods. What you can buy here, you cannot afford to be without. Information is the only thing that is cheap.',
@@ -11160,10 +11198,6 @@ const SHOP_CATEGORY_PRICING = {
   'Silkwood Forest': {
     gem:1.0, weapon:1.0, armor:1.0, book:1.0, healing:0.9, general:1.0,
     note:'No conventional economy. Gifted or salvaged goods only.',
-  },
-  'Eldoria (The Trade Port)': {
-    gem:1.15, weapon:1.0, armor:1.0, book:1.0, healing:1.0, general:1.0,
-    note:'Specialty gems & sea artifacts +15%. Maritime goods at standard.',
   },
 };
 
@@ -11415,7 +11449,7 @@ const REGIONAL_FILLER_ITEMS = {
     {name:'Parchment (celestial-grade, 10 sheets)',price:110,desc:'Treated parchment that resists fading from resonance exposure and retains sigil ink with enhanced clarity.',stats:'10 sheets | Resonance-stable: sigil ink retains full clarity indefinitely | Weight: 0.5 lb.',invType:'gear'},
   ],
 
-  // ── Eldoria (Port City + Trade Port) ─────────────────────────────────
+  // ── Eldoria (Port City) ───────────────────────────────────────────────
   'Eldoria':[
     {name:'Maritime Charts (regional)',price:600,desc:'A set of current maritime charts covering the coastal regions around Eldoria. Updated annually by the Sea Trader Consortium.',stats:'Coverage: regional coastal | Updated: current year | Navigation advantage in charted waters | Weight: 0.5 lb.',invType:'gear'},
     {name:'Rope (50 ft., salt-treated)',price:130,desc:'Hempen rope treated against salt-water degradation. Standard maritime issue.',stats:'50 ft. | 300 lb. capacity | Salt-resistant | Weight: 10 lb.',invType:'gear'},
@@ -11905,11 +11939,16 @@ function saveAll(){
   });
   // Save profs
   state.saveProficiencies = ABILITIES.filter(ab=>{const el=document.getElementById('sav_'+ab);return el&&el.checked;});
+  // Save manual ability mods from MODS inputs
+  if(!state.abilityMods) state.abilityMods={};
+  ABILITIES.forEach(ab=>{const el=document.getElementById('abmods_'+ab);if(el)state.abilityMods[ab]=parseInt(el.value)||0;});
   updateCalcs();
   const _spIn=document.getElementById('combatSpeed');
   const _spSb=document.getElementById('charSpeed');
   state.combatSpeed=(_spIn&&_spIn.value)||state.combatSpeed||'';
   state.speed=((_spSb&&_spSb.textContent)||'').trim()||state.combatSpeed||'30 ft.';
+  // Save alternate movement speeds
+  ['swimSpeed','flySpeed','climbSpeed','burrowSpeed'].forEach(id=>{const el=document.getElementById(id);if(el)state[id]=el.value||'';});
   // currentBiome is set directly on state (not from a DOM element) — preserve it explicitly
   if(state.currentBiome===undefined) state.currentBiome=null;
   _debouncedSave();
@@ -11921,6 +11960,7 @@ function ensureStateDefaults(){
   if(!state.shopStock) state.shopStock = {};
   if(!state.shopRotationPick) state.shopRotationPick = {};
   if(!state.rollLog) state.rollLog = [];
+  if(!state.abilityMods) state.abilityMods = {};
   if(!state.selectedDie) state.selectedDie = 'd20';
   if(!Array.isArray(state.deathSaveBlips)) state.deathSaveBlips = [];
   if(state.deathSaveBlips.length > 3) state.deathSaveBlips = state.deathSaveBlips.slice(-3);
@@ -12296,6 +12336,12 @@ function refreshAggregatedSpeed(){
     bonus += multiplier * level;
   })();
 
+  // Add ex_speed from active spell/ability effects, equipped items, and active sets
+  const spBon = getSpellAbilityEffectBonuses ? getSpellAbilityEffectBonuses() : {};
+  const eqBon = getEquippedItemEffectBonuses ? getEquippedItemEffectBonuses() : {};
+  const setBon = getActiveSetStatBonuses ? getActiveSetStatBonuses() : {};
+  bonus += (spBon.ex_speed||0) + (eqBon.ex_speed||0) + (setBon.ex_speed||0);
+
   const base = getWalkingSpeedBaseFt();
   const total = Math.max(0, base + bonus);
   const label = total+' ft.';
@@ -12314,7 +12360,10 @@ function updateCalcs(){
   document.getElementById('tierDisplay').textContent = getTier(state.level);
   const dex = getMod('DEX');
   const biomeInit = getBiomeInitBonus ? getBiomeInitBonus() : 0;
-  const totalInit = dex + biomeInit;
+  const spellAbilityBon = getSpellAbilityEffectBonuses();
+  const equippedItemBon = getEquippedItemEffectBonuses();
+  const setStatBonEarly = getActiveSetStatBonuses();
+  const totalInit = dex + biomeInit + getManualAbilityMod('DEX') + (spellAbilityBon.ex_init||0) + (equippedItemBon.ex_init||0) + (setStatBonEarly.ex_init||0);
   document.getElementById('initDisplay').textContent = fmtMod(totalInit);
   document.getElementById('initVal').textContent = fmtMod(totalInit);
   // Update Alas Heavy dice pool in Attributes tab
@@ -12346,21 +12395,27 @@ function updateCalcs(){
     document.getElementById('spModDisplay').textContent='—';
     document.getElementById('spDcDisplay').textContent='—';
   }
-  // Gather cumulative set stat bonuses + active effect bonuses
+  // Gather cumulative set stat bonuses + active effect bonuses + new sources
   const setStatBon=getActiveSetStatBonuses();
   const effBon=getActiveEffectBonuses();
-  // Ability mods — tinted gold when a set or effect bonus is active
+  // Ability mods — tinted gold when any bonus is active
   ABILITIES.forEach(ab=>{
     const el=document.getElementById('abmod_'+ab);
     if(!el)return;
     const setB=setStatBon['ab_'+ab]||0;
     const effB=effBon[ab]||0;
-    const abBonus=setB+effB;
+    const manB=getManualAbilityMod(ab);
+    const spB=spellAbilityBon['ab_'+ab]||0;
+    const eqB=equippedItemBon['ab_'+ab]||0;
+    const abBonus=setB+effB+manB+spB+eqB;
     el.textContent=fmtMod(getMod(ab)+abBonus);
     el.style.color=abBonus?'var(--gold-l)':'';
     const parts=[];
-    if(setB) parts.push('Set +'+setB);
+    if(setB) parts.push('Set '+(setB>=0?'+':'')+setB);
     if(effB) parts.push('Effect '+(effB>=0?'+':'')+effB);
+    if(manB) parts.push('Mods '+(manB>=0?'+':'')+manB);
+    if(spB)  parts.push('Spell '+(spB>=0?'+':'')+spB);
+    if(eqB)  parts.push('Item '+(eqB>=0?'+':'')+eqB);
     el.title=parts.length?parts.join(', '):'';
   });
   // Saves
@@ -12369,12 +12424,12 @@ function updateCalcs(){
     if(!el)return;
     const profEl=document.getElementById('sav_'+ab);
     const isProficient=profEl&&profEl.checked;
-    const abBonus=(setStatBon['ab_'+ab]||0)+(effBon[ab]||0);
-    const svBonus=setStatBon['sv_'+ab]||0;
+    const abBonus=(setStatBon['ab_'+ab]||0)+(effBon[ab]||0)+getManualAbilityMod(ab)+(spellAbilityBon['ab_'+ab]||0)+(equippedItemBon['ab_'+ab]||0);
+    const svBonus=(setStatBon['sv_'+ab]||0)+(spellAbilityBon['sv_'+ab]||0)+(equippedItemBon['sv_'+ab]||0);
     const total=getMod(ab)+(isProficient?prof:0)+abBonus+svBonus;
     el.textContent=fmtMod(total);
     el.style.color=(abBonus||svBonus)?'var(--gold-l)':'';
-    el.title=(abBonus||svBonus)?'Includes set bonus ab:'+abBonus+' sv:'+svBonus:'';
+    el.title=(abBonus||svBonus)?'ab:'+abBonus+' sv:'+svBonus:'';
   });
   // Skills
   SKILLS_DATA.forEach(sk=>{
@@ -12384,18 +12439,18 @@ function updateCalcs(){
     const base=getMod(sk.ab);
     const isPr=(document.getElementById('sp_'+skId)||{}).checked;
     const isEx=(document.getElementById('se_'+skId)||{}).checked;
-    const abBonus=(setStatBon['ab_'+sk.ab]||0)+(effBon[sk.ab]||0);
-    const skBonus=setStatBon['sk_'+sk.name]||0;
+    const abBonus=(setStatBon['ab_'+sk.ab]||0)+(effBon[sk.ab]||0)+getManualAbilityMod(sk.ab)+(spellAbilityBon['ab_'+sk.ab]||0)+(equippedItemBon['ab_'+sk.ab]||0);
+    const skBonus=(setStatBon['sk_'+sk.name]||0)+(spellAbilityBon['sk_'+sk.name]||0)+(equippedItemBon['sk_'+sk.name]||0);
     const total=base+(isPr?prof:0)+(isEx?prof:0)+abBonus+skBonus;
     totEl.textContent=fmtMod(total);
     totEl.style.color=(abBonus||skBonus)?'var(--gold-l)':'';
-    totEl.title=(abBonus||skBonus)?'Includes set+effect bonus: '+(abBonus+skBonus):'';
+    totEl.title=(abBonus||skBonus)?'Bonus: '+(abBonus+skBonus):'';
   });
   // Passive Perception
   const percEl=document.getElementById('sp_Perception');
   const percProf=percEl&&percEl.checked;
   const percExp=(document.getElementById('se_Perception')||{}).checked;
-  const passPercSetBonus=(setStatBon['ab_WIS']||0)+(setStatBon['sk_Perception']||0)+(effBon['WIS']||0);
+  const passPercSetBonus=(setStatBon['ab_WIS']||0)+(setStatBon['sk_Perception']||0)+(effBon['WIS']||0)+getManualAbilityMod('WIS')+(spellAbilityBon['ab_WIS']||0)+(equippedItemBon['ab_WIS']||0)+(spellAbilityBon['sk_Perception']||0)+(equippedItemBon['sk_Perception']||0);
   const passPerc=10+getMod('WIS')+(percProf?prof:0)+(percExp?prof:0)+passPercSetBonus;
   document.getElementById('passPerc').textContent=passPerc;
   // Refresh effects section header live
@@ -12725,13 +12780,29 @@ function buildAbilityGrid(){
     const card=document.createElement('div');
     card.className='ability-card';
     const sc=state[ab]||10;
+    const manMod=(state.abilityMods&&state.abilityMods[ab])||0;
     card.innerHTML=`
       <div class="ab-name" onclick="openQuickAbilityRoll('${ab}')" title="Click to roll ${AB_NAMES[ab]} check or save">${AB_NAMES[ab]}</div>
       <input class="ab-score" type="number" id="ab_${ab}" value="${sc}" min="1" max="30" oninput="saveAll()">
       <div class="ab-mod" id="abmod_${ab}">${fmtMod(Math.floor((sc-10)/2))}</div>
+      <div class="ab-mods-wrap" title="Manual modifier — stacks with all ${ab} checks, saves &amp; skills">
+        <span class="ab-mods-lbl">MODS</span>
+        <input class="ab-mods-inp" type="number" id="abmods_${ab}" value="${manMod}" min="-20" max="20"
+          oninput="onAbilityModInput(this,'${ab}')">
+      </div>
     `;
     g.appendChild(card);
   });
+}
+
+function onAbilityModInput(inp,ab){
+  if(!state.abilityMods) state.abilityMods={};
+  state.abilityMods[ab]=parseInt(inp.value)||0;
+  updateCalcs();
+  _debouncedSave();
+}
+function getManualAbilityMod(ab){
+  return (state.abilityMods&&state.abilityMods[ab])||0;
 }
 
 function buildSavesGrid(){
@@ -13317,6 +13388,7 @@ function addSpell(data){
   const savType  = data.saveType   || 'none';
   const dmgDie   = data.dmgDie     || 'none';
   const hasAE    = data.hasActiveEffect==='1'||data.hasActiveEffect===true;
+  const aeStats  = (()=>{ try{ return data.aeStats?JSON.parse(data.aeStats):{} }catch(e){return{}} })();
   const durType  = data.durType || 'Instant';
   const conditions = (data.conditions||'').split(',').filter(Boolean);
   const CONDS = ['Stunned','Blinded','Frightened','Restrained','Poisoned','Paralyzed','Prone','Charmed','Incapacitated','Burning','Exhausted','Petrified'];
@@ -13442,8 +13514,8 @@ function addSpell(data){
     <div class="sp-section">
       <div class="sp-section-ttl" style="margin-bottom:0;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:7.5px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;font-family:'Cinzel',serif;">
-          <input type="checkbox" ${hasAE?'checked':''} onchange="spellTogglePill(this,'hasActiveEffect',this.checked?'1':'0',null);this.closest('.sp-section').querySelector('.sp-ae-panel').style.display=this.checked?'block':'none'">
-          Has Active Effect (persists with duration)
+          <input type="checkbox" ${hasAE?'checked':''} onchange="spellTogglePill(this,'hasActiveEffect',this.checked?'1':'0',null);this.closest('.sp-section').querySelector('.sp-ae-panel').style.display=this.checked?'block':'none';updateCalcs()">
+          Has Active Effect — auto-applies stat bonuses while active
         </label>
       </div>
       <div class="sp-ae-panel" style="display:${hasAE?'block':'none'};margin-top:8px;">
@@ -13460,6 +13532,12 @@ function addSpell(data){
             </select>
           </div>
         </div>
+        <!-- EFFECTS Toggle Panel -->
+        <button type="button" class="eff-stat-toggle-btn" onclick="const p=this.nextElementSibling;p.classList.toggle('open');this.querySelector('.eff-arr').textContent=p.classList.contains('open')?'▲':'▼'">
+          <span>⚡ EFFECTS — Stat Modifiers (auto-apply while active)</span>
+          <span class="eff-arr">▼</span>
+        </button>
+        ${buildEffectStatPanel(aeStats)}
       </div>
     </div>
 
@@ -13773,8 +13851,11 @@ function addAbility(data){
   const archPills = archetypes.map(a=>`<button type="button" class="ab-archetype-pill${savedArch.includes(a)?' on':''}" onclick="this.classList.toggle('on');abilitySetAttr(this.closest('.item-card'),'archetype',[...this.closest('.ab-archetype-row').querySelectorAll('.on')].map(b=>b.textContent).join(','))">${a}</button>`).join('');
   const costPills  = costTypes.map(c=>`<button type="button" class="ab-cost-pill${savedCost.includes(c)?' on':''}" onclick="this.classList.toggle('on');abilitySetAttr(this.closest('.item-card'),'costType',[...this.closest('.ab-cost-type-row').querySelectorAll('.on')].map(b=>b.textContent).join(','))">${c}</button>`).join('');
 
-  card.dataset.archetype = data.archetype || '';
-  card.dataset.costType  = data.costType  || '';
+  card.dataset.archetype      = data.archetype      || '';
+  card.dataset.costType       = data.costType       || '';
+  card.dataset.hasActiveEffect= data.hasActiveEffect|| '0';
+  const abHasAE  = data.hasActiveEffect==='1'||data.hasActiveEffect===true;
+  const abAeStats= (()=>{ try{ return data.aeStats?JSON.parse(data.aeStats):{} }catch(e){return{}} })();
 
   card.innerHTML = `
     <button class="c-remove" onclick="this.parentElement.remove();saveCards('abilitiesList','abilities')">×</button>
@@ -13881,6 +13962,23 @@ function addAbility(data){
           <div class="tac-balance-row"><span class="tac-balance-lbl">Cost</span><div class="tac-balance-track"><div class="tac-balance-fill cost" style="width:40%"></div></div><span class="tac-balance-val tac-v-cost">2</span></div>
           <div class="tac-verdict balanced">✓ Balanced — Power is offset by meaningful cost and reliability limits.</div>
         </div>
+      </div>
+    </div>
+
+    <!-- Active Effect Toggle + Stat Panel -->
+    <div class="sp-section" style="margin-top:8px;">
+      <div class="sp-section-ttl" style="margin-bottom:0;">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:7.5px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;font-family:'Cinzel',serif;">
+          <input type="checkbox" ${abHasAE?'checked':''} onchange="this.closest('.item-card').dataset.hasActiveEffect=this.checked?'1':'0';this.closest('.sp-section').querySelector('.ab-ae-panel').style.display=this.checked?'block':'none';saveCards('abilitiesList','abilities');updateCalcs()">
+          Has Active Effect — auto-applies stat bonuses while active
+        </label>
+      </div>
+      <div class="ab-ae-panel" style="display:${abHasAE?'block':'none'};margin-top:6px;">
+        <button type="button" class="eff-stat-toggle-btn" onclick="const p=this.nextElementSibling;p.classList.toggle('open');this.querySelector('.eff-arr').textContent=p.classList.contains('open')?'▲':'▼'">
+          <span>⚡ EFFECTS — Stat Modifiers (auto-apply while active)</span>
+          <span class="eff-arr">▼</span>
+        </button>
+        ${buildEffectStatPanel(abAeStats)}
       </div>
     </div>
 
@@ -14507,6 +14605,7 @@ function addInventory(data){
   const list=document.getElementById('inventoryList');
   const card=document.createElement('div');
   card.className='item-card inv-card'+(data.equipped?' equipped':'');
+  const invStats=(()=>{ try{ return data.itemStats?JSON.parse(data.itemStats):{} }catch(e){return{}} })();
   const SLOT_OPTS = ['none','Head','Body','Hands','Legs','Feet','Ring 1','Ring 2','Ring 3','Ring 4','Ring 5','Necklace','Earring L','Earring R','Bracelet L','Bracelet R'];
   const slotOptions = SLOT_OPTS.map(s=>`<option value="${s}"${(data.slot||'none')===s?' selected':''}>${s==='none'?'No Slot':s}</option>`).join('');
   card.innerHTML=`
@@ -14546,6 +14645,12 @@ function addInventory(data){
       <button type="button" class="shop-act-btn inv-craft-btn" style="display:none" onclick="openJewelryCraft(this)">Craft Jewelry</button>
     </div>
     <div class="c-fld"><span class="c-fld-lbl">Notes / Properties</span><textarea class="c-ta inv-notes" placeholder="Damage dice, weight, special properties…" oninput="saveCards('inventoryList','inventory')">${data.notes||''}</textarea></div>
+    <!-- EFFECTS Toggle Panel — applied automatically when Equipped -->
+    <button type="button" class="eff-stat-toggle-btn" onclick="const p=this.nextElementSibling;p.classList.toggle('open');this.querySelector('.eff-arr').textContent=p.classList.contains('open')?'▲':'▼'">
+      <span>⚡ EFFECTS — Stat Modifiers (auto-apply when Equipped)</span>
+      <span class="eff-arr">▼</span>
+    </button>
+    ${buildEffectStatPanel(invStats)}
   `;
   list.appendChild(card);
   onInvTypeChange(card.querySelector('.inv-type'));
@@ -16400,7 +16505,153 @@ function statKeyDisplay(key){
   if(key.startsWith('ab_')) return key.slice(3)+' (Score)';
   if(key.startsWith('sv_')) return key.slice(3)+' Save';
   if(key.startsWith('sk_')) return key.slice(3);
+  if(key==='ex_init') return 'Initiative';
+  if(key==='ex_atk')  return 'Attack Roll';
+  if(key==='ex_dmg')  return 'Damage';
+  if(key==='ex_speed') return 'Speed (ft)';
   return key;
+}
+
+// ═══════════════════════════════════════════════════
+// EFFECT STAT PANEL — shared by Spells, Abilities, Inventory
+// ═══════════════════════════════════════════════════
+function buildEffectStatPanel(activeStats){
+  activeStats=activeStats||{};
+  let html='<div class="eff-stat-panel">';
+
+  // Ability Scores
+  html+='<div class="eff-stat-group-hdr">Ability Scores</div><div class="eff-stat-grid">';
+  SET_AB_KEYS.forEach(ab=>{
+    const key='ab_'+ab; const on=key in activeStats; const val=activeStats[key]||0;
+    html+=`<div class="eff-stat-item${on?' stat-on':''}" data-stat-key="${key}">
+      <input type="checkbox" class="eff-stat-chk" ${on?'checked':''} onchange="onEffStatToggle(this)">
+      <span class="eff-stat-name">${ab}</span>
+      <input class="eff-stat-val" type="number" value="${val}" min="-20" max="20" style="${on?'':'display:none'}" oninput="onEffStatChange(this)">
+    </div>`;
+  });
+  html+='</div>';
+
+  // Saving Throws
+  html+='<div class="eff-stat-group-hdr">Saving Throws</div><div class="eff-stat-grid">';
+  SET_AB_KEYS.forEach(ab=>{
+    const key='sv_'+ab; const on=key in activeStats; const val=activeStats[key]||0;
+    html+=`<div class="eff-stat-item${on?' stat-on':''}" data-stat-key="${key}">
+      <input type="checkbox" class="eff-stat-chk" ${on?'checked':''} onchange="onEffStatToggle(this)">
+      <span class="eff-stat-name">${ab} Save</span>
+      <input class="eff-stat-val" type="number" value="${val}" min="-20" max="20" style="${on?'':'display:none'}" oninput="onEffStatChange(this)">
+    </div>`;
+  });
+  html+='</div>';
+
+  // Skills
+  html+='<div class="eff-stat-group-hdr">Skill Checks</div><div class="eff-stat-grid">';
+  SET_SK_KEYS.forEach(sk=>{
+    const key='sk_'+sk; const on=key in activeStats; const val=activeStats[key]||0;
+    html+=`<div class="eff-stat-item${on?' stat-on':''}" data-stat-key="${key}">
+      <input type="checkbox" class="eff-stat-chk" ${on?'checked':''} onchange="onEffStatToggle(this)">
+      <span class="eff-stat-name">${sk}</span>
+      <input class="eff-stat-val" type="number" value="${val}" min="-20" max="20" style="${on?'':'display:none'}" oninput="onEffStatChange(this)">
+    </div>`;
+  });
+  html+='</div>';
+
+  // Die Rolls & Combat
+  html+='<div class="eff-stat-group-hdr">Die Rolls &amp; Combat</div><div class="eff-stat-grid">';
+  [['ex_init','Initiative'],['ex_atk','Attack Roll'],['ex_dmg','Damage'],['ex_speed','Speed (ft)']].forEach(([key,label])=>{
+    const on=key in activeStats; const val=activeStats[key]||0;
+    html+=`<div class="eff-stat-item${on?' stat-on':''}" data-stat-key="${key}">
+      <input type="checkbox" class="eff-stat-chk" ${on?'checked':''} onchange="onEffStatToggle(this)">
+      <span class="eff-stat-name">${label}</span>
+      <input class="eff-stat-val" type="number" value="${val}" min="-99" max="99" style="${on?'':'display:none'}" oninput="onEffStatChange(this)">
+    </div>`;
+  });
+  html+='</div>';
+
+  html+='</div>';
+  return html;
+}
+
+function collectEffectStats(container){
+  const result={};
+  if(!container) return result;
+  container.querySelectorAll('.eff-stat-item').forEach(item=>{
+    const chk=item.querySelector('.eff-stat-chk');
+    if(chk&&chk.checked){
+      const key=item.dataset.statKey;
+      const val=parseInt((item.querySelector('.eff-stat-val')||{}).value)||0;
+      result[key]=val;
+    }
+  });
+  return result;
+}
+
+function onEffStatToggle(chk){
+  const item=chk.closest('.eff-stat-item');
+  const inp=item.querySelector('.eff-stat-val');
+  item.classList.toggle('stat-on',chk.checked);
+  inp.style.display=chk.checked?'':'none';
+  if(chk.checked)inp.focus();
+  const card=chk.closest('.item-card');
+  if(card){
+    const listId=card.closest('[id$="List"]')||card.closest('[id="sigilsList"]')||card.closest('[id="abilitiesList"]')||card.closest('[id="inventoryList"]');
+    triggerCardSave(card);
+  }
+  updateCalcs();
+}
+
+function onEffStatChange(inp){
+  triggerCardSave(inp.closest('.item-card'));
+  updateCalcs();
+}
+
+function triggerCardSave(card){
+  if(!card) return;
+  const list=card.closest('#sigilsList');
+  if(list){ saveCards('sigilsList','sigils'); return; }
+  const list2=card.closest('#abilitiesList');
+  if(list2){ saveCards('abilitiesList','abilities'); return; }
+  const list3=card.closest('#inventoryList');
+  if(list3){ saveCards('inventoryList','inventory'); return; }
+}
+
+/** Aggregate stat bonuses from active spells (hasActiveEffect=1, not daily-spent) and abilities. */
+function getSpellAbilityEffectBonuses(){
+  const bonuses={};
+  // Spells
+  document.querySelectorAll('#sigilsList .item-card').forEach(card=>{
+    const hasAE=card.dataset.hasActiveEffect==='1';
+    const availBtn=card.querySelector('.sig-avail-btn');
+    const isSpent=availBtn&&availBtn.getAttribute('data-spent')==='1';
+    if(!hasAE||isSpent) return;
+    const panel=card.querySelector('.eff-stat-panel');
+    if(!panel) return;
+    const stats=collectEffectStats(panel);
+    for(const [k,v] of Object.entries(stats)) bonuses[k]=(bonuses[k]||0)+v;
+  });
+  // Abilities
+  document.querySelectorAll('#abilitiesList .item-card').forEach(card=>{
+    const hasAE=card.dataset.hasActiveEffect==='1';
+    if(!hasAE) return;
+    const panel=card.querySelector('.eff-stat-panel');
+    if(!panel) return;
+    const stats=collectEffectStats(panel);
+    for(const [k,v] of Object.entries(stats)) bonuses[k]=(bonuses[k]||0)+v;
+  });
+  return bonuses;
+}
+
+/** Aggregate stat bonuses from equipped inventory items. */
+function getEquippedItemEffectBonuses(){
+  const bonuses={};
+  document.querySelectorAll('#inventoryList .inv-card').forEach(card=>{
+    const equipped=(card.querySelector('.eq-chk')||{}).checked;
+    if(!equipped) return;
+    const panel=card.querySelector('.eff-stat-panel');
+    if(!panel) return;
+    const stats=collectEffectStats(panel);
+    for(const [k,v] of Object.entries(stats)) bonuses[k]=(bonuses[k]||0)+v;
+  });
+  return bonuses;
 }
 
 // Build the collapsible stat-bonus panel HTML for one tier
@@ -16448,6 +16699,19 @@ function buildStatPanelHTML(activeStats){
       <input type="checkbox" class="stat-chk" ${on?'checked':''} onchange="onStatToggle(this)">
       <span class="stat-bonus-name">${sk}</span>
       <input class="stat-val-inp" type="number" value="${val}" min="-10" max="30"
+        style="${on?'':'display:none'}" oninput="onSetStatChange(this)">
+    </div>`;
+  });
+  html+='</div>';
+
+  // Die Rolls & Combat extras
+  html+='<div class="stat-group-hdr">Die Rolls &amp; Combat</div><div class="stat-bonus-grid">';
+  [['ex_init','Initiative'],['ex_atk','Attack Roll'],['ex_dmg','Damage'],['ex_speed','Speed (ft)']].forEach(([key,label])=>{
+    const on=key in activeStats; const val=activeStats[key]||0;
+    html+=`<div class="stat-bonus-item${on?' stat-on':''}" data-stat-key="${key}">
+      <input type="checkbox" class="stat-chk" ${on?'checked':''} onchange="onStatToggle(this)">
+      <span class="stat-bonus-name">${label}</span>
+      <input class="stat-val-inp" type="number" value="${val}" min="-99" max="99"
         style="${on?'':'display:none'}" oninput="onSetStatChange(this)">
     </div>`;
   });
@@ -16550,21 +16814,26 @@ function addSet(data){
     `<option value="${i+2}"${(i+2===totalPieces)?' selected':''}>${i+2} Pieces</option>`).join('');
 
   card.innerHTML=`
-    <button class="c-remove" onclick="this.parentElement.remove();updateCalcs();updateArmorAC();saveSets()">×</button>
-    <div class="c-row c-2col" style="margin-bottom:10px">
-      <div class="c-fld">
-        <span class="c-fld-lbl">Set Name</span>
-        <input class="c-inp set-name-inp" value="${setName}" placeholder="e.g. Frostbound, Sunforged…"
+    <button class="c-remove" onclick="this.parentElement.remove();updateCalcs();updateArmorAC();saveSets()" title="Remove Set">×</button>
+
+    <!-- ── SET HEADER ── -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bdr-g);">
+      <div style="flex:1;">
+        <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;margin-bottom:4px;">Armor / Equipment Set</div>
+        <input class="c-inp set-name-inp" value="${setName}" placeholder="Set Name — e.g. Frostbound, Sunforged…"
+          style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:1px;font-weight:600;width:100%;"
           oninput="updateSetStatus(this.closest('.set-card'));updateArmorAC();saveSets()">
       </div>
-      <div class="c-fld">
-        <span class="c-fld-lbl">Total Pieces in Set</span>
-        <select class="c-sel set-total-sel" onchange="rebuildSetTiers(this.closest('.set-card'))">
+      <div style="text-align:center;min-width:80px;">
+        <div style="font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;margin-bottom:3px;">Total Pieces</div>
+        <select class="c-sel set-total-sel" style="text-align:center;font-size:12px;font-weight:700;" onchange="rebuildSetTiers(this.closest('.set-card'))">
           ${pieceOpts}
         </select>
       </div>
     </div>
-    <div class="set-status-bar">
+
+    <!-- ── STATUS BAR ── -->
+    <div class="set-status-bar" style="margin-bottom:10px;">
       <div class="set-eq-block">
         <div class="set-equipped-count">0</div>
         <div class="set-status-label">Equipped</div>
@@ -16573,15 +16842,24 @@ function addSet(data){
       <div class="set-active-bonus">No active bonuses</div>
       <div class="set-status-badge set-badge-inactive">Inactive</div>
     </div>
-    <div class="set-override-row">
-      <span class="set-override-lbl">Override:</span>
-      <button class="ov-btn${(data.override||'auto')==='auto'?' active':''}" onclick="setOverride(this,'auto')">Auto-Detect</button>
-      <button class="ov-btn${(data.override||'auto')==='partial'?' active-partial active':''}" onclick="setOverride(this,'partial')">Force Partial</button>
-      <button class="ov-btn${(data.override||'auto')==='full'?' active':''}" onclick="setOverride(this,'full')">Force Full Set</button>
-      <button class="ov-btn${(data.override||'auto')==='off'?' active-off active':''}" onclick="setOverride(this,'off')">Off</button>
+
+    <!-- ── DETECTION MODE ── -->
+    <div style="margin-bottom:12px;">
+      <div style="font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:2px;color:var(--txt-dim);text-transform:uppercase;margin-bottom:5px;">Detection Mode — how equipped pieces are counted</div>
+      <div class="set-override-row" style="gap:4px;">
+        <button class="ov-btn${(data.override||'auto')==='auto'?' active':''}" onclick="setOverride(this,'auto')" title="Count pieces automatically from Equipped items sharing this Set name">⟳ Auto</button>
+        <button class="ov-btn${(data.override||'auto')==='partial'?' active-partial active':''}" onclick="setOverride(this,'partial')" title="Force partial set bonus regardless of equipped count">◑ Partial</button>
+        <button class="ov-btn${(data.override||'auto')==='full'?' active':''}" onclick="setOverride(this,'full')" title="Force full set bonus regardless of equipped count">★ Full Set</button>
+        <button class="ov-btn${(data.override||'auto')==='off'?' active-off active':''}" onclick="setOverride(this,'off')" title="Disable set bonuses entirely">✕ Off</button>
+      </div>
     </div>
+
+    <!-- ── TIER BONUSES ── -->
     <div class="set-tiers-wrap">
-      <div class="set-tiers-hdr">Piece Bonuses — toggle stats and enter modifiers per threshold</div>
+      <div class="set-tiers-hdr">
+        <span>Set Bonuses</span>
+        <span style="font-family:'EB Garamond',serif;font-size:10px;font-style:italic;color:var(--txt-dim);font-weight:normal;letter-spacing:0;text-transform:none;">— unlock at each piece threshold</span>
+      </div>
       <div class="set-tiers-inner">${buildSetTierRowsHTML(totalPieces,tiers)}</div>
     </div>
   `;
@@ -16849,6 +17127,9 @@ function saveCards(listId, stateKey){
       } else {
         d.unstableTable = '';
       }
+      // Effect stat panel
+      const aePanel = card.querySelector('.sp-ae-panel .eff-stat-panel');
+      d.aeStats = aePanel ? JSON.stringify(collectEffectStats(aePanel)) : '{}';
     } else if(listId==='activeEffectsList'){
       const inps = card.querySelectorAll('.c-inp');
       const sel  = card.querySelector('.c-sel');
@@ -16887,9 +17168,12 @@ function saveCards(listId, stateKey){
       d.duration    = (sels[4]||{}).value||'Instant';
       d.archetype   = card.dataset.archetype||'';
       d.costType    = card.dataset.costType||'';
+      d.hasActiveEffect = card.dataset.hasActiveEffect||'0';
       d.effect      = (tas[0]||{}).value||'';
       d.counterplay = (tas[1]||{}).value||'';
       d.notes       = (tas[2]||{}).value||'';
+      const abAePanel = card.querySelector('.ab-ae-panel .eff-stat-panel');
+      d.aeStats = abAePanel ? JSON.stringify(collectEffectStats(abAePanel)) : '{}';
     } else if(listId==='inventoryList'){
       d.name=(card.querySelectorAll('.c-inp')[0]||{}).value||'';
       d.qty=(card.querySelector('.inv-qty')||{}).value||1;
@@ -16899,6 +17183,8 @@ function saveCards(listId, stateKey){
       d.set=(card.querySelector('.inv-set')||{}).value||'';
       d.equipped=(card.querySelector('.eq-chk')||{}).checked||false;
       d.notes=(card.querySelector('.inv-notes')||{}).value||'';
+      const invPanel=card.querySelector('.eff-stat-panel');
+      d.itemStats=invPanel?JSON.stringify(collectEffectStats(invPanel)):'{}';
     }
     items.push(d);
   });
@@ -16908,6 +17194,7 @@ function saveCards(listId, stateKey){
   const __sb=document.getElementById('charSpeed');
   state.combatSpeed=(__cs&&__cs.value)||state.combatSpeed||'';
   state.speed=((__sb&&__sb.textContent)||'').trim()||state.combatSpeed||'30 ft.';
+  ['swimSpeed','flySpeed','climbSpeed','burrowSpeed'].forEach(id=>{const el=document.getElementById(id);if(el)state[id]=el.value||'';});
   _debouncedSave();
 }
 
@@ -22787,6 +23074,10 @@ function restoreSimpleInputs(){
   ];
   pairs.forEach(([id,key])=>{const el=document.getElementById(id);if(el&&state[key]!==undefined)el.value=state[key];});
   ABILITIES.forEach(ab=>{const el=document.getElementById('ab_'+ab);if(el)el.value=state[ab]||10;});
+  // Restore manual ability MODS
+  if(state.abilityMods){ABILITIES.forEach(ab=>{const el=document.getElementById('abmods_'+ab);if(el)el.value=state.abilityMods[ab]||0;});}
+  // Restore alternate movement speeds
+  ['swimSpeed','flySpeed','climbSpeed','burrowSpeed'].forEach(id=>{const el=document.getElementById(id);if(el&&state[id]!==undefined)el.value=state[id];});
   const asSel = document.getElementById('attunedSigil'); if(asSel){ asSel.value = state.attunedSigil||''; renderAttunedSigilPanel(state.attunedSigil||''); }
 }
 
