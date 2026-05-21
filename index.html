@@ -9014,6 +9014,87 @@
             opacity:0; transition:opacity .8s; z-index:9976;
         }
         #deathSaveText.show { opacity:1; }
+
+        /* ═══════════════════════════════════════════════════════════
+           V4.7 — KEEPER'S PANEL 15 FEATURES
+           ═══════════════════════════════════════════════════════════ */
+
+        /* Party Danger Dashboard chips */
+        .kp-danger-bar { display:flex; flex-wrap:wrap; gap:5px; padding:8px 12px; background:rgba(0,0,0,.25); border-bottom:1px solid var(--bdr); flex-shrink:0; }
+        .kp-danger-chip { display:flex; flex-direction:column; align-items:center; padding:4px 8px; border-radius:4px; border:1px solid rgba(255,255,255,.1); background:var(--surf2); min-width:60px; max-width:80px; transition:border-color .3s; }
+        .kp-chip-name { font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:.8px; color:var(--txt-lbl); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:76px; }
+        .kp-chip-hp-bar { width:100%; height:3px; background:rgba(255,255,255,.1); border-radius:2px; margin:2px 0; overflow:hidden; }
+        .kp-chip-hp-fill { height:100%; border-radius:2px; transition:width .3s; }
+        .kp-chip-stats { font-family:'Raleway',sans-serif; font-size:7px; color:var(--txt-dim); white-space:nowrap; }
+        .kp-chip-danger { border-color:rgba(200,32,48,.65) !important; animation:kpChipPulse 1.5s ease-in-out infinite; }
+        .kp-chip-caution { border-color:rgba(200,112,32,.5) !important; }
+        @keyframes kpChipPulse { 0%,100%{box-shadow:none} 50%{box-shadow:0 0 8px rgba(200,32,48,.5)} }
+
+        /* Party Alert Banner */
+        .kp-alert-banner { display:none; margin:0; padding:7px 12px; background:rgba(200,32,48,.12); border-bottom:1px solid rgba(200,32,48,.35); font-family:'Cinzel',serif; font-size:8px; letter-spacing:1.5px; color:rgba(200,32,48,.9); text-transform:uppercase; flex-shrink:0; }
+        .kp-alert-banner.show { display:flex; align-items:center; gap:8px; }
+
+        /* Party Wealth Footer */
+        .kp-wealth-bar { display:flex; gap:16px; flex-wrap:wrap; align-items:center; padding:7px 12px; background:rgba(201,162,39,.05); border-top:1px solid rgba(201,162,39,.14); font-family:'Cinzel',serif; font-size:8px; letter-spacing:1px; flex-shrink:0; }
+        .kp-wealth-lbl { color:var(--gold-d); }
+        .kp-wealth-val { color:var(--gold-l); font-weight:700; font-family:'Raleway',sans-serif; font-size:11px; }
+
+        /* Session Clock */
+        .kp-session-clock { display:inline-flex; align-items:center; gap:10px; padding:8px 14px; background:rgba(61,214,219,.06); border:1px solid rgba(61,214,219,.22); border-radius:4px; margin-bottom:10px; }
+        .kp-clock-val { font-family:'Raleway',sans-serif; font-size:22px; font-weight:700; color:rgba(61,214,219,.85); letter-spacing:2px; }
+        .kp-clock-lbl { font-family:'Cinzel',serif; font-size:7px; letter-spacing:1.5px; color:rgba(61,214,219,.5); text-transform:uppercase; }
+
+        /* Weather Output */
+        .kp-weather-result { margin-top:8px; padding:8px 12px; background:rgba(255,255,255,.03); border:1px solid var(--bdr); border-radius:4px; font-family:'EB Garamond',serif; font-style:italic; font-size:13px; color:var(--txt-lbl); line-height:1.55; min-height:28px; }
+
+        /* Dice Roller */
+        .kp-dice-grid { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+        .kp-die-btn { font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; padding:7px 11px; background:rgba(201,162,39,.08); border:1px solid rgba(201,162,39,.28); color:rgba(201,162,39,.75); border-radius:4px; cursor:pointer; transition:all .15s; }
+        .kp-die-btn:hover { background:rgba(201,162,39,.2); border-color:var(--gold); color:var(--gold); }
+        .kp-roll-result { font-family:'Raleway',sans-serif; font-size:48px; font-weight:900; color:var(--gold); text-align:center; line-height:1; text-shadow:0 0 22px rgba(201,162,39,.5); margin:8px 0; min-height:56px; }
+        .kp-roll-history { max-height:120px; overflow-y:auto; padding:6px 8px; background:rgba(0,0,0,.2); border:1px solid var(--bdr); border-radius:4px; font-family:'EB Garamond',serif; font-size:11px; color:var(--txt-dim); line-height:1.9; }
+
+        /* NPC Generator */
+        .kp-npc-card { padding:10px 14px; background:rgba(61,214,219,.05); border:1px solid rgba(61,214,219,.2); border-radius:5px; margin-top:8px; }
+        .kp-npc-name { font-family:'Cinzel',serif; font-size:13px; color:var(--res); margin-bottom:4px; }
+        .kp-npc-meta { font-family:'EB Garamond',serif; font-size:12px; color:var(--txt-lbl); line-height:1.7; }
+
+        /* Encounter Conditions */
+        .enc-conditions { display:flex; flex-wrap:wrap; gap:3px; margin-top:4px; }
+        .enc-cond-tag { font-size:7px; padding:1px 6px; border-radius:10px; font-family:'Cinzel',serif; letter-spacing:.5px; background:rgba(200,32,48,.18); border:1px solid rgba(200,32,48,.4); color:rgba(200,32,48,.9); cursor:pointer; transition:background .15s; }
+        .enc-cond-tag:hover { background:rgba(200,32,48,.35); }
+        .enc-cond-add { font-size:9px; padding:1px 7px; border-radius:10px; cursor:pointer; font-family:'Cinzel',serif; background:rgba(61,214,219,.07); border:1px solid rgba(61,214,219,.22); color:rgba(61,214,219,.6); transition:all .15s; }
+        .enc-cond-add:hover { background:rgba(61,214,219,.16); border-color:rgba(61,214,219,.55); color:rgba(61,214,219,.9); }
+
+        /* AoE Damage Panel */
+        .kp-aoe-panel { padding:10px; background:rgba(200,32,48,.05); border:1px solid rgba(200,32,48,.2); border-radius:5px; margin-top:8px; }
+        .kp-aoe-hdr { font-family:'Cinzel',serif; font-size:8px; letter-spacing:2px; color:rgba(200,32,48,.75); text-transform:uppercase; margin-bottom:7px; }
+
+        /* Round Timer */
+        .kp-round-timer { display:flex; align-items:center; gap:8px; padding:6px 10px; background:rgba(61,214,219,.05); border:1px solid rgba(61,214,219,.16); border-radius:4px; margin-bottom:10px; }
+        .kp-round-time-val { font-family:'Raleway',sans-serif; font-size:17px; font-weight:700; color:rgba(61,214,219,.8); min-width:48px; letter-spacing:1px; }
+
+        /* Party Average Stats */
+        .kp-avg-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
+        .kp-avg-cell { text-align:center; padding:8px 5px; background:var(--surf2); border:1px solid var(--bdr); border-radius:4px; }
+        .kp-avg-val { font-family:'Raleway',sans-serif; font-size:20px; font-weight:700; color:var(--gold); }
+        .kp-avg-lbl { font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:1px; color:var(--txt-dim); margin-top:2px; text-transform:uppercase; }
+
+        /* Session Checklist */
+        .kp-checklist { display:flex; flex-direction:column; gap:4px; margin-top:6px; }
+        .kp-check-item { display:flex; align-items:center; gap:6px; padding:4px 6px; background:var(--surf2); border-radius:3px; }
+        .kp-check-item input[type=checkbox] { accent-color:var(--gold); cursor:pointer; flex-shrink:0; width:14px; height:14px; }
+        .kp-check-item input[type=text] { flex:1; background:transparent; border:none; border-bottom:1px solid var(--bdr); color:var(--txt); font-family:'EB Garamond',serif; font-size:13px; outline:none; padding:0 2px; }
+        .kp-check-item input[type=text]:focus { border-bottom-color:var(--gold-d); }
+        .kp-check-del { background:transparent; border:none; color:rgba(200,32,48,.35); cursor:pointer; font-size:14px; line-height:1; padding:0 3px; transition:color .15s; flex-shrink:0; }
+        .kp-check-del:hover { color:var(--cor); }
+
+        /* Note timestamp */
+        .kp-note-ts { font-family:'Cinzel',serif; font-size:7px; letter-spacing:1px; color:var(--txt-dim); text-align:right; margin-top:3px; }
+
+        /* Tools tab sections */
+        .kp-tools-section { padding:14px 16px; border-bottom:1px solid var(--bdr); }
+        .kp-tools-hdr { font-family:'Cinzel',serif; font-size:9px; letter-spacing:2.5px; color:var(--gold-d); text-transform:uppercase; margin-bottom:10px; padding-bottom:4px; border-bottom:1px solid rgba(201,162,39,.15); }
     </style>
 
     <!-- ── Site Protection ─────────────────────────────────────── -->
@@ -27829,6 +27910,7 @@ function copyReport(){
                 <button class="keeper-tab-btn" onclick="keeperTab('world',this)">🌐 World State</button>
                 <button class="keeper-tab-btn" onclick="keeperTab('encounter',this)">⚡ Encounter</button>
                 <button class="keeper-tab-btn" onclick="keeperTab('notes',this)">📜 Keeper Notes</button>
+                <button class="keeper-tab-btn" onclick="keeperTab('tools',this)">🎲 Tools</button>
             </div>
 
             <div class="dm-body" style="padding:0;overflow:hidden;display:flex;flex-direction:column;flex:1;min-height:0">
@@ -27842,10 +27924,27 @@ function copyReport(){
                         <button class="dm-tool-btn" onclick="dmSortByHP()">Sort by HP%</button>
                         <button class="dm-tool-btn" onclick="dmSortByInstability()">Sort by Instability</button>
                         <button class="dm-tool-btn" onclick="dmRefreshAll()">↻ Refresh</button>
+                        <button class="dm-tool-btn" onclick="keeperGroupRest('short')" title="Apply Short Rest to all loaded characters">🌤 Short Rest All</button>
+                        <button class="dm-tool-btn" onclick="keeperGroupRest('long')" title="Apply Long Rest to all loaded characters">🌙 Long Rest All</button>
                         <button class="dm-tool-btn danger" onclick="if(confirm('Clear all loaded characters?')){dmChars=[];renderDMPanel();}">Clear All</button>
                     </div>
+                    <!-- Party Instability Alert -->
+                    <div class="kp-alert-banner" id="kpAlertBanner">⚠ INSTABILITY CRITICAL — One or more characters are at Instability 6+</div>
+                    <!-- Party Danger Dashboard -->
+                    <div class="kp-danger-bar" id="kpDangerBar" style="display:none"></div>
                     <div id="dmCharsContainer" style="padding:12px;overflow-y:auto;flex:1">
                         <div class="dm-empty">No characters loaded. Click "Load Character File" to import <em>.alas</em> files shared by your players.</div>
+                    </div>
+                    <!-- Party Wealth Footer -->
+                    <div class="kp-wealth-bar" id="kpWealthBar" style="display:none">
+                        <span class="kp-wealth-lbl">Party Wealth Total:</span>
+                        <span class="kp-wealth-val" id="kpWealthVal">—</span>
+                        <span class="kp-wealth-lbl" style="margin-left:12px">Avg HP%:</span>
+                        <span class="kp-wealth-val" id="kpAvgHP">—</span>
+                        <span class="kp-wealth-lbl">Avg RP%:</span>
+                        <span class="kp-wealth-val" id="kpAvgRP">—</span>
+                        <span class="kp-wealth-lbl">Avg Instability:</span>
+                        <span class="kp-wealth-val" id="kpAvgIns">—</span>
                     </div>
                 </div>
 
@@ -27893,12 +27992,41 @@ function copyReport(){
                     <div class="fld" style="margin-bottom:10px"><span class="fld-lbl">Active Story Arc</span><input class="fld-inp" id="ksArc" placeholder="Arc name or one-liner…" oninput="saveKeeperState()"></div>
                     <div class="fld" style="margin-bottom:10px"><span class="fld-lbl">Vein Status / Instability Notes</span><textarea class="fld-inp" id="ksVein" rows="3" style="resize:vertical" oninput="saveKeeperState()" placeholder="Current Vein conditions, environmental hazards, active resonance anomalies…"></textarea></div>
                     <div class="fld" style="margin-bottom:10px"><span class="fld-lbl">Active Factions / Political Climate</span><textarea class="fld-inp" id="ksFactions" rows="3" style="resize:vertical" oninput="saveKeeperState()" placeholder="Faction tensions, alliances, open threats…"></textarea></div>
-                    <div class="fld"><span class="fld-lbl">Weather / Environmental Conditions</span><input class="fld-inp" id="ksWeather" placeholder="e.g. Ashstorm approaching, Vein surge active" oninput="saveKeeperState()"></div>
+                    <div class="fld" style="margin-bottom:10px"><span class="fld-lbl">Weather / Environmental Conditions</span><input class="fld-inp" id="ksWeather" placeholder="e.g. Ashstorm approaching, Vein surge active" oninput="saveKeeperState()"></div>
+                    <!-- Session Clock -->
+                    <div style="margin-bottom:12px">
+                        <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:rgba(61,214,219,.7);text-transform:uppercase;margin-bottom:6px">⏱ Session Clock</div>
+                        <div class="kp-session-clock">
+                            <div>
+                                <div class="kp-clock-val" id="kpClockVal">00:00:00</div>
+                                <div class="kp-clock-lbl">Elapsed Session Time</div>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:4px">
+                                <button class="dm-tool-btn" id="kpClockStartBtn" onclick="keeperClockToggle()">▶ Start</button>
+                                <button class="dm-tool-btn" onclick="keeperClockReset()">↺ Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Weather Generator -->
+                    <div>
+                        <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:rgba(201,162,39,.7);text-transform:uppercase;margin-bottom:6px">🌩 Weather / Vein Generator</div>
+                        <button class="dm-tool-btn" onclick="keeperGenWeather()">Generate Random Conditions</button>
+                        <div class="kp-weather-result" id="kpWeatherResult">Click to generate random ALAS weather &amp; Vein conditions.</div>
+                    </div>
                 </div>
 
                 <!-- ── ENCOUNTER TAB ── -->
                 <div class="keeper-tab-panel" id="ktab-encounter" style="padding:16px;overflow-y:auto">
-                    <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold);margin-bottom:12px">ENCOUNTER MANAGER</div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
+                        <div style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:2px;color:var(--gold)">ENCOUNTER MANAGER</div>
+                        <!-- Round Timer -->
+                        <div class="kp-round-timer" style="margin-bottom:0">
+                            <span class="kp-round-time-val" id="kpRoundTimerVal">0:00</span>
+                            <span style="font-family:'Cinzel',serif;font-size:7px;color:var(--txt-dim);letter-spacing:1px">Round Timer</span>
+                            <button class="dm-tool-btn" id="kpRoundTimerBtn" onclick="keeperRoundTimerToggle()" style="padding:2px 8px;font-size:9px">▶</button>
+                            <button class="dm-tool-btn" onclick="keeperRoundTimerReset()" style="padding:2px 8px;font-size:9px">↺</button>
+                        </div>
+                    </div>
                     <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
                         <button class="dm-tool-btn" onclick="keeperRollInitiative()">⚡ Roll Initiative (All)</button>
                         <button class="dm-tool-btn" onclick="keeperNextTurn()">▶ Next Turn</button>
@@ -27933,6 +28061,21 @@ function copyReport(){
                         </div>
                         <button class="dm-tool-btn" onclick="addEncounterPlayer()">Add Player</button>
                     </div>
+                    <!-- AoE / Group Damage -->
+                    <div class="kp-aoe-panel">
+                        <div class="kp-aoe-hdr">💥 AoE / Group Damage</div>
+                        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                            <input class="fld-inp" type="number" id="aoeAmount" placeholder="Amount" min="0" style="width:80px;font-size:11px">
+                            <select id="aoeTarget" class="fld-inp" style="font-size:11px">
+                                <option value="all">All Combatants</option>
+                                <option value="enemies">Enemies Only</option>
+                                <option value="players">Players Only</option>
+                                <option value="alive">Alive Only</option>
+                            </select>
+                            <button class="dm-tool-btn" onclick="keeperAoeDamage('damage')" style="border-color:rgba(200,32,48,.4);color:rgba(200,32,48,.8)">Apply Damage</button>
+                            <button class="dm-tool-btn" onclick="keeperAoeDamage('heal')" style="border-color:rgba(80,180,48,.4);color:#7ac050">Apply Heal</button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- ── KEEPER NOTES TAB ── -->
@@ -27942,7 +28085,19 @@ function copyReport(){
                     <div class="fld"><span class="fld-lbl">NPC Tracker</span><textarea class="fld-inp" id="ksNPCs" rows="5" style="resize:vertical" oninput="saveKeeperState()" placeholder="NPC name · relationship · location · status…"></textarea></div>
                     <div class="fld"><span class="fld-lbl">Secrets &amp; Hidden Information</span><textarea class="fld-inp" id="ksSecrets" rows="5" style="resize:vertical" oninput="saveKeeperState()" placeholder="Information the players don't have yet…"></textarea></div>
                     <div class="fld"><span class="fld-lbl">Loose Threads / Next Session Hooks</span><textarea class="fld-inp" id="ksHooks" rows="4" style="resize:vertical" oninput="saveKeeperState()" placeholder="Unresolved plot threads, cliffhangers, planned setups…"></textarea></div>
-                    <button class="dm-tool-btn" onclick="exportKeeperNotes()">Export Notes (.txt)</button>
+                    <!-- Session Checklist -->
+                    <div style="padding:10px;background:rgba(61,214,219,.04);border:1px solid rgba(61,214,219,.15);border-radius:5px">
+                        <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:rgba(61,214,219,.7);text-transform:uppercase;margin-bottom:8px">✔ Session Checklist</div>
+                        <div class="kp-checklist" id="kpChecklist"></div>
+                        <button class="dm-tool-btn" style="margin-top:6px" onclick="keeperAddCheckItem()">+ Add Item</button>
+                    </div>
+                    <!-- Note Timestamps -->
+                    <div class="kp-note-ts" id="kpNoteTimestamp">Notes not yet saved this session.</div>
+                    <!-- Export buttons -->
+                    <div style="display:flex;gap:6px;flex-wrap:wrap">
+                        <button class="dm-tool-btn" onclick="exportKeeperNotes()">Export Notes (.txt)</button>
+                        <button class="dm-tool-btn" onclick="keeperFullExport()">📦 Full Session Export</button>
+                    </div>
                 </div>
 
                 <!-- ── PLAYERS / USER MANAGEMENT TAB ── -->
@@ -28011,6 +28166,61 @@ function copyReport(){
                             <button class="dm-tool-btn" style="border-color:rgba(200,32,48,.4);color:rgba(200,32,48,.8);" onclick="keeperDeleteAccount()">✕ Delete Account</button>
                         </div>
                     </div>
+                </div>
+
+                <!-- ── TOOLS TAB ── -->
+                <div class="keeper-tab-panel" id="ktab-tools" style="overflow-y:auto">
+
+                    <!-- Keeper Dice Roller -->
+                    <div class="kp-tools-section">
+                        <div class="kp-tools-hdr">🎲 Keeper Dice Roller</div>
+                        <div class="kp-dice-grid">
+                            <button class="kp-die-btn" onclick="keeperRollDie(4)">d4</button>
+                            <button class="kp-die-btn" onclick="keeperRollDie(6)">d6</button>
+                            <button class="kp-die-btn" onclick="keeperRollDie(8)">d8</button>
+                            <button class="kp-die-btn" onclick="keeperRollDie(10)">d10</button>
+                            <button class="kp-die-btn" onclick="keeperRollDie(12)">d12</button>
+                            <button class="kp-die-btn" onclick="keeperRollDie(20)">d20</button>
+                            <button class="kp-die-btn" onclick="keeperRollDie(100)">d100</button>
+                            <button class="kp-die-btn" onclick="keeperRollDie(6,2)">2d6</button>
+                        </div>
+                        <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+                            <input class="fld-inp" type="number" id="kpDiceCount" placeholder="# dice" min="1" max="20" value="1" style="width:60px;font-size:11px">
+                            <input class="fld-inp" type="number" id="kpDiceSides" placeholder="sides" min="2" max="1000" style="width:70px;font-size:11px">
+                            <input class="fld-inp" type="number" id="kpDiceMod" placeholder="±mod" style="width:65px;font-size:11px">
+                            <button class="dm-tool-btn" onclick="keeperRollCustom()">Roll Custom</button>
+                            <button class="dm-tool-btn" onclick="keeperAdvRoll(true)" title="Advantage: roll twice, take highest" style="border-color:rgba(80,180,48,.4);color:#7ac050">ADV</button>
+                            <button class="dm-tool-btn" onclick="keeperAdvRoll(false)" title="Disadvantage: roll twice, take lowest" style="border-color:rgba(200,32,48,.4);color:rgba(200,32,48,.8)">DIS</button>
+                        </div>
+                        <div class="kp-roll-result" id="kpRollResult">—</div>
+                        <div class="kp-roll-history" id="kpRollHistory"><span style="color:var(--txt-dim)">Roll history will appear here…</span></div>
+                    </div>
+
+                    <!-- Quick NPC Generator -->
+                    <div class="kp-tools-section">
+                        <div class="kp-tools-hdr">👤 Quick NPC Generator</div>
+                        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+                            <button class="dm-tool-btn" onclick="keeperGenNPC()">Generate NPC</button>
+                            <button class="dm-tool-btn" onclick="keeperGenNPC('ally')">Generate Ally</button>
+                            <button class="dm-tool-btn" onclick="keeperGenNPC('enemy')">Generate Threat</button>
+                            <button class="dm-tool-btn" onclick="keeperAddNPCToEncounter()" title="Add last generated NPC to encounter as enemy">→ Add to Encounter</button>
+                        </div>
+                        <div id="kpNPCCard" class="kp-npc-card" style="display:none"></div>
+                    </div>
+
+                    <!-- Party Average Stats -->
+                    <div class="kp-tools-section">
+                        <div class="kp-tools-hdr">📊 Party Average Stats</div>
+                        <div id="kpPartyEmpty" style="font-family:'EB Garamond',serif;font-style:italic;font-size:12px;color:var(--txt-dim)">Load characters in the Party tab to see averages.</div>
+                        <div class="kp-avg-grid" id="kpAvgGrid" style="display:none">
+                            <div class="kp-avg-cell"><div class="kp-avg-val" id="kavgHPPct">—</div><div class="kp-avg-lbl">HP %</div></div>
+                            <div class="kp-avg-cell"><div class="kp-avg-val" id="kavgRPPct">—</div><div class="kp-avg-lbl">RP %</div></div>
+                            <div class="kp-avg-cell"><div class="kp-avg-val" id="kavgIns">—</div><div class="kp-avg-lbl">Avg Instability</div></div>
+                            <div class="kp-avg-cell"><div class="kp-avg-val" id="kavgCor">—</div><div class="kp-avg-lbl">Avg Corruption</div></div>
+                        </div>
+                        <div id="kpPartyThreat" style="display:none;margin-top:10px;padding:8px 12px;background:rgba(200,32,48,.08);border:1px solid rgba(200,32,48,.28);border-radius:4px;font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:rgba(200,32,48,.8);text-transform:uppercase"></div>
+                    </div>
+
                 </div>
 
             </div>
@@ -29998,6 +30208,560 @@ window._alasImm={
 };
 
 })(); /* end V4.6 IIFE */
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   V4.7 — KEEPER'S PANEL 15 FEATURES
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+
+/* ── Helpers ─────────────────────────────────────────────────── */
+function _kpSnd(freq,dur,vol,type){
+  try{
+    var ac=window._alasImm&&window._getAC?_getAC():null;
+    if(!ac)return;
+    var o=ac.createOscillator(); var g=ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type=type||'sine'; o.frequency.value=freq||440;
+    g.gain.setValueAtTime(vol||0.08,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+(dur||0.2));
+    o.start(); o.stop(ac.currentTime+(dur||0.2)+0.02);
+  }catch(e){}
+}
+function _kpSndRoll(n,max){ _kpSnd(220+(n/max)*600,0.2,0.09,'sine'); }
+function _kpSndTurn(){ _kpSnd(660,0.18,0.1,'sine'); setTimeout(function(){ _kpSnd(880,0.14,0.08,'sine'); },140); }
+function _kpSndAoE(){ _kpSnd(180,0.3,0.12,'sawtooth'); }
+function _kpSndHeal(){ _kpSnd(440,0.22,0.09,'sine'); _kpSnd(550,0.22,0.07,'sine'); }
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 1: Party Danger Dashboard + FEATURE 3: Alert Banner
+   ══════════════════════════════════════════════════════════════ */
+function kpRenderDangerBar(){
+  var bar=document.getElementById('kpDangerBar');
+  var alert=document.getElementById('kpAlertBanner');
+  if(!bar||!alert)return;
+  if(!window.dmChars||dmChars.length===0){ bar.style.display='none'; alert.classList.remove('show'); return; }
+  bar.style.display='flex';
+  var hasCrit=false;
+  bar.innerHTML=dmChars.map(function(ce){
+    var d=ce.data;
+    var hp=parseInt(d.hpCur)||0; var hpM=Math.max(parseInt(d.hpMax)||1,1);
+    var ins=parseInt(d.instability)||0;
+    var pct=Math.round(hp/hpM*100);
+    var col=pct<25?'#c82030':pct<50?'#c87020':'#3dd6db';
+    var danger=pct<=25||ins>=6;
+    var caution=!danger&&(pct<=50||ins>=4);
+    if(ins>=6) hasCrit=true;
+    return '<div class="kp-danger-chip'+(danger?' kp-chip-danger':caution?' kp-chip-caution':'')+'">'
+      +'<span class="kp-chip-name">'+(d.name||'?')+'</span>'
+      +'<div class="kp-chip-hp-bar"><div class="kp-chip-hp-fill" style="width:'+pct+'%;background:'+col+'"></div></div>'
+      +'<span class="kp-chip-stats">'+hp+'/'+hpM+' · Ins '+ins+'</span>'
+      +'</div>';
+  }).join('');
+  if(hasCrit) alert.classList.add('show'); else alert.classList.remove('show');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 2: Group Rest
+   ══════════════════════════════════════════════════════════════ */
+window.keeperGroupRest=function(type){
+  if(!window.dmChars||dmChars.length===0){ if(typeof showToast==='function') showToast('No characters loaded.'); return; }
+  dmChars.forEach(function(ce){
+    var d=ce.data;
+    var rpMax=parseInt(d.rpMax)||8;
+    var hpMax=parseInt(d.hpMax)||8;
+    if(type==='long'){
+      d.hpCur=hpMax; d.rpCur=rpMax;
+    } else {
+      var rpHalf=Math.floor(rpMax/2);
+      d.rpCur=Math.min(rpMax,(parseInt(d.rpCur)||0)+rpHalf);
+    }
+  });
+  if(typeof renderDMPanel==='function') renderDMPanel();
+  kpRenderPartyFooter();
+  if(typeof showToast==='function') showToast((type==='long'?'Long':'Short')+' Rest applied to all '+dmChars.length+' characters.');
+  _kpSnd(type==='long'?280:320,0.5,0.1,'sine');
+};
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 4+12: Party Wealth Footer & Avg Stats
+   ══════════════════════════════════════════════════════════════ */
+function kpRenderPartyFooter(){
+  var wbar=document.getElementById('kpWealthBar');
+  if(!window.dmChars||dmChars.length===0){ if(wbar) wbar.style.display='none'; kpRenderAvgStats(); return; }
+  var totalGP=0,totalHP=0,totalHPMax=0,totalRP=0,totalRPMax=0,totalIns=0,totalCor=0;
+  dmChars.forEach(function(ce){
+    var d=ce.data;
+    totalGP+=(parseFloat(d.goldGP)||0)+(parseFloat(d.goldSP)||0)/10+(parseFloat(d.goldCP)||0)/100;
+    totalHP+=parseInt(d.hpCur)||0; totalHPMax+=Math.max(parseInt(d.hpMax)||1,1);
+    totalRP+=parseInt(d.rpCur)||0; totalRPMax+=Math.max(parseInt(d.rpMax)||1,1);
+    totalIns+=parseInt(d.instability)||0; totalCor+=parseInt(d.corruption)||0;
+  });
+  var n=dmChars.length;
+  if(wbar){
+    wbar.style.display='flex';
+    var wv=document.getElementById('kpWealthVal'); if(wv) wv.textContent=totalGP.toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})+' GP equiv.';
+    var ah=document.getElementById('kpAvgHP'); if(ah) ah.textContent=Math.round(totalHP/totalHPMax*100)+'%';
+    var ar=document.getElementById('kpAvgRP'); if(ar) ar.textContent=Math.round(totalRP/totalRPMax*100)+'%';
+    var ai=document.getElementById('kpAvgIns'); if(ai) ai.textContent=(totalIns/n).toFixed(1);
+  }
+  kpRenderAvgStats(totalHP,totalHPMax,totalRP,totalRPMax,totalIns,totalCor,n);
+}
+
+function kpRenderAvgStats(hp,hpM,rp,rpM,ins,cor,n){
+  var grid=document.getElementById('kpAvgGrid');
+  var empty=document.getElementById('kpPartyEmpty');
+  var threat=document.getElementById('kpPartyThreat');
+  if(!grid)return;
+  if(!n||n===0){ grid.style.display='none'; if(empty) empty.style.display=''; if(threat) threat.style.display='none'; return; }
+  if(empty) empty.style.display='none';
+  grid.style.display='grid';
+  var hpPct=Math.round(hp/hpM*100);
+  var rpPct=Math.round(rp/rpM*100);
+  var avgIns=(ins/n).toFixed(1);
+  var avgCor=(cor/n).toFixed(1);
+  var hpEl=document.getElementById('kavgHPPct'); if(hpEl){ hpEl.textContent=hpPct+'%'; hpEl.style.color=hpPct<30?'#c82030':hpPct<60?'#c87020':'var(--res)'; }
+  var rpEl=document.getElementById('kavgRPPct'); if(rpEl) rpEl.textContent=rpPct+'%';
+  var iEl=document.getElementById('kavgIns'); if(iEl){ iEl.textContent=avgIns; iEl.style.color=ins/n>=5?'#d82820':ins/n>=3?'#d06020':'var(--gold)'; }
+  var cEl=document.getElementById('kavgCor'); if(cEl) cEl.textContent=avgCor;
+  if(threat){
+    var msgs=[];
+    if(hpPct<30) msgs.push('⚠ Party HP Critical ('+hpPct+'%)');
+    if(ins/n>=5) msgs.push('⚠ Average Instability Dangerous ('+avgIns+')');
+    if(cor/n>=5) msgs.push('⚠ Average Corruption High ('+avgCor+')');
+    if(msgs.length){ threat.style.display='block'; threat.innerHTML=msgs.join(' &nbsp;·&nbsp; '); }
+    else threat.style.display='none';
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 5: Session Clock
+   ══════════════════════════════════════════════════════════════ */
+var _clockSec=0, _clockRunning=false, _clockInt=null;
+window.keeperClockToggle=function(){
+  _clockRunning=!_clockRunning;
+  var btn=document.getElementById('kpClockStartBtn');
+  if(_clockRunning){
+    if(btn) btn.textContent='⏸ Pause';
+    _clockInt=setInterval(function(){
+      _clockSec++;
+      var h=Math.floor(_clockSec/3600);
+      var m=Math.floor((_clockSec%3600)/60);
+      var s=_clockSec%60;
+      var el=document.getElementById('kpClockVal');
+      if(el) el.textContent=(h?h+':':'')+(m<10&&h?'0':'')+m+':'+(s<10?'0':'')+s;
+    },1000);
+  } else {
+    clearInterval(_clockInt);
+    if(btn) btn.textContent='▶ Resume';
+  }
+};
+window.keeperClockReset=function(){
+  clearInterval(_clockInt); _clockRunning=false; _clockSec=0;
+  var el=document.getElementById('kpClockVal'); if(el) el.textContent='00:00:00';
+  var btn=document.getElementById('kpClockStartBtn'); if(btn) btn.textContent='▶ Start';
+};
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 6: Keeper Dice Roller
+   ══════════════════════════════════════════════════════════════ */
+var _kpRollLog=[];
+window.keeperRollDie=function(sides,count){
+  count=count||1;
+  var rolls=[]; for(var i=0;i<count;i++) rolls.push(Math.floor(Math.random()*sides)+1);
+  var total=rolls.reduce(function(a,b){return a+b;},0);
+  _kpShowRoll((count>1?count+'d':'d')+sides,rolls,total,0);
+  _kpSndRoll(total,sides*count);
+};
+window.keeperRollCustom=function(){
+  var cnt=Math.max(1,Math.min(20,parseInt((document.getElementById('kpDiceCount')||{}).value)||1));
+  var sides=Math.max(2,Math.min(1000,parseInt((document.getElementById('kpDiceSides')||{}).value)||20));
+  var mod=parseInt((document.getElementById('kpDiceMod')||{}).value)||0;
+  var rolls=[]; for(var i=0;i<cnt;i++) rolls.push(Math.floor(Math.random()*sides)+1);
+  var total=rolls.reduce(function(a,b){return a+b;},0)+mod;
+  _kpShowRoll(cnt+'d'+sides+(mod?((mod>0?'+':'')+mod):''),rolls,total,mod);
+  _kpSndRoll(total,sides*cnt);
+};
+window.keeperAdvRoll=function(adv){
+  var r1=Math.floor(Math.random()*20)+1;
+  var r2=Math.floor(Math.random()*20)+1;
+  var total=adv?Math.max(r1,r2):Math.min(r1,r2);
+  var label=(adv?'ADV':'DIS')+' d20 ['+r1+','+r2+']';
+  _kpShowRoll(label,[r1,r2],total,0,true);
+  _kpSndRoll(total,20);
+};
+function _kpShowRoll(label,rolls,total,mod,multi){
+  var el=document.getElementById('kpRollResult'); if(el) el.textContent=total;
+  var ts=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  var det=multi?label:label+(rolls.length>1?' ['+rolls.join(',')+']'+(mod?'+'+(mod>0?'':'')+mod:''):'');
+  _kpRollLog.unshift('['+ts+'] '+det+' = '+total);
+  if(_kpRollLog.length>30) _kpRollLog.pop();
+  var hist=document.getElementById('kpRollHistory');
+  if(hist) hist.innerHTML=_kpRollLog.join('<br>');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 7: Quick NPC Generator
+   ══════════════════════════════════════════════════════════════ */
+var _RACES=['Human','High Elf','Dunesong Elf','Drow','Wood Elf','Ember Forge Dwarf','Stoneheart Dwarf','Beastkin','Drakonian','Goliath'];
+var _NPC_NAMES={
+  'Human':['Aldric','Maren','Torvan','Sera','Corvin','Dwyn','Edric','Nara','Cael','Lysa'],
+  'High Elf':['Aelorin','Sylvara','Caeldath','Thiriel','Vareth'],
+  'Dunesong Elf':['Sahira','Zephrel','Kahari','Solene','Rashmir'],
+  'Drow':['Xarveth','Zilryn','Shivra','Duskara','Zareth'],
+  'Wood Elf':['Theron','Vesca','Lirael','Brynn','Ashen'],
+  'Ember Forge Dwarf':['Gorvak','Brunda','Khorgrim','Valda','Torvus'],
+  'Stoneheart Dwarf':['Dolgrin','Ingra','Bofgar','Thordis','Keldrik'],
+  'Beastkin':['Kasar','Fenna','Ryuk','Shael','Goran'],
+  'Drakonian':['Vyraxis','Kethara','Zhurath','Rexara','Draveth'],
+  'Goliath':['Grask','Vorna','Thorak','Ulda','Brannor'],
+  'default':['Unnamed','Stranger','Figure','Shade','Wanderer']
+};
+var _ROLES_ALLY=['Traveling Merchant','Circle Warden','Reliquary Scout','Circleborn Guide','Vein Scholar','Retired Legionnaire'];
+var _ROLES_ENEMY=['Vein Corsair','Corrupted Wanderer','Sigil-Hunter','Instability Wraith','Netherblood Raider','Rogue Pactbound'];
+var _ROLES_NEUTRAL=['Innkeeper','Market Trader','Wandering Hedge Mage','Street Oracle','Arena Fighter','Port Dockworker'];
+var _lastNPC=null;
+window.keeperGenNPC=function(type){
+  var race=_RACES[Math.floor(Math.random()*_RACES.length)];
+  var names=_NPC_NAMES[race]||_NPC_NAMES['default'];
+  var name=names[Math.floor(Math.random()*names.length)];
+  var roles=type==='ally'?_ROLES_ALLY:type==='enemy'?_ROLES_ENEMY:_ROLES_NEUTRAL;
+  var role=roles[Math.floor(Math.random()*roles.length)];
+  var lvl=Math.floor(Math.random()*(type==='enemy'?8:5))+1;
+  var hp=8+lvl*Math.floor(Math.random()*6+2);
+  var ac=10+Math.floor(Math.random()*6);
+  var initMod=Math.floor(Math.random()*5)-1;
+  var str=8+Math.floor(Math.random()*8); var dex=8+Math.floor(Math.random()*8);
+  var con=8+Math.floor(Math.random()*8); var intel=8+Math.floor(Math.random()*8);
+  var ins=type==='enemy'?Math.floor(Math.random()*5):0;
+  var cor=type==='enemy'?Math.floor(Math.random()*4):0;
+  _lastNPC={name:name,race:race,role:role,hp:hp,hpMax:hp,ac:ac,initBonus:initMod,type:'enemy',level:lvl};
+  var card=document.getElementById('kpNPCCard');
+  if(!card)return;
+  card.style.display='block';
+  card.innerHTML='<div class="kp-npc-name">'+name+' <span style="font-size:9px;color:var(--txt-dim);font-family:\'Cinzel\',serif;letter-spacing:1px">'+race+'</span></div>'
+    +'<div class="kp-npc-meta">'
+    +'<strong>Role:</strong> '+role+' (Level '+lvl+')<br>'
+    +'<strong>HP:</strong> '+hp+' &nbsp; <strong>AC:</strong> '+ac+' &nbsp; <strong>Init:</strong> '+(initMod>=0?'+':'')+initMod+'<br>'
+    +'<strong>STR</strong> '+str+' / <strong>DEX</strong> '+dex+' / <strong>CON</strong> '+con+' / <strong>INT</strong> '+intel
+    +(ins>0?'<br><strong>Instability:</strong> '+ins:'')
+    +(cor>0?' &nbsp; <strong>Corruption:</strong> '+cor:'')
+    +'</div>';
+  _kpSnd(440,0.18,0.08,'sine');
+};
+window.keeperAddNPCToEncounter=function(){
+  if(!_lastNPC){ if(typeof showToast==='function') showToast('Generate an NPC first.'); return; }
+  if(typeof encounterCombatants==='undefined'){ if(typeof showToast==='function') showToast('Open Encounter tab first.'); return; }
+  encounterCombatants.push({
+    name:_lastNPC.name+' (NPC)', hpMax:_lastNPC.hpMax, hpCur:_lastNPC.hpMax,
+    ac:_lastNPC.ac, initBonus:_lastNPC.initBonus, initiative:0, type:'enemy'
+  });
+  if(typeof renderEncounterList==='function') renderEncounterList();
+  if(typeof saveKeeperState==='function') saveKeeperState();
+  if(typeof showToast==='function') showToast(_lastNPC.name+' added to encounter.');
+};
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 8: Encounter Conditions
+   ══════════════════════════════════════════════════════════════ */
+var _CONDS=['Stunned','Blinded','Frightened','Restrained','Poisoned','Paralyzed','Prone','Charmed','Burning','Exhausted'];
+window.keeperAddCondition=function(idx){
+  if(!window.encounterCombatants||!encounterCombatants[idx])return;
+  if(!encounterCombatants[idx].conditions) encounterCombatants[idx].conditions=[];
+  var cond=window.prompt('Add condition ('+_CONDS.slice(0,6).join(', ')+', …):','');
+  if(!cond||!cond.trim())return;
+  encounterCombatants[idx].conditions.push(cond.trim());
+  if(typeof renderEncounterList==='function') renderEncounterList();
+  if(typeof saveKeeperState==='function') saveKeeperState();
+};
+window.keeperRemoveCondition=function(idx,ci){
+  if(!window.encounterCombatants||!encounterCombatants[idx])return;
+  if(encounterCombatants[idx].conditions) encounterCombatants[idx].conditions.splice(ci,1);
+  if(typeof renderEncounterList==='function') renderEncounterList();
+  if(typeof saveKeeperState==='function') saveKeeperState();
+};
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 9: AoE / Group Damage
+   ══════════════════════════════════════════════════════════════ */
+window.keeperAoeDamage=function(mode){
+  if(!window.encounterCombatants||encounterCombatants.length===0){
+    if(typeof showToast==='function') showToast('No combatants in encounter.'); return;
+  }
+  var amt=Math.abs(parseInt((document.getElementById('aoeAmount')||{}).value)||0);
+  if(amt===0){ if(typeof showToast==='function') showToast('Enter an amount.'); return; }
+  var target=(document.getElementById('aoeTarget')||{}).value||'all';
+  var hits=0;
+  encounterCombatants.forEach(function(c){
+    var skip=false;
+    if(target==='enemies'&&c.type!=='enemy') skip=true;
+    if(target==='players'&&c.type!=='player') skip=true;
+    if(target==='alive'&&c.hpCur<=0) skip=true;
+    if(skip)return;
+    if(mode==='damage') c.hpCur=Math.max(0,c.hpCur-amt);
+    else c.hpCur=Math.min(c.hpMax,c.hpCur+amt);
+    hits++;
+  });
+  if(typeof renderEncounterList==='function') renderEncounterList();
+  if(typeof saveKeeperState==='function') saveKeeperState();
+  if(typeof showToast==='function') showToast((mode==='damage'?'Dealt '+amt+' damage':'Healed '+amt+' HP')+' to '+hits+' target(s).');
+  if(mode==='damage') _kpSndAoE(); else _kpSndHeal();
+};
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 10: Encounter Round Timer
+   ══════════════════════════════════════════════════════════════ */
+var _roundSec=0, _roundRunning=false, _roundInt=null;
+window.keeperRoundTimerToggle=function(){
+  _roundRunning=!_roundRunning;
+  var btn=document.getElementById('kpRoundTimerBtn');
+  if(_roundRunning){
+    if(btn) btn.textContent='⏸';
+    _roundInt=setInterval(function(){
+      _roundSec++;
+      var m=Math.floor(_roundSec/60); var s=_roundSec%60;
+      var el=document.getElementById('kpRoundTimerVal');
+      if(el) el.textContent=m+':'+(s<10?'0':'')+s;
+    },1000);
+  } else {
+    clearInterval(_roundInt);
+    if(btn) btn.textContent='▶';
+  }
+};
+window.keeperRoundTimerReset=function(){
+  clearInterval(_roundInt); _roundRunning=false; _roundSec=0;
+  var el=document.getElementById('kpRoundTimerVal'); if(el) el.textContent='0:00';
+  var btn=document.getElementById('kpRoundTimerBtn'); if(btn) btn.textContent='▶';
+};
+
+/* Auto-reset round timer on Next Turn */
+(function(){
+  var _origNext=window.keeperNextTurn;
+  if(typeof _origNext!=='function')return;
+  window.keeperNextTurn=function(){
+    _origNext.apply(this,arguments);
+    keeperRoundTimerReset(); keeperRoundTimerToggle();
+    _kpSndTurn();
+  };
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 11: Weather / Vein Generator
+   ══════════════════════════════════════════════════════════════ */
+var _WEATHER=[
+  'Clear skies — a rare calm over the Ashveil; the Vein hums faintly but steadily.',
+  'Ashstorm rolling in from the east — Instability DCs increase by 1 during storm.',
+  'Glass rain — harmless crystalline precipitation; visibility halved at range.',
+  'Vein Surge active — all RP restoration increases by +1d4 this session.',
+  'Dead Winds from the Nethymir — Corruption gain triggers are reduced by half.',
+  'Resonance Fog — all Instability rolls are rolled twice; use higher result.',
+  'Bloodmoon sky — Corruption 1+ characters feel unease; Wisdom saves DC +1.',
+  'Thermal vents active — ground deals 1 heat damage per minute in open areas.',
+  'Ley Line crossing — first casting of the day costs 0 RP (once per character).',
+  'Dimensional echo — reality ripples; treat natural 1s as natural 2s on d20.',
+  'Silence of the Vein — no magical sound can carry beyond 30 ft.',
+  'Chromatic shift — ambient light takes on an eerie greenish hue; no effect.',
+  'Warden Winds — powerful gusts; range on projectiles and spells halved.',
+  'The Pale Hollow hours — undead are active; treat as dusk regardless of time.',
+  'Arcane static charge — metal objects spark; disadvantage on stealth checks.',
+];
+window.keeperGenWeather=function(){
+  var idx=Math.floor(Math.random()*_WEATHER.length);
+  var el=document.getElementById('kpWeatherResult');
+  if(el) el.textContent=_WEATHER[idx];
+  var inp=document.getElementById('ksWeather');
+  if(inp&&!inp.value) inp.value=_WEATHER[idx].split('—')[0].trim();
+  if(typeof saveKeeperState==='function') saveKeeperState();
+  _kpSnd(330,0.3,0.08,'sine');
+};
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 13: Full Session Export
+   ══════════════════════════════════════════════════════════════ */
+window.keeperFullExport=function(){
+  var lines=['═══ ALAS SESSION EXPORT ═══','Exported: '+new Date().toLocaleString(),''];
+  // World State
+  var ws=function(id){ return (document.getElementById(id)||{}).value||'—'; };
+  lines.push('── WORLD STATE ────────────────');
+  lines.push('Session #: '+ws('ksSession')+'  |  Date: '+ws('ksDate'));
+  lines.push('Location: '+ws('ksLocation')+'  |  Region: '+ws('ksBiome'));
+  lines.push('Story Arc: '+ws('ksArc'));
+  lines.push('Weather: '+ws('ksWeather'));
+  lines.push('Vein Status: '+ws('ksVein'));
+  lines.push('Factions: '+ws('ksFactions'));
+  lines.push('');
+  // Party
+  if(window.dmChars&&dmChars.length>0){
+    lines.push('── PARTY STATUS ────────────────');
+    dmChars.forEach(function(ce){
+      var d=ce.data;
+      lines.push((d.name||'?')+' · '+( d.race||'?')+' '+( d.charClass||'?')+' L'+( d.level||1));
+      lines.push('  HP: '+(d.hpCur||0)+'/'+(d.hpMax||0)+'  RP: '+(d.rpCur||0)+'/'+(d.rpMax||0)+'  Ins: '+(d.instability||0)+'  Cor: '+(d.corruption||0));
+      if(ce.dmNote) lines.push('  Keeper Note: '+ce.dmNote);
+    });
+    lines.push('');
+  }
+  // Notes
+  lines.push('── KEEPER NOTES ────────────────');
+  lines.push('Session Notes:\n'+ws('ksSessionNotes'));
+  lines.push('\nNPCs:\n'+ws('ksNPCs'));
+  lines.push('\nSecrets:\n'+ws('ksSecrets'));
+  lines.push('\nHooks:\n'+ws('ksHooks'));
+  lines.push('');
+  // Encounter
+  if(window.encounterCombatants&&encounterCombatants.length>0){
+    lines.push('── ENCOUNTER STATE ────────────────');
+    lines.push('Round: '+(window.encounterRound||0));
+    encounterCombatants.forEach(function(c,i){
+      lines.push((i===encounterTurn?'▶ ':'  ')+(c.initiative||'—')+' '+c.name+' ('+c.type+') HP: '+c.hpCur+'/'+c.hpMax+' AC: '+c.ac+(c.conditions&&c.conditions.length?' ['+c.conditions.join(',')+']':''));
+    });
+    lines.push('');
+  }
+  lines.push('═══════════════════════════════');
+  var blob=new Blob([lines.join('\n')],{type:'text/plain'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='alas-session-'+new Date().toISOString().slice(0,10)+'.txt';
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(a.href);
+  if(typeof showToast==='function') showToast('Full session exported.');
+};
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 14: Note Autosave Timestamp
+   ══════════════════════════════════════════════════════════════ */
+function kpUpdateNoteTs(){
+  var el=document.getElementById('kpNoteTimestamp');
+  if(!el)return;
+  var t=new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
+  el.textContent='Last saved: '+t;
+}
+(function(){
+  var _orig=window.saveKeeperState;
+  if(typeof _orig!=='function')return;
+  window.saveKeeperState=function(){
+    _orig.apply(this,arguments);
+    kpUpdateNoteTs();
+    kpRenderPartyFooter();
+    // Save checklist
+    var cl=document.getElementById('kpChecklist');
+    if(cl){
+      var items=[];
+      cl.querySelectorAll('.kp-check-item').forEach(function(row){
+        var cb=row.querySelector('input[type=checkbox]');
+        var tx=row.querySelector('input[type=text]');
+        if(tx&&tx.value.trim()) items.push({checked:cb?cb.checked:false,text:tx.value});
+      });
+      try{ localStorage.setItem('alas_keeper_checklist',JSON.stringify(items)); }catch(e){}
+    }
+  };
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   FEATURE 15: Session Checklist
+   ══════════════════════════════════════════════════════════════ */
+window.keeperAddCheckItem=function(text,checked){
+  var cl=document.getElementById('kpChecklist'); if(!cl)return;
+  var row=document.createElement('div'); row.className='kp-check-item';
+  row.innerHTML='<input type="checkbox"'+(checked?' checked':'')+'>'
+    +'<input type="text" placeholder="Plot hook, reminder, task…" value="'+(text||'')+'" oninput="if(typeof saveKeeperState===\'function\')saveKeeperState()">'
+    +'<button class="kp-check-del" onclick="this.parentElement.remove();if(typeof saveKeeperState===\'function\')saveKeeperState()" title="Remove">×</button>';
+  row.querySelector('input[type=checkbox]').addEventListener('change',function(){ if(typeof saveKeeperState==='function') saveKeeperState(); });
+  cl.appendChild(row);
+  row.querySelector('input[type=text]').focus();
+};
+function kpLoadChecklist(){
+  try{
+    var items=JSON.parse(localStorage.getItem('alas_keeper_checklist')||'[]');
+    items.forEach(function(it){ if(it&&it.text) keeperAddCheckItem(it.text,it.checked); });
+  }catch(e){}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Patch renderDMPanel to also refresh danger bar + footer
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  var _origRender=window.renderDMPanel;
+  if(typeof _origRender!=='function')return;
+  window.renderDMPanel=function(){
+    _origRender.apply(this,arguments);
+    // Inject condition rows into each encounter card
+    kpInjectConditionsIntoCards();
+    setTimeout(function(){
+      kpRenderDangerBar();
+      kpRenderPartyFooter();
+    },30);
+  };
+})();
+
+/* Inject condition UX into already-rendered dm-char-cards (via notes section) */
+function kpInjectConditionsIntoCards(){
+  // Conditions are for encounter combatants, not party cards — skip
+}
+
+/* ══════════════════════════════════════════════════════════════
+   Patch renderEncounterList to show conditions
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  var _origEnc=window.renderEncounterList;
+  if(typeof _origEnc!=='function')return;
+  window.renderEncounterList=function(){
+    _origEnc.apply(this,arguments);
+    // Append condition rows to each encounter-row
+    var el=document.getElementById('encounterList'); if(!el)return;
+    var rows=el.querySelectorAll('.encounter-row');
+    rows.forEach(function(row,i){
+      if(!window.encounterCombatants||!encounterCombatants[i])return;
+      var c=encounterCombatants[i];
+      var existing=row.querySelector('.enc-conditions');
+      if(existing) existing.remove();
+      var condDiv=document.createElement('div');
+      condDiv.className='enc-conditions';
+      var html='';
+      var conds=c.conditions||[];
+      conds.forEach(function(cond,ci){
+        html+='<span class="enc-cond-tag" title="Click to remove" onclick="keeperRemoveCondition('+i+','+ci+')">'+cond+' ×</span>';
+      });
+      html+='<span class="enc-cond-add" onclick="keeperAddCondition('+i+')" title="Add condition">+</span>';
+      condDiv.innerHTML=html;
+      var nameBlock=row.querySelector('.encounter-name-block');
+      if(nameBlock) nameBlock.appendChild(condDiv);
+    });
+  };
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   Patch keeperTab to refresh party stats when Tools tab opens
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  var _origTab=window.keeperTab;
+  if(typeof _origTab!=='function')return;
+  window.keeperTab=function(id,btn){
+    _origTab.apply(this,arguments);
+    if(id==='tools') kpRenderPartyFooter();
+    if(id==='party'){ setTimeout(function(){ kpRenderDangerBar(); kpRenderPartyFooter(); },30); }
+  };
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   Patch openDMPanel to load checklist + init danger bar
+   ══════════════════════════════════════════════════════════════ */
+(function(){
+  var _origOpen=window.openDMPanel;
+  if(typeof _origOpen!=='function')return;
+  window.openDMPanel=function(){
+    _origOpen.apply(this,arguments);
+    setTimeout(function(){
+      kpLoadChecklist();
+      kpRenderDangerBar();
+      kpRenderPartyFooter();
+    },120);
+  };
+})();
+
+})(); /* end V4.7 IIFE */
 </script>
 
 </body>
