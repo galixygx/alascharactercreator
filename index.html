@@ -8521,6 +8521,178 @@
         }
         .apikey-inp:focus { border-color: rgba(160,96,224,.6); }
         .apikey-btns { display: flex; gap: 10px; }
+
+        /* ═══════════════════════════════════════════════════
+           V4.5 — QoL Enhancements + Visual Animations
+           ═══════════════════════════════════════════════════ */
+
+        /* QoL: Quick HP/RP adjust row */
+        .res-quick-row {
+            display: flex;
+            gap: 3px;
+            margin-top: 5px;
+        }
+        .qk-btn {
+            background: var(--surf2);
+            border: 1px solid var(--bdr);
+            color: var(--txt-dim);
+            font-family: 'Cinzel', serif;
+            font-size: 7px;
+            letter-spacing: .5px;
+            padding: 2px 4px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all .15s;
+            flex: 1;
+            text-align: center;
+            line-height: 1.4;
+        }
+        .qk-btn:hover { background: var(--surf3); }
+        .qk-btn.hp-qk:hover { border-color: var(--cor); color: #e05060; }
+        .qk-btn.hp-qk-p:hover { border-color: rgba(80,180,48,.6); color: #7ac050; }
+        .qk-btn.rp-qk:hover { border-color: var(--res-d); color: var(--res); }
+        .qk-btn.qk-max { color: var(--gold-d); border-color: var(--bdr-g); }
+        .qk-btn.qk-max:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* QoL: Gold total display */
+        .gold-total-row {
+            margin-top: 6px;
+            padding: 5px 9px;
+            background: rgba(201,162,39,.04);
+            border: 1px solid rgba(201,162,39,.13);
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .gold-total-lbl {
+            font-family: 'Cinzel', serif;
+            font-size: 7px;
+            letter-spacing: 1.5px;
+            color: var(--gold-d);
+            text-transform: uppercase;
+        }
+        .gold-total-val {
+            font-family: 'Raleway', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--gold-l);
+        }
+
+        /* QoL: Inventory search filter */
+        #invSearchFilter {
+            width: 100%;
+            background: var(--surf2);
+            border: 1px solid var(--bdr);
+            border-radius: var(--rad);
+            color: var(--txt);
+            font-family: 'Raleway', sans-serif;
+            font-size: 11px;
+            padding: 5px 10px;
+            outline: none;
+            margin-bottom: 10px;
+            transition: border-color .15s;
+        }
+        #invSearchFilter:focus { border-color: var(--gold-d); }
+        #invSearchFilter::placeholder { color: var(--txt-dim); }
+
+        /* QoL: Autosave indicator */
+        #autosaveIndicator {
+            font-family: 'Cinzel', serif;
+            font-size: 6.5px;
+            letter-spacing: 1.5px;
+            color: rgba(61,214,219,.65);
+            text-transform: uppercase;
+            text-align: center;
+            margin-top: 4px;
+            opacity: 0;
+            transition: opacity .4s;
+            pointer-events: none;
+        }
+        #autosaveIndicator.show { opacity: 1; }
+
+        /* ANIM 1 — HP bar damage flash */
+        @keyframes hpDamageFlash {
+            0%   { filter: brightness(1.9) saturate(1.6); box-shadow: 0 0 14px rgba(200,32,48,.95); }
+            100% { filter: brightness(1)   saturate(1);   box-shadow: none; }
+        }
+        .hp-fill.damage-flash { animation: hpDamageFlash .55s ease-out forwards; }
+
+        /* ANIM 2 — RP cast pulse */
+        @keyframes rpCastPulse {
+            0%   { filter: brightness(1.7) saturate(1.5); box-shadow: 0 0 16px rgba(61,214,219,.9); }
+            100% { filter: brightness(1)   saturate(1);   box-shadow: 0 0 5px rgba(61,214,219,.4); }
+        }
+        .rp-fill.cast-pulse { animation: rpCastPulse .65s ease-out forwards; }
+
+        /* ANIM 3 — Tab panel slide-in */
+        @keyframes tabSlideIn {
+            from { opacity: 0; transform: translateY(9px); }
+            to   { opacity: 1; transform: translateY(0);   }
+        }
+        .tab-panel.active:not(#tab-vtt) { animation: tabSlideIn .24s ease-out forwards; }
+
+        /* ANIM 4 — Ability card roll glow */
+        @keyframes abilityRollGlow {
+            0%   { border-color: var(--gold); box-shadow: 0 0 18px rgba(201,162,39,.65); }
+            100% { border-color: var(--bdr-g); box-shadow: none; }
+        }
+        .ability-card.roll-flash { animation: abilityRollGlow .6s ease-out forwards; }
+
+        /* ANIM 5 — Rest button shimmer */
+        .rest-btn { position: relative; overflow: hidden; }
+        .rest-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 55%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(201,162,39,.22), transparent);
+            transform: skewX(-18deg);
+            pointer-events: none;
+        }
+        @keyframes restShimmer { from { left: -100%; } to { left: 165%; } }
+        .rest-btn:hover::after { animation: restShimmer .65s ease forwards; }
+
+        /* ANIM 6 — Tracker value pop */
+        @keyframes trackerPop {
+            0%   { transform: scale(1);    }
+            42%  { transform: scale(1.38); }
+            100% { transform: scale(1);    }
+        }
+        .trk-val.pop { animation: trackerPop .32s cubic-bezier(.36,.07,.19,.97) forwards; }
+
+        /* ANIM 7 — Toast slide-in */
+        @keyframes toastSlideIn {
+            from { opacity: 0; transform: translateX(24px) translateY(6px); }
+            to   { opacity: 1; transform: translateX(0)    translateY(0);   }
+        }
+        .toast.show { animation: toastSlideIn .3s ease-out forwards; opacity: 1; }
+
+        /* ANIM 8 — Gold input glow */
+        @keyframes goldInputGlow {
+            0%   { border-color: rgba(201,162,39,.85); box-shadow: 0 0 10px rgba(201,162,39,.45); }
+            100% { border-color: var(--bdr); box-shadow: none; }
+        }
+        .cstat-inp.gold-flash { animation: goldInputGlow .75s ease-out forwards; }
+
+        /* ANIM 9 — Sigil/cast ripple */
+        .alas-ripple {
+            position: absolute;
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            background: radial-gradient(circle, rgba(61,214,219,.52) 0%, transparent 70%);
+            pointer-events: none;
+            transform: scale(0);
+            animation: alasRippleExpand .55s ease-out forwards;
+        }
+        @keyframes alasRippleExpand { to { transform: scale(5.5); opacity: 0; } }
+
+        /* ANIM 10 — ALAS title pulsing glow */
+        @keyframes alasTitlePulse {
+            0%,100% { text-shadow: 0 0 14px rgba(201,162,39,.3); }
+            50%     { text-shadow: 0 0 30px rgba(201,162,39,.78), 0 0 60px rgba(232,197,71,.28); }
+        }
+        .alas-title { animation: alasTitlePulse 3.5s ease-in-out infinite; }
     </style>
 
     <!-- ── Site Protection ─────────────────────────────────────── -->
@@ -9131,7 +9303,7 @@
                 <button class="dm-btn galixy-only" id="keeperPanelBtn" onclick="openDMPanel()">
                     <span>⚔</span> Keeper's Panel
                 </button>
-                <button class="reset-btn" onclick="if(confirm('Reset entire sheet?')){localStorage.clear();location.reload();}">Reset Sheet</button>
+                <button class="reset-btn galixy-only" onclick="resetSheetFields()">Reset Sheet</button>
             </div>
         </aside>
 
@@ -12480,6 +12652,77 @@ function loadState(){
 }
 
 // ═══════════════════════════════════════════════════
+// RESET SHEET — Galixy only. Blanks character fields;
+// does NOT touch localStorage, auth tokens, or any
+// game records (inventory, spells, creatures, etc.).
+// ═══════════════════════════════════════════════════
+function resetSheetFields(){
+  // Hard guard — must be Galixy
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  // Safety block — prevent full wipe
+  if(!confirm('Reset character sheet fields? This will blank all character info fields (name, class, stats, notes, gold). Game records (inventory, spells, creatures, companions) are kept. This cannot be undone.')) return;
+
+  // ── Reset identity & character fields ──────────────────────────
+  const textFields = [
+    ['charName',''],['charRace',''],['charClass',''],['charBG',''],
+    ['charBiome',''],['charArc',''],['charOrigin',''],['charPlayerName',''],
+    ['charAlignment',''],['charAge',''],['charHeight',''],
+    ['charWeight',''],['charDistinguishingMarks',''],
+  ];
+  textFields.forEach(([id, val])=>{ const el=document.getElementById(id); if(el) el.value=val; });
+
+  // Level & XP
+  const lvlEl=document.getElementById('charLevel'); if(lvlEl) lvlEl.value='1';
+  const xpEl=document.getElementById('charXP');    if(xpEl)  xpEl.value='0';
+
+  // Ability scores → 10
+  ['STR','DEX','CON','INT','WIS','CHA'].forEach(ab=>{
+    const el=document.getElementById('ab_'+ab); if(el) el.value='10';
+  });
+
+  // HP / RP → 8
+  ['hpCur','hpMax','rpCur','rpMax'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='8';
+  });
+
+  // Status trackers → 0
+  ['instability','corruption','exhaustion'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='0';
+  });
+
+  // Gold → 0
+  ['goldGP','goldSP','goldCP'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='0';
+  });
+
+  // Notes
+  ['noteBackstory','noteSession','noteAllies','noteGoals','noteScars'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+
+  // ── Reset matching state fields ─────────────────────────────────
+  Object.assign(state, {
+    name:'', race:'', charClass:'', level:1, bg:'', biome:'', arc:'', xp:0,
+    origin:'', playerName:'', alignment:'', age:'', height:'', weight:'', distinguishingMarks:'',
+    STR:10,DEX:10,CON:10,INT:10,WIS:10,CHA:10,
+    hpCur:8, hpMax:8, rpCur:8, rpMax:8,
+    instability:0, corruption:0, exhaustion:0, scarTier:0,
+    goldGP:0, goldSP:0, goldCP:0, gemsHeld:0,
+    noteBackstory:'', noteSession:'', noteAllies:'', noteGoals:'', noteScars:'',
+    saveProficiencies:[], skillProf:{}, skillExp:{}, savesOverride:{},
+    combatAC:10, combatSpeed:'30 ft.', hitDie:'', acMod:0, initMod:0,
+    activeEffects:[],
+    // Preserved: capturedCreatures, completedSpells, completedAbilities,
+    //            inventory, sigils, features, companions, customShapes,
+    //            rollLog, factions, languages, savedContext, shopStock, etc.
+  });
+
+  _debouncedSave();
+  updateCalcs();
+  showToast('Sheet fields reset. Game records kept intact.');
+}
+
+// ═══════════════════════════════════════════════════
 // CALCULATIONS
 // ═══════════════════════════════════════════════════
 function getMod(ab){ return Math.floor(((parseInt(state[ab])||10)-10)/2); }
@@ -15793,6 +16036,94 @@ function removeCustomShape(type, id){
   buildClassProgressionDisplay();
 }
 
+function openEditShapeForm(type, id){
+  ensureCustomShapes();
+  const isWild = type === 'wildshape';
+  const sizesAllowed = isWild ? ['Tiny','Small'] : ['Medium','Large','Huge','Gigantic'];
+  const accentColor = isWild ? 'var(--res)' : '#a060e0';
+  const title = isWild ? '✎ Edit Wild Shape Form' : '✎ Edit Beast Shape Bond';
+  const entry = state.customShapes[type].find(s => s.id === id);
+  if(!entry){ showToast('Entry not found.'); return; }
+
+  document.getElementById('shapeEditOverlay')?.remove();
+  const overlay = document.createElement('div');
+  overlay.className = 'sr-overlay';
+  overlay.style.cssText = 'display:flex;';
+  overlay.id = 'shapeEditOverlay';
+  overlay.onclick = e=>{ if(e.target===overlay) overlay.remove(); };
+
+  const ea = v => (v||'').toString().replace(/"/g,'&quot;');
+  overlay.innerHTML = `
+    <div class="sr-box" style="max-width:520px;width:94%;padding:20px;">
+      <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:${accentColor};margin-bottom:14px;">${title}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="c-fld"><span class="c-fld-lbl">Creature Name</span>
+          <input class="c-inp" id="sef_name" value="${ea(entry.name)}">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">Size</span>
+          <select class="c-sel" id="sef_size">
+            ${sizesAllowed.map(s=>`<option${s===entry.size?' selected':''}>${s}</option>`).join('')}
+          </select>
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">Element / Type</span>
+          <input class="c-inp" id="sef_element" value="${ea(entry.element)}">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">AC</span>
+          <input class="c-inp" type="number" id="sef_ac" value="${entry.ac||12}">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">HP</span>
+          <input class="c-inp" type="number" id="sef_hp" value="${entry.hp||24}">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">Speed</span>
+          <input class="c-inp" id="sef_speed" value="${ea(entry.speed)}">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">Primary Strike</span>
+          <input class="c-inp" id="sef_strike" value="${ea(entry.strike)}">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">Where Observed / Found</span>
+          <input class="c-inp" id="sef_location" value="${ea(entry.location)}">
+        </div>
+      </div>
+      <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">Traits &amp; Abilities</span>
+        <textarea class="c-ta" id="sef_traits" style="min-height:60px;">${ea(entry.traits)}</textarea>
+      </div>
+      <div class="c-fld" style="margin-bottom:14px;"><span class="c-fld-lbl">Notes</span>
+        <textarea class="c-ta" id="sef_notes" style="min-height:50px;">${ea(entry.notes)}</textarea>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="add-btn" style="flex:1;" onclick="saveEditShapeForm('${type}','${id}')">✦ Save Changes</button>
+        <button class="shop-act-btn" onclick="document.getElementById('shapeEditOverlay').remove()">Cancel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function saveEditShapeForm(type, id){
+  ensureCustomShapes();
+  const name = document.getElementById('sef_name')?.value.trim()||'';
+  if(!name){ showToast('Enter a creature name.'); return; }
+  const idx = state.customShapes[type].findIndex(s => s.id === id);
+  if(idx === -1){ showToast('Entry not found.'); return; }
+  state.customShapes[type][idx] = {
+    ...state.customShapes[type][idx],
+    name,
+    size:     document.getElementById('sef_size')?.value||'Small',
+    element:  document.getElementById('sef_element')?.value.trim()||'Physical',
+    ac:       parseInt(document.getElementById('sef_ac')?.value)||12,
+    hp:       parseInt(document.getElementById('sef_hp')?.value)||24,
+    speed:    document.getElementById('sef_speed')?.value.trim()||'30 ft.',
+    strike:   document.getElementById('sef_strike')?.value.trim()||'',
+    location: document.getElementById('sef_location')?.value.trim()||'',
+    traits:   document.getElementById('sef_traits')?.value.trim()||'',
+    notes:    document.getElementById('sef_notes')?.value.trim()||'',
+  };
+  _debouncedSave();
+  document.getElementById('shapeEditOverlay')?.remove();
+  showToast(`${name} updated.`);
+  buildClassProgressionDisplay();
+  renderShapeList(type);
+}
+
 function renderShapeList(type){
   ensureCustomShapes();
   const container = document.getElementById('shapeList_'+type);
@@ -15810,7 +16141,10 @@ function renderShapeList(type){
     <div style="background:var(--surf2);border:1px solid ${borderColor};border-radius:5px;padding:10px 12px;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div style="font-family:'Cinzel',serif;font-size:11px;color:${accentColor};">${s.name} <span style="font-size:8px;opacity:.7;letter-spacing:1px;">[${s.size}]</span></div>
-        <button class="c-remove" onclick="removeCustomShape('${type}','${s.id}')" style="position:static;transform:none;">×</button>
+        <div style="display:flex;gap:5px;align-items:center;">
+          <button onclick="openEditShapeForm('${type}','${s.id}')" style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:.8px;padding:3px 8px;background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.25);border-radius:3px;color:rgba(201,162,39,.8);cursor:pointer;transition:all .15s;white-space:nowrap;" onmouseover="this.style.background='rgba(201,162,39,.18)'" onmouseout="this.style.background='rgba(201,162,39,.08)'">✎ Edit</button>
+          <button class="c-remove" onclick="removeCustomShape('${type}','${s.id}')" style="position:static;transform:none;">×</button>
+        </div>
       </div>
       <div style="display:flex;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
         <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--txt-dim);">AC <strong style="color:var(--txt)">${s.ac}</strong></span>
@@ -17139,6 +17473,15 @@ function toggleCompletedSpellActive(id){
   renderSpellList();
   updateCalcs();
   showToast(sp.name+' effect '+(sp.isActive?'activated':'deactivated')+'.');
+}
+
+function toggleSpellAvailable(id){
+  const sp=(state.completedSpells||[]).find(function(s){ return s.id===id; });
+  if(!sp) return;
+  sp.available = sp.available === false ? true : false;
+  _debouncedSave();
+  renderSpellList();
+  showToast(sp.available ? sp.name+' — available.' : sp.name+' marked as used.');
 }
 
 function toggleCompletedAbilityActive(id){
@@ -20665,7 +21008,10 @@ function renderCapturedList(){
             +'<div style="font-family:Cinzel,serif;font-size:7px;color:rgba(201,162,39,.25);">Captured '+cap.capturedAt+'</div>'
           +'</div>'
         +'</div>'
+        +'<div style="display:flex;gap:5px;align-items:center;">'
+        +'<button onclick="openEditCapturedCreature(\'' +cap.id+ '\')" style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:.8px;padding:3px 9px;background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.25);border-radius:3px;color:rgba(201,162,39,.8);cursor:pointer;transition:all .15s;white-space:nowrap;" onmouseover="this.style.background=\'rgba(201,162,39,.18)\'" onmouseout="this.style.background=\'rgba(201,162,39,.08)\'">✎ Edit Creature</button>'
         +'<button class="captured-rm-btn" onclick="removeCapturedCreature(\'' +cap.id+ '\')">&#x2715;</button>'
+        +'</div>'
       +'</div>'
       +(cap.notes?'<div class="captured-card-notes" style="margin-top:6px;">'+cap.notes+'</div>':'')
       +(cap.flavor?'<div style="font-family:EB Garamond,serif;font-size:11.5px;font-style:italic;color:rgba(208,208,232,.4);margin-top:5px;line-height:1.5;">'+cap.flavor+'</div>':'')
@@ -20716,6 +21062,87 @@ function capSaveName(capId, val){
   if(!cap) return;
   cap.companionName = val.trim();
   _debouncedSave();
+}
+
+function openEditCapturedCreature(id){
+  if(!state.capturedCreatures) return;
+  const cap = state.capturedCreatures.find(c => c.id === id);
+  if(!cap){ showToast('Creature not found.'); return; }
+
+  document.getElementById('editCapturedOverlay')?.remove();
+  const overlay = document.createElement('div');
+  overlay.id = 'editCapturedOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:10100;background:rgba(0,0,6,.85);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;';
+  overlay.onclick = e=>{ if(e.target===overlay) overlay.remove(); };
+
+  const ea = v => (v||'').toString().replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const maxHp = cap.maxHp !== undefined ? cap.maxHp : (parseInt(cap.notes)||10);
+  const curHp = cap.currentHp !== undefined ? cap.currentHp : maxHp;
+
+  overlay.innerHTML = `
+    <div style="background:linear-gradient(145deg,rgba(10,10,28,.98),rgba(6,6,18,.98));border:1px solid rgba(201,162,39,.22);border-radius:10px;width:min(580px,95vw);max-height:90vh;overflow-y:auto;padding:24px;animation:capIn .3s ease;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+        <div>
+          <div style="font-family:'Cinzel Decorative',serif;font-size:13px;color:#c9a227;letter-spacing:2px;">✎ Edit Creature</div>
+          <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:rgba(201,162,39,.4);margin-top:3px;">Modify stats, name, type, HP, and notes</div>
+        </div>
+        <button onclick="document.getElementById('editCapturedOverlay').remove()" style="background:transparent;border:none;color:rgba(201,162,39,.4);font-size:18px;cursor:pointer;padding:2px 6px;transition:color .15s;" onmouseover="this.style.color='rgba(201,162,39,.9)'" onmouseout="this.style.color='rgba(201,162,39,.4)'">✕</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div class="c-fld"><span class="c-fld-lbl">Species Name</span>
+          <input class="c-inp" id="ecap_name" value="${ea(cap.name)}" placeholder="Species name…">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">Companion Name</span>
+          <input class="c-inp" id="ecap_compname" value="${ea(cap.companionName)}" placeholder="Personal name (optional)…">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">Type / Element</span>
+          <input class="c-inp" id="ecap_type" value="${ea(cap.type)}" placeholder="e.g. Nature, Fire…">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">Size</span>
+          <input class="c-inp" id="ecap_size" value="${ea(cap.size)}" placeholder="e.g. Small, Large…">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">Max HP</span>
+          <input class="c-inp" type="number" id="ecap_maxhp" value="${maxHp}" min="1">
+        </div>
+        <div class="c-fld"><span class="c-fld-lbl">Current HP</span>
+          <input class="c-inp" type="number" id="ecap_curhp" value="${curHp}" min="0">
+        </div>
+      </div>
+      <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">Notes / Stats</span>
+        <textarea class="c-ta" id="ecap_notes" style="min-height:60px;">${ea(cap.notes)}</textarea>
+      </div>
+      <div class="c-fld" style="margin-bottom:18px;"><span class="c-fld-lbl">Flavor / Description</span>
+        <textarea class="c-ta" id="ecap_flavor" style="min-height:50px;">${ea(cap.flavor||'')}</textarea>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="add-btn" style="flex:1;" onclick="saveEditCapturedCreature('${id}')">✦ Save Changes</button>
+        <button class="shop-act-btn" onclick="document.getElementById('editCapturedOverlay').remove()">Cancel</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function saveEditCapturedCreature(id){
+  if(!state.capturedCreatures) return;
+  const cap = state.capturedCreatures.find(c => c.id === id);
+  if(!cap){ showToast('Creature not found.'); return; }
+  const name = document.getElementById('ecap_name')?.value.trim()||'';
+  if(!name){ showToast('Species name is required.'); return; }
+  cap.name         = name;
+  cap.companionName= document.getElementById('ecap_compname')?.value.trim()||'';
+  cap.type         = document.getElementById('ecap_type')?.value.trim()||cap.type||'Unknown';
+  cap.size         = document.getElementById('ecap_size')?.value.trim()||cap.size||'—';
+  const newMax     = parseInt(document.getElementById('ecap_maxhp')?.value)||cap.maxHp||10;
+  const newCur     = parseInt(document.getElementById('ecap_curhp')?.value);
+  cap.maxHp        = newMax;
+  cap.currentHp    = isNaN(newCur) ? newMax : Math.min(Math.max(0, newCur), newMax);
+  cap.notes        = document.getElementById('ecap_notes')?.value.trim()||'';
+  cap.flavor       = document.getElementById('ecap_flavor')?.value.trim()||'';
+  _debouncedSave();
+  document.getElementById('editCapturedOverlay')?.remove();
+  showToast(`${cap.companionName||cap.name} updated.`);
+  renderCapturedList();
+  _updateCapturedCount();
 }
 
 
@@ -22535,7 +22962,7 @@ function _renderCompCardProgress(creature, cs, progRow, actionArea){
 
   actionArea.innerHTML = lockBanner + (cs.tamed
     ? `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">`
-      +`<span class="comp-tamed-badge">✓ In Captured</span>`
+      +`<button class="comp-tamed-badge" onclick="openCapturedCreatures()" style="cursor:pointer;background:rgba(61,214,219,.08);border:1px solid rgba(61,214,219,.35);border-radius:4px;padding:3px 9px;font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:.8px;color:rgba(61,214,219,.9);" title="Open My Creatures">✓ In My Creatures</button>`
       +(!btnDisabled?`<button class="comp-action-btn${biomeBtnCls}" style="width:auto;padding:6px 12px;" onclick="compRoll(COMPANION_CREATURES.find(c=>c.id==='${creature.id}'),'${btnAction}',this.closest('.comp-card'))">${btnLabel}</button>`:'<span style="font-family:Cinzel,serif;font-size:7px;color:var(--res);letter-spacing:1.5px;">FULLY TRAINED</span>')
       +'</div>'
     : `<button class="comp-action-btn${biomeBtnCls}"${btnDisabled?' disabled':''} onclick="${biomeBtnOnclick}">${btnLabel}</button>`);
@@ -26368,22 +26795,30 @@ function renderSpellList(){
       `<span style="display:inline-block;padding:1px 6px;background:rgba(200,32,48,.12);border:1px solid rgba(200,32,48,.3);border-radius:3px;font-size:10px;color:#c84050;">${c}</span>`
     ).join('') : '';
 
-    const hasAE   = sp.hasActiveEffect === '1';
+    const hasAE    = sp.hasActiveEffect === '1';
     const isActive = !!(sp.isActive);
+    const avail    = sp.available !== false;
     const effBtnStyle = isActive
       ? 'background:rgba(61,214,219,.15);border-color:rgba(61,214,219,.6);color:rgba(61,214,219,.9);'
       : 'background:transparent;border-color:rgba(255,255,255,.15);color:var(--txt-dim);';
+    const availBtnStyle = avail
+      ? 'background:rgba(61,214,219,.1);border-color:rgba(61,214,219,.55);color:rgba(61,214,219,.95);'
+      : 'background:rgba(200,32,48,.07);border-color:rgba(200,32,48,.35);color:rgba(200,32,48,.7);';
+    const availLabel = avail
+      ? '◉ AVAILABLE (TAP WHEN USED)'
+      : '✕ USED — TAP TO RESTORE';
 
     const div = document.createElement('div');
-    div.style.cssText = `background:rgba(10,10,18,.6);border:1px solid ${isActive&&hasAE?'rgba(61,214,219,.25)':'rgba(255,255,255,.08)'};border-left:3px solid ${col};border-radius:6px;padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;`;
+    div.style.cssText = `background:rgba(10,10,18,.6);border:1px solid ${!avail?'rgba(200,32,48,.12)':isActive&&hasAE?'rgba(61,214,219,.25)':'rgba(255,255,255,.08)'};border-left:3px solid ${avail?col:'rgba(200,32,48,.5)'};border-radius:6px;padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;opacity:${avail?'1':'.6'};transition:opacity .2s,border-color .2s;`;
     div.innerHTML = `
       <div>
         <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
-          <span style="font-family:'Cinzel Decorative',serif;font-size:12px;color:${col};">${sp.name}</span>
+          <span style="font-family:'Cinzel Decorative',serif;font-size:12px;color:${avail?col:'rgba(200,32,48,.7)'};">${sp.name}</span>
           <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:rgba(201,162,39,.7);padding:1px 6px;border:1px solid rgba(201,162,39,.25);border-radius:3px;">LVL ${sp.spellLevel}</span>
           <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:${col};opacity:.7;">${sp.aff}</span>
           ${sp.unstableMagic ? `<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:rgba(208,112,48,.85);padding:1px 6px;border:1px solid rgba(208,112,48,.3);border-radius:3px;">⚡ UNSTABLE</span>` : ''}
           ${hasAE && isActive ? `<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:rgba(61,214,219,.9);padding:1px 6px;border:1px solid rgba(61,214,219,.35);border-radius:3px;">⚡ EFFECT ACTIVE</span>` : ''}
+          ${!avail ? `<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.2px;color:rgba(200,32,48,.7);padding:1px 6px;border:1px solid rgba(200,32,48,.3);border-radius:3px;">USED</span>` : ''}
         </div>
         <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:${sp.notes||conds?'8px':'0'};">
           <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">RC <strong style="color:rgba(61,214,219,.8);">${sp.rc}</strong></span>
@@ -26398,6 +26833,7 @@ function renderSpellList(){
         ${sp.notes ? `<div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:rgba(208,208,232,.6);line-height:1.5;">${sp.notes}</div>` : ''}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
+        <button type="button" onclick="toggleSpellAvailable('${sp.id}')" style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;padding:5px 11px;border:1px solid;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .2s;${availBtnStyle}">${availLabel}</button>
         <button type="button" class="sig-cast-btn" onclick="castCompletedSpell('${sp.id}')" style="font-size:7.5px;padding:5px 12px;letter-spacing:1.5px;">⟳ Cast</button>
         ${hasAE ? `<button type="button" onclick="toggleCompletedSpellActive('${sp.id}')" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;border:1px solid;border-radius:4px;cursor:pointer;white-space:nowrap;${effBtnStyle}">${isActive ? '⚡ Effect On' : '○ Effect Off'}</button>` : ''}
         <button type="button" onclick="removeCompletedSpell('${sp.id}')" title="Remove from Spell List" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(200,32,48,.3);border-radius:4px;color:rgba(200,32,48,.6);cursor:pointer;white-space:nowrap;">✕ Remove</button>
@@ -28378,6 +28814,329 @@ function _escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
     if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',patch); else patch();
   }
 })();
+</script>
+
+<!-- ═══════════════════════════════════════════════════
+     V4.5 — QoL Enhancements + Visual Animations
+     ═══════════════════════════════════════════════════ -->
+<script>
+(function(){
+'use strict';
+
+/* ── QoL 1: Ctrl+S / Cmd+S → save character file ─────────────── */
+document.addEventListener('keydown',function(e){
+  if((e.ctrlKey||e.metaKey)&&e.key==='s'){
+    e.preventDefault();
+    if(typeof saveCharacterFile==='function') saveCharacterFile();
+  }
+});
+
+/* ── QoL 3: Alt+1…0 → switch tabs ────────────────────────────── */
+var _TAB_IDS=['attributes','skills','sigils','abilities','inventory','world','companions','gems','places','notes'];
+document.addEventListener('keydown',function(e){
+  if(!e.altKey||e.ctrlKey||e.metaKey||e.shiftKey) return;
+  var idx=e.key==='0'?9:parseInt(e.key)-1;
+  if(idx>=0&&idx<_TAB_IDS.length){
+    e.preventDefault();
+    var btn=document.querySelectorAll('.tab-btn')[idx]||null;
+    if(typeof showTab==='function') showTab(_TAB_IDS[idx],btn);
+  }
+});
+
+/* ── QoL 2: HP/RP quick adjust ────────────────────────────────── */
+function qkAdjHP(delta){
+  var el=document.getElementById('hpCur'),mx=document.getElementById('hpMax');
+  if(!el) return;
+  el.value=Math.max(0,Math.min(parseInt((mx||{}).value)||0,(parseInt(el.value)||0)+delta));
+  if(typeof updateBar==='function') updateBar('hp');
+  if(delta<0){var b=document.getElementById('hpBar');if(b){b.classList.remove('damage-flash');void b.offsetWidth;b.classList.add('damage-flash');}}
+  if(typeof saveAll==='function') saveAll();
+}
+function qkAdjRP(delta){
+  var el=document.getElementById('rpCur'),mx=document.getElementById('rpMax');
+  if(!el) return;
+  el.value=Math.max(0,Math.min(parseInt((mx||{}).value)||0,(parseInt(el.value)||0)+delta));
+  if(typeof updateBar==='function') updateBar('rp');
+  if(typeof updateRpState==='function') updateRpState();
+  if(delta<0){var b=document.getElementById('rpBar');if(b){b.classList.remove('cast-pulse');void b.offsetWidth;b.classList.add('cast-pulse');}}
+  if(typeof saveAll==='function') saveAll();
+}
+
+/* ── QoL 5: HP / RP full restore ──────────────────────────────── */
+function qkHPMax(){
+  var el=document.getElementById('hpCur'),mx=document.getElementById('hpMax');
+  if(!el||!mx) return;
+  el.value=mx.value;
+  if(typeof updateBar==='function') updateBar('hp');
+  if(typeof saveAll==='function') saveAll();
+}
+function qkRPMax(){
+  var el=document.getElementById('rpCur'),mx=document.getElementById('rpMax');
+  if(!el||!mx) return;
+  el.value=mx.value;
+  if(typeof updateBar==='function') updateBar('rp');
+  if(typeof updateRpState==='function') updateRpState();
+  if(typeof saveAll==='function') saveAll();
+}
+
+/* ── QoL 4: Gold total ─────────────────────────────────────────── */
+function _refreshGoldTotal(){
+  var gp=parseFloat((document.getElementById('goldGP')||{}).value)||0;
+  var sp=parseFloat((document.getElementById('goldSP')||{}).value)||0;
+  var cp=parseFloat((document.getElementById('goldCP')||{}).value)||0;
+  var el=document.getElementById('goldTotalDisplay');
+  if(el) el.textContent=(gp+sp/10+cp/100).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})+' GP equiv.';
+}
+function updateGoldTotal(){
+  _refreshGoldTotal();
+  ['goldGP','goldSP','goldCP'].forEach(function(id){
+    var inp=document.getElementById(id);
+    if(inp){inp.classList.remove('gold-flash');void inp.offsetWidth;inp.classList.add('gold-flash');}
+  });
+}
+
+/* ── QoL 6: Inventory filter ──────────────────────────────────── */
+function filterInventoryCards(query){
+  var cards=document.querySelectorAll('#inventoryList .item-card');
+  var q=(query||'').trim().toLowerCase();
+  cards.forEach(function(card){
+    if(!q){card.style.display='';return;}
+    var name=((card.querySelector('.c-inp')||{}).value||'').toLowerCase();
+    var desc=((card.querySelector('.c-ta')||{}).value||'').toLowerCase();
+    card.style.display=(name.includes(q)||desc.includes(q))?'':'none';
+  });
+}
+
+/* ── QoL 7: Hold-to-repeat globals ───────────────────────────── */
+var _trkHT=null,_trkHI=null;
+function startHPHold(d){_trkHT=setTimeout(function(){_trkHI=setInterval(function(){qkAdjHP(d);},95);},360);}
+function startRPHold(d){_trkHT=setTimeout(function(){_trkHI=setInterval(function(){qkAdjRP(d);},95);},360);}
+function _stopTrkHold(){clearTimeout(_trkHT);clearInterval(_trkHI);}
+
+/* ── QoL 9: Autosave indicator ────────────────────────────────── */
+function flashAutosaveIndicator(){
+  var el=document.getElementById('autosaveIndicator');
+  if(!el) return;
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t=setTimeout(function(){el.classList.remove('show');},1900);
+}
+
+/* ── QoL 10: Scroll-to-top ────────────────────────────────────── */
+function qkScrollTop(){
+  var tc=document.querySelector('.tab-content');
+  if(tc) tc.scrollTo({top:0,behavior:'smooth'});
+}
+document.addEventListener('keydown',function(e){
+  if(e.altKey&&e.key==='Home'){e.preventDefault();qkScrollTop();}
+});
+
+/* ── Patch _debouncedSave → flash indicator + refresh gold ───── */
+(function(){
+  var _orig=window._debouncedSave;
+  if(typeof _orig!=='function') return;
+  window._debouncedSave=function(){
+    _orig.apply(this,arguments);
+    flashAutosaveIndicator();
+    _refreshGoldTotal();
+  };
+})();
+
+/* ── ANIM 9: Ripple helper ────────────────────────────────────── */
+function _attachAlasRipple(el){
+  if(!el||el._alasRippled) return;
+  el._alasRippled=true;
+  if(getComputedStyle(el).position==='static') el.style.position='relative';
+  el.style.overflow='hidden';
+  el.addEventListener('click',function(e){
+    var rect=el.getBoundingClientRect();
+    var r=document.createElement('span');
+    r.className='alas-ripple';
+    r.style.left=(e.clientX-rect.left-20)+'px';
+    r.style.top=(e.clientY-rect.top-20)+'px';
+    el.appendChild(r);
+    setTimeout(function(){r.remove();},620);
+  });
+}
+
+/* ── DOM-ready ────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded',function(){
+
+  /* QoL 2 — HP quick adjust row */
+  var hpBarEl=document.getElementById('hpBar');
+  if(hpBarEl){
+    var hpRow=document.createElement('div');
+    hpRow.className='res-quick-row';
+    hpRow.innerHTML=
+      '<button class="qk-btn hp-qk"   onmousedown="startHPHold(-1)" onmouseup="_stopTrkHold()" onmouseleave="_stopTrkHold()" title="HP −1 (hold)">−1</button>'+
+      '<button class="qk-btn hp-qk"   onclick="qkAdjHP(-5)" title="HP −5">−5</button>'+
+      '<button class="qk-btn qk-max"  onclick="qkHPMax()" title="Restore HP to max">⟳</button>'+
+      '<button class="qk-btn hp-qk-p" onclick="qkAdjHP(5)"  title="HP +5">+5</button>'+
+      '<button class="qk-btn hp-qk-p" onmousedown="startHPHold(1)"  onmouseup="_stopTrkHold()" onmouseleave="_stopTrkHold()" title="HP +1 (hold)">+1</button>';
+    hpBarEl.parentElement.insertAdjacentElement('afterend',hpRow);
+  }
+
+  /* QoL 2 — RP quick adjust row */
+  var rpLbl=document.getElementById('rpStateLabel');
+  if(rpLbl){
+    var rpRow=document.createElement('div');
+    rpRow.className='res-quick-row';
+    rpRow.innerHTML=
+      '<button class="qk-btn rp-qk"  onmousedown="startRPHold(-1)" onmouseup="_stopTrkHold()" onmouseleave="_stopTrkHold()" title="RP −1 (hold)">−1</button>'+
+      '<button class="qk-btn rp-qk"  onclick="qkAdjRP(-5)" title="RP −5">−5</button>'+
+      '<button class="qk-btn qk-max" onclick="qkRPMax()" title="Restore RP to max">⟳</button>'+
+      '<button class="qk-btn" onclick="qkAdjRP(5)"  title="RP +5"  style="flex:1;color:var(--res);border-color:rgba(61,214,219,.3)">+5</button>'+
+      '<button class="qk-btn" onmousedown="startRPHold(1)" onmouseup="_stopTrkHold()" onmouseleave="_stopTrkHold()" title="RP +1 (hold)" style="flex:1;color:var(--res);border-color:rgba(61,214,219,.3)">+1</button>';
+    rpLbl.insertAdjacentElement('afterend',rpRow);
+  }
+
+  /* QoL 4 — Gold total row */
+  var goldCPEl=document.getElementById('goldCP');
+  if(goldCPEl){
+    var cstat=goldCPEl.closest('.cstat');
+    var currGrid=cstat&&cstat.parentElement;
+    if(currGrid){
+      var totalRow=document.createElement('div');
+      totalRow.className='gold-total-row';
+      totalRow.innerHTML='<span class="gold-total-lbl">Total Value</span><span class="gold-total-val" id="goldTotalDisplay">—</span>';
+      currGrid.insertAdjacentElement('afterend',totalRow);
+      ['goldGP','goldSP','goldCP'].forEach(function(id){
+        var inp=document.getElementById(id);
+        if(inp) inp.addEventListener('input',updateGoldTotal);
+      });
+      _refreshGoldTotal();
+    }
+  }
+
+  /* QoL 6 — Inventory search filter */
+  var invEl=document.getElementById('inventoryList');
+  if(invEl){
+    var sInp=document.createElement('input');
+    sInp.id='invSearchFilter';
+    sInp.type='text';
+    sInp.placeholder='⊘  Filter inventory…';
+    sInp.addEventListener('input',function(){filterInventoryCards(this.value);});
+    invEl.insertAdjacentElement('beforebegin',sInp);
+  }
+
+  /* QoL 9 — Autosave indicator below save buttons */
+  var cliEl=document.getElementById('charLoadInput');
+  if(cliEl){
+    var ind=document.createElement('div');
+    ind.id='autosaveIndicator';
+    ind.textContent='◈  Auto-saved';
+    cliEl.insertAdjacentElement('afterend',ind);
+  }
+
+  /* QoL 8 — Double-click name → copy summary to clipboard */
+  var nameInp=document.getElementById('charName');
+  if(nameInp){
+    nameInp.title='Double-click to copy character summary to clipboard';
+    nameInp.addEventListener('dblclick',function(){
+      var parts=[
+        nameInp.value||'Unnamed','—','Level',
+        (document.getElementById('charLevel')||{}).value||'1',
+        (document.getElementById('charClass')||{}).value||'',
+        (document.getElementById('charRace')||{}).value||''
+      ].filter(Boolean);
+      if(navigator.clipboard){
+        navigator.clipboard.writeText(parts.join(' ')).then(function(){
+          if(typeof showToast==='function') showToast('Copied: '+parts.join(' '));
+        });
+      }
+    });
+  }
+
+  /* QoL 10 — Floating scroll-to-top button */
+  var tcEl=document.querySelector('.tab-content');
+  if(tcEl){
+    var topBtn=document.createElement('button');
+    topBtn.id='scrollTopBtn';
+    topBtn.innerHTML='▲';
+    topBtn.title='Scroll to top (Alt+Home)';
+    topBtn.style.cssText='position:fixed;bottom:60px;right:14px;width:28px;height:28px;background:var(--surf2);border:1px solid var(--bdr-g);color:var(--gold-d);font-size:11px;border-radius:3px;cursor:pointer;z-index:888;opacity:0;transition:opacity .3s,border-color .15s,color .15s;pointer-events:none;';
+    topBtn.addEventListener('mouseenter',function(){this.style.borderColor='var(--gold)';this.style.color='var(--gold)';});
+    topBtn.addEventListener('mouseleave',function(){this.style.borderColor='var(--bdr-g)';this.style.color='var(--gold-d)';});
+    topBtn.onclick=qkScrollTop;
+    document.body.appendChild(topBtn);
+    tcEl.addEventListener('scroll',function(){
+      var v=tcEl.scrollTop>90;
+      topBtn.style.opacity=v?'0.9':'0';
+      topBtn.style.pointerEvents=v?'auto':'none';
+    });
+  }
+
+  /* QoL 7 — Hold-to-repeat on existing tracker +/− buttons */
+  document.querySelectorAll('.trk-btn').forEach(function(btn){
+    var orig=btn.onclick;
+    if(!orig) return;
+    btn.addEventListener('mousedown',function(e){
+      if(e.button!==0) return;
+      _trkHT=setTimeout(function(){_trkHI=setInterval(function(){orig.call(btn,e);},95);},360);
+    });
+    btn.addEventListener('mouseup',_stopTrkHold);
+    btn.addEventListener('mouseleave',_stopTrkHold);
+  });
+
+  /* ANIM 4 — Ability card gold ring on roll click */
+  if(typeof openQuickAbilityRoll==='function'){
+    var _origRoll=openQuickAbilityRoll;
+    window.openQuickAbilityRoll=function(ab){
+      var scoreEl=document.getElementById('ab_'+ab);
+      var card=scoreEl&&scoreEl.closest('.ability-card');
+      if(card){card.classList.remove('roll-flash');void card.offsetWidth;card.classList.add('roll-flash');}
+      _origRoll.apply(this,arguments);
+    };
+  }
+
+  /* ANIM 1+2 — Bar flash on direct HP/RP input typing */
+  var _hpEl=document.getElementById('hpCur'),_rpEl=document.getElementById('rpCur');
+  var _pH=parseInt((_hpEl||{}).value)||0,_pR=parseInt((_rpEl||{}).value)||0;
+  if(_hpEl) _hpEl.addEventListener('input',function(){
+    var c=parseInt(this.value)||0;
+    if(c<_pH){var b=document.getElementById('hpBar');if(b){b.classList.remove('damage-flash');void b.offsetWidth;b.classList.add('damage-flash');}}
+    _pH=c;
+  });
+  if(_rpEl) _rpEl.addEventListener('input',function(){
+    var c=parseInt(this.value)||0;
+    if(c<_pR){var b=document.getElementById('rpBar');if(b){b.classList.remove('cast-pulse');void b.offsetWidth;b.classList.add('cast-pulse');}}
+    _pR=c;
+  });
+
+  /* ANIM 6 — Tracker value pop on +/− click */
+  document.querySelectorAll('.trk-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      var ctrl=btn.closest('.trk-ctrl');
+      if(!ctrl) return;
+      var val=ctrl.querySelector('.trk-val');
+      if(val){val.classList.remove('pop');void val.offsetWidth;val.classList.add('pop');}
+    });
+  });
+
+  /* ANIM 9 — Sigil cast ripple (static + dynamic) */
+  document.querySelectorAll('.sig-cast-btn,.rest-btn,.comp-action-btn').forEach(_attachAlasRipple);
+  new MutationObserver(function(muts){
+    muts.forEach(function(m){
+      m.addedNodes.forEach(function(n){
+        if(n.nodeType!==1) return;
+        if(n.matches&&n.matches('.sig-cast-btn,.comp-action-btn')) _attachAlasRipple(n);
+        if(n.querySelectorAll) n.querySelectorAll('.sig-cast-btn,.comp-action-btn').forEach(_attachAlasRipple);
+      });
+    });
+  }).observe(document.body,{childList:true,subtree:true});
+
+}); /* end DOMContentLoaded */
+
+/* Expose to global scope for inline HTML handlers */
+window.qkAdjHP=qkAdjHP; window.qkAdjRP=qkAdjRP;
+window.qkHPMax=qkHPMax; window.qkRPMax=qkRPMax;
+window.startHPHold=startHPHold; window.startRPHold=startRPHold;
+window._stopTrkHold=_stopTrkHold;
+window.filterInventoryCards=filterInventoryCards;
+window.qkScrollTop=qkScrollTop;
+window.updateGoldTotal=updateGoldTotal;
+
+})(); /* end IIFE */
 </script>
 
 </body>
