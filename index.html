@@ -9474,6 +9474,72 @@
                         </select>
                     </div>
                 </div>
+                <!-- Beastkin Lineage selector — shown only when Beastkin is selected -->
+                <div id="beastkinLineageRow" style="display:none;margin-top:6px;">
+                    <div class="fld">
+                        <span class="fld-lbl">Lineage</span>
+                        <select class="fld-sel" id="beastkinLineage" onchange="onLineageChange()">
+                            <option value="">— Select Lineage —</option>
+                            <option value="Felinekin">Felinekin (Sythari) — Precision, Stealth</option>
+                            <option value="Rabbitkin">Rabbitkin (Velkyn) — Speed, Evasion</option>
+                            <option value="Ravenkin">Ravenkin (Kynsu) — Memory, Intelligence</option>
+                            <option value="Bullkin">Bullkin (Gor'Vakh) — Strength, Control</option>
+                            <option value="Foxkin">Foxkin (Veyshi) — Charisma, Deception</option>
+                            <option value="Frogkin">Frogkin (Tho'ren) — Amphibious, Patience</option>
+                            <option value="Turtlekin">Turtlekin (Kaelorum) — Endurance, Shell AC</option>
+                            <option value="Bearkin">Bearkin (Ur'Khaim) — Power, Protection</option>
+                            <option value="Boarkin">Boarkin (Droggan) — Ferocity, Relentless</option>
+                            <option value="Wolfkin">Wolfkin (Vaelthir) — Pack Tactics, Strategy</option>
+                            <option value="Deerkin">Deerkin (Lyraneth) — Resonance, Nature Grace</option>
+                            <option value="Badgerkin">Badgerkin (Groveth) — Rage, Burrow</option>
+                            <option value="Goatkin">Goatkin (Kurnath) — Balance, Climb</option>
+                            <option value="Serpentkin">Serpentkin (Xha'reth) — Venom, Patience</option>
+                            <option value="Horsekin">Horsekin (Vaelorin) — Speed, Charge</option>
+                            <option value="Ratkin">Ratkin (Skrel'ven) — Resourceful, Escape</option>
+                            <option value="Cowkin">Cowkin (Bovarin) — Resilience, Provider</option>
+                            <option value="Lizardkin">Lizardkin (Saurik) — Regen, Adapt</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Drakonian Breath Type selector — shown only when Drakonian is selected -->
+                <div id="drakonianBreathRow" style="display:none;margin-top:6px;">
+                    <div class="fld">
+                        <span class="fld-lbl">Breath Type</span>
+                        <select class="fld-sel" id="drakonianBreath" onchange="onBreathTypeChange()">
+                            <option value="">— Select Breath Type —</option>
+                            <option value="Inferno">1. Inferno — Fire, 15-ft cone, DEX save</option>
+                            <option value="Stormstrike">2. Stormstrike — Lightning, 30-ft line, DEX save</option>
+                            <option value="Frostfall">3. Frostfall — Cold, 15-ft cone, CON save</option>
+                            <option value="Corrosive Spray">4. Corrosive Spray — Acid, 30-ft line, DEX save</option>
+                            <option value="Venomcloud">5. Venomcloud — Poison, 15-ft cone, CON save</option>
+                            <option value="Concussive Roar">6. Concussive Roar — Thunder, 15-ft cone, CON save</option>
+                            <option value="Radiant Sear">7. Radiant Sear — Radiant, 15-ft cone, CON save</option>
+                            <option value="Necrotic Exhale">8. Necrotic Exhale — Necrotic, 15-ft cone, CON save</option>
+                            <option value="Force Wave">9. Force Wave — Force, 30-ft line, STR save</option>
+                            <option value="Void Breath">10. Void Breath — Psychic, 15-ft cone, WIS save</option>
+                            <option value="Shadowcloud">11. Shadowcloud — Necrotic, 20-ft cone, DEX save</option>
+                            <option value="Steamblast">12. Steamblast — Fire+Water, 15-ft cone, CON save</option>
+                            <option value="Sandstorm">13. Sandstorm — Abrasive, 20-ft cone, DEX save</option>
+                            <option value="Crystal Shard">14. Crystal Shard — Piercing, 30-ft line, DEX save</option>
+                            <option value="Paralytic Mist">15. Paralytic Mist — Poison, 15-ft cone, CON save</option>
+                            <option value="Ashcloud">16. Ashcloud — Fire, 20-ft cone, CON save</option>
+                            <option value="Void Pulse">17. Void Pulse — Force, 20-ft cone, CON save</option>
+                            <option value="Magmajet">18. Magmajet — Fire+Acid, 30-ft line, DEX save</option>
+                            <option value="Gale Force">19. Gale Force — Thunder, 30-ft line, STR save</option>
+                            <option value="Blinding Flash">20. Blinding Flash — Radiant, 15-ft cone, CON save</option>
+                            <option value="Petrifying Mist">21. Petrifying Mist — Necrotic, 15-ft cone, CON save</option>
+                            <option value="Resonance Pulse">22. Resonance Pulse — Force, 15-ft cone, CON save</option>
+                            <option value="Venom Web">23. Venom Web — Poison, 15-ft cone, DEX save</option>
+                            <option value="Corrosive Fog">24. Corrosive Fog — Acid, 15-ft cone, CON save</option>
+                            <option value="Sleep Mist">25. Sleep Mist — Psychic, 15-ft cone, WIS save</option>
+                            <option value="Fear Shriek">26. Fear Shriek — Psychic, 20-ft cone, WIS save</option>
+                            <option value="Iron Spray">27. Iron Spray — Piercing, 30-ft line, DEX save</option>
+                            <option value="Seismic Shout">28. Seismic Shout — Thunder, 30-ft cone, CON save</option>
+                            <option value="Blood Mist">29. Blood Mist — Necrotic, 15-ft cone, CON save</option>
+                            <option value="Abyssal Exhale">30. Abyssal Exhale — Necrotic+Chaos, 15-ft cone, CON save</option>
+                        </select>
+                    </div>
+                </div>
                 <div class="id-grid-3">
                     <div class="fld">
                         <span class="fld-lbl">Level</span>
@@ -10628,17 +10694,258 @@ const ABILITIES = ['STR','DEX','CON','INT','WIS','CHA'];
 const AB_NAMES = {STR:'Strength',DEX:'Dexterity',CON:'Constitution',INT:'Intelligence',WIS:'Wisdom',CHA:'Charisma'};
 
 const RACES = {
-  'Human':          {stats:{STR:10,DEX:10,CON:10,INT:10,WIS:10,CHA:10},hitDie:'d8',baseHP:8,heavyBaseHP:85,speed:30,asi:'+2 to one, +1 to another. 6 Distinction Points (max +3 any single).',traits:['Adaptive Resonance (cantrip-tier Sigil −1 RC)','Distinction Points (6 pts, max +3 any)','Resilient Ambition (reroll 1 check/LR)','Biome Familiarity'],langs:['Alasian Standard','+ 1 of choice','+ 1 Biome language']},
+  'Human':          {stats:{STR:10,DEX:10,CON:10,INT:10,WIS:10,CHA:10},hitDie:'d8',baseHP:8,heavyBaseHP:85,speed:30,asi:'+2 to one, +1 to another. 6 Distinction Points (max +3 any single).',traits:['Adaptive Resonance (cantrip-tier Sigil −1 RC)','Distinction Points (6 pts, max +3 any)','Resilient Ambition (reroll 1 failed d20/Deep Rest)','Learned Resilience (+1 skill prof; 1 Expertise context)','Network (1 named NPC contact at start)','Biome Familiarity (ADV Survival/Nature in home biome)'],langs:['Alasian Standard','+ 1 of choice','+ 1 Biome language']},
   'High Elf':       {stats:{STR:8,DEX:12,CON:10,INT:14,WIS:12,CHA:11},hitDie:'d6',baseHP:7,heavyBaseHP:85,speed:35,asi:'+2 INT, +1 WIS',traits:['Trance (4hr = 8hr sleep; partial awareness)','Keen Senses (Perception prof; adv. vs. Charmed)','Light Sigil Sensitivity (cantrip Light −1 RC)','Aelorian Archive Mind (perfect factual recall)'],langs:['Alasian Standard','Aelorian','+ 1 of choice','+ 1 Biome language']},
   'Dunesong Elf':   {stats:{STR:9,DEX:14,CON:11,INT:10,WIS:13,CHA:10},hitDie:'d6',baseHP:7,heavyBaseHP:85,speed:35,asi:'+2 DEX, +1 WIS',traits:['Desert Stride (no cost in arid terrain; heat immune)','Geraki Bond (Desert Falcon companion; Rite of First Descent)','Resonance Navigator (sense Vein within 5 mi)','Trance'],langs:['Alasian Standard','Na\'Shira (incl. Cry-Language subsystem)']},
   'Drow':           {stats:{STR:9,DEX:14,CON:10,INT:12,WIS:11,CHA:12},hitDie:'d6',baseHP:7,heavyBaseHP:85,speed:30,asi:'+2 DEX, +1 CHA',traits:['Superior Darkvision 120 ft. (incl. magical darkness)','Sunlight Sensitivity (disadv. in direct sunlight)','Drow Magic (Dancing Lights + Faerie Fire L3 + Darkness L5)','Web Thinking (adv. Investigation; adv. vs. Charmed)','Trance'],langs:['Alasian Standard','Drow Shadespeak','+ 1 of choice']},
   'Wood Elf':       {stats:{STR:10,DEX:14,CON:11,INT:10,WIS:13,CHA:9},hitDie:'d6',baseHP:7,heavyBaseHP:85,speed:35,asi:'+2 DEX, +1 WIS',traits:['Fleet of Foot (35 ft.; no cost in forest terrain)','Mask of the Wild (hide in natural obscurement)','Nature Sigil Sensitivity (cantrip Nature −1 RC)','Sylvari Speaker (communicate with unintelligent plants)','Trance'],langs:['Alasian Standard','Sylvari','+ 1 of choice']},
   'Ember Forge Dwarf':{stats:{STR:13,DEX:9,CON:14,INT:12,WIS:10,CHA:9},hitDie:'d10',baseHP:10,heavyBaseHP:110,speed:25,asi:'+2 CON, +1 INT',traits:['Dwarven Resilience (adv. vs. poison; poison resistance)','Forge Mastery (smith\'s/jeweler\'s/tinker\'s tools proficiency)','Ember Resonance (fire resistance; ignite/extinguish flames)','Vein-Sight (identify gem quality by touch)'],langs:['Alasian Standard','Dur\'Khan','+ 1 of choice']},
   'Stoneheart Dwarf':{stats:{STR:14,DEX:8,CON:15,INT:10,WIS:12,CHA:8},hitDie:'d12',baseHP:12,heavyBaseHP:115,speed:25,asi:'+2 CON, +1 STR',traits:['Stoneheart Endurance (reaction: drop to 1 HP; recharges Deep Rest)','Dwarven Resilience (adv. vs. poison; poison resistance)','Tremorsense 15 ft. (detect creatures touching same surface)','Stone\'s Memory (Athletics prof; adv. grapple)'],langs:['Alasian Standard','Dur\'Khan','+ 1 of choice']},
-  'Beastkin':       {stats:{STR:10,DEX:12,CON:10,INT:10,WIS:10,CHA:10},hitDie:'d8',baseHP:8,heavyBaseHP:85,speed:30,asi:'By Lineage (Felinoid: DEX+2/WIS+1 | Caninoid: STR+2/CON+1 | Ursine: STR+2/CON+1 | Raptorid: DEX+2/INT+1 | Serpenid: CON+1/CHA+2 | Lagomorph: DEX+2/CHA+1)',traits:['Choose Lineage at creation: Felinoid / Caninoid / Ursine / Raptorid / Serpenid / Lagomorph','Each lineage grants unique traits (darkvision, claws, pack tactics, etc.)'],langs:['Alasian Standard','+ 1 regional','+ 1 Biome language']},
+  'Beastkin':       {stats:{STR:10,DEX:12,CON:10,INT:10,WIS:10,CHA:10},hitDie:'d8',baseHP:8,heavyBaseHP:85,speed:30,asi:'By Lineage — choose one of 19 Lineages. Each grants specific ASI, natural weapon, speed, and racial traits. All receive 6 Distinction Points (max +3 any single score).',traits:['Universal: Heightened Instinct (ADV hearing/smell Perception)','Universal: Pack Memory (detect authority holder in group; ADV Insight vs. frightened)','Universal: Natural Weapon (scales 1d6→1d8→1d10 at L6/11)','Choose one of 19 Lineages at creation: Felinekin · Rabbitkin · Ravenkin · Bullkin · Foxkin · Frogkin · Turtlekin · Bearkin · Boarkin · Wolfkin · Deerkin · Badgerkin · Goatkin · Serpentkin · Horsekin · Ratkin · Cowkin · Lizardkin'],langs:['Alasian Standard (learned)','Velsum (Beastkin trade tongue)','Thrael (root tongue — inherited)','+ Lineage Thrael dialect']},
   'Drakonian':      {stats:{STR:14,DEX:12,CON:13,INT:12,WIS:10,CHA:12},hitDie:'d8',baseHP:8,heavyBaseHP:125,speed:30,asi:'Base: STR+2/DEX+1/CON+1/INT+1/CHA+1 + Bloodline bonus. Choose: Flameblood/Stormbound/Deepcoil/Veilscales/Aetherwing',traits:['Gem Resonance (detect Sigil Gems 30 ft.; +3 Pool if Bloodline gem attuned)','Draconic Fortitude (adv. fear saves; 0HP → 1HP CON DC12 1/Deep Rest)','Natural AC 14+STR mod (compare with armor; use higher)','Draconic Breath (choose 1 of 30 types; 1/Short Rest; scales at L6/11/17)'],langs:['Alasian Standard','Vor\'Thak','+ 1 of choice']},
   'Goliath':        {stats:{STR:15,DEX:9,CON:14,INT:9,WIS:12,CHA:8},hitDie:'d12',baseHP:12,heavyBaseHP:115,speed:30,asi:'+2 STR, +1 CON',traits:['Powerful Build (count as Large for carry; wield Heavy without disadv.)','Mountain Born (altitude immune; extreme cold immune; Athletics prof)','Stone\'s Endurance (reaction: 1d12+CON resist damage; 1/Short Rest)','Worldscar Connection (sense geological events 1 mi.; movement in rocky terrain)'],langs:['Alasian Standard','Kar\'Run','+ 1 of choice']}
 };
+
+// ── BEASTKIN LINEAGES ─────────────────────────────────────────────────────
+// All 19 named lineages from the Alas Players Handbook v2.0 (PHB pp.20–39)
+const BEASTKIN_LINEAGES = {
+  'Felinekin': {
+    thrael:'Sythari', essence:'Precision. Independence. Predator\'s Grace.',
+    stats:{STR:8,DEX:14,CON:10,INT:10,WIS:12,CHA:10},
+    asi:'+2 DEX, +1 WIS', hitDie:'d8', baseHP:8, speed:35, darkvision:60,
+    naturalWeapon:'Claws 1d4 (Finesse, Slashing)', naturalAC:'12 + DEX mod',
+    primarySigil:'Air', secondarySigil:'Fire', resonanceBonus:0, instabilityMod:0,
+    biomes:['Forest / Woodland','Plains / Grassland','Urban / Civilized'],
+    traits:['Predator\'s Grace (Stealth prof; +1d4 dmg on claw after 10 ft. move)','Retractable Claws (conceal natural weapons; ADV Deception to hide them)','Low-Light Reflex (cannot be surprised conscious; ADV Initiative in dim/dark)','Darkvision 60 ft.'],
+  },
+  'Rabbitkin': {
+    thrael:'Velkyn', essence:'Instinct. Speed. Survival.',
+    stats:{STR:7,DEX:15,CON:9,INT:10,WIS:11,CHA:12},
+    asi:'+2 DEX, +1 CHA', hitDie:'d6', baseHP:7, speed:40, darkvision:0,
+    naturalWeapon:'Kick 1d4 (Finesse, Bludgeoning)', naturalAC:'10 + DEX mod',
+    primarySigil:'Air', secondarySigil:'Nature', resonanceBonus:1, instabilityMod:0,
+    biomes:['Plains / Grassland','Forest / Woodland','Mountain / Highland'],
+    traits:['Sprinter\'s Instinct (speed 40 ft.; Dash: OAs have disadv. until next turn)','Triple Jump (jump distance tripled; use DEX for jumps)','Lucky (reroll any d20 after seeing result, 1/day)','Threat Sense (ADV hearing Perception; cannot be surprised with ally within 30 ft.)'],
+  },
+  'Ravenkin': {
+    thrael:'Kynsu', essence:'Memory. Echo. Observer.',
+    stats:{STR:7,DEX:11,CON:8,INT:14,WIS:13,CHA:10},
+    asi:'+2 INT, +1 WIS', hitDie:'d6', baseHP:7, speed:30, darkvision:30,
+    naturalWeapon:'Talons 1d4 (Finesse, Piercing)', naturalAC:'10 + DEX mod',
+    primarySigil:'Air', secondarySigil:'Chaos', resonanceBonus:2, instabilityMod:1,
+    biomes:['Urban / Civilized','Mountain / Highland','Dead Lands / Corrupted'],
+    traits:['Echo Memory (perfectly reproduce any voice/sound/phrase heard once)','Perfect Recall (ADV History/Investigation on personally witnessed events; cannot forget chosen memories)','Kyn\'s Eye (Darkvision 30 ft.; ADV Insight to detect lies by voice alone)','Collector of Secrets (1/Short Rest: ask Keeper 1 question about observed creature)'],
+  },
+  'Bullkin': {
+    thrael:"Gor'Vakh", essence:'Control. Burden. Chosen Force.',
+    stats:{STR:15,DEX:8,CON:14,INT:9,WIS:11,CHA:10},
+    asi:'+2 STR, +1 CON', hitDie:'d10', baseHP:10, speed:30, darkvision:0,
+    naturalWeapon:'Horn Gore 1d8 (STR, Piercing)', naturalAC:'12 + CON mod',
+    primarySigil:'Earth', secondarySigil:'Fire', resonanceBonus:0, instabilityMod:2,
+    biomes:['Plains / Grassland','Mountain / Highland','Arid / Desert'],
+    traits:['Powerful Build (count as Large for carry/grapple/shove)','Trample Charge (1/Short Rest: 15 ft. charge + Horn Gore → prone + 1d6 bludg on failed STR save)','The Held Line (ADV saves vs. forced movement/prone; attacks have disadv. when you plant feet)','Consequence Memory (ADV Intimidation; beaten foes have disadv. Intimidating you)'],
+  },
+  'Foxkin': {
+    thrael:'Veyshi', essence:'Cunning. Misdirection. Opportunity.',
+    stats:{STR:7,DEX:13,CON:8,INT:12,WIS:10,CHA:14},
+    asi:'+2 CHA, +1 DEX', hitDie:'d6', baseHP:7, speed:35, darkvision:0,
+    naturalWeapon:'Bite 1d4 (Finesse, Piercing)', naturalAC:'10 + DEX mod',
+    primarySigil:'Air', secondarySigil:'Chaos', resonanceBonus:1, instabilityMod:0,
+    biomes:['Forest / Woodland','Plains / Grassland','Urban / Civilized'],
+    traits:['Silver Tongue (ADV Deception; double prof on Persuasion/Deception vs. non-hostile)','Misdirection (1/Short Rest: bonus action, WIS save or disadv. on next Perception, 30 ft.)','Low-Light Vision (dim light treated as bright; not full Darkvision)','Pack-Hunt Instinct (ADV attacks when ally within 5 ft. of target)'],
+  },
+  'Frogkin': {
+    thrael:"Tho'ren", essence:'Adaptation. Patience. Eruption.',
+    stats:{STR:11,DEX:10,CON:12,INT:9,WIS:13,CHA:8},
+    asi:'+1 STR, +1 CON, +1 WIS', hitDie:'d8', baseHP:8, speed:30, swimSpeed:30, darkvision:60,
+    naturalWeapon:'Tongue Slam 1d6 (STR, Bludgeoning, Reach 15 ft.)', naturalAC:'12 + CON mod',
+    primarySigil:'Water', secondarySigil:'Nature', resonanceBonus:0, instabilityMod:1,
+    biomes:['Coastal / Maritime','Forest / Woodland','Dead Lands / Corrupted'],
+    traits:['Amphibious (breathe air and water; swim speed 30 ft.; ADV Athletics to swim)','Prehensile Tongue (Reach 15 ft. attack; bonus action pull Small/smaller object or creature)','Wetland Camouflage (ADV Stealth in aquatic/marsh/humid; hold breath CON×3 min)','Still as Stone (no movement this turn → ADV next attack + attackers disadv.)'],
+  },
+  'Turtlekin': {
+    thrael:'Kaelorum', essence:'Endurance. Time. Inevitability.',
+    stats:{STR:11,DEX:6,CON:16,INT:10,WIS:13,CHA:7},
+    asi:'+2 CON, +1 WIS', hitDie:'d12', baseHP:12, speed:25, darkvision:0,
+    naturalWeapon:'Shell Ram 1d6 (STR, Bludgeoning)', naturalAC:'16 + CON mod (max 20)',
+    primarySigil:'Earth', secondarySigil:'Water', resonanceBonus:0, instabilityMod:3,
+    biomes:['Coastal / Maritime','Plains / Grassland','Arid / Desert'],
+    traits:['Living Shell (unarmored AC = 16 + CON, max 20; use higher vs. armor)','Cannot Be Surprised (immune to surprise; add CON mod to Initiative)','Death\'s Defiance (+2 to death saves; on success: reaction to regain 1 HP + stand free)','Immovable Presence (ADV saves vs. forced movement/prone/grapple; attacker disadv. on grapple/shove)'],
+  },
+  'Bearkin': {
+    thrael:"Ur'Khaim", essence:'Power. Protection. Endure.',
+    stats:{STR:15,DEX:8,CON:14,INT:8,WIS:10,CHA:9},
+    asi:'+2 STR, +1 CON', hitDie:'d10', baseHP:10, speed:30, darkvision:0,
+    naturalWeapon:'Maul 1d8 (STR, Bludgeoning)', naturalAC:'13 + DEX mod',
+    primarySigil:'Earth', secondarySigil:'Nature', resonanceBonus:0, instabilityMod:1,
+    biomes:['Forest / Woodland','Mountain / Highland','Arctic / Tundra'],
+    traits:['Natural Armor (unarmored AC = 13 + DEX; can still use shield)','Powerful Build (count as Large for carry/grapple/shove)','Primal Surge (1/Short Rest: bonus action, 1 min: ADV STR, +2 melee dmg, immune Frightened)','Clan Warden (reaction: impose disadv. on attack vs. creature within 5 ft.)'],
+  },
+  'Boarkin': {
+    thrael:'Droggan', essence:'Ferocity. Momentum. Unrelenting.',
+    stats:{STR:14,DEX:9,CON:14,INT:7,WIS:8,CHA:8},
+    asi:'+2 STR, +1 CON', hitDie:'d10', baseHP:10, speed:30, darkvision:0,
+    naturalWeapon:'Gore 1d6 (STR, Piercing)', naturalAC:'12 + CON mod',
+    primarySigil:'Fire', secondarySigil:'Earth', resonanceBonus:0, instabilityMod:0,
+    biomes:['Forest / Woodland','Plains / Grassland','Dead Lands / Corrupted'],
+    traits:['Relentless (1/Short Rest: damage that would drop you to 0 HP drops you to 1 instead)','Gore Charge (1/Short Rest: 10 ft. charge + Gore → +1d6 dmg + prone on failed STR save)','Fear Immunity (immune to Frightened; ADV vs. compulsion to flee)','Momentum Body (bonus action to break grapple with ADV STR check)'],
+  },
+  'Wolfkin': {
+    thrael:"Vaelthir", essence:'Royalty. Pack. Strategy.',
+    stats:{STR:12,DEX:12,CON:12,INT:10,WIS:11,CHA:11},
+    asi:'+2 STR, +1 CON', hitDie:'d8', baseHP:8, speed:35, darkvision:60,
+    naturalWeapon:'Bite 1d6 (STR, Piercing)', naturalAC:'11 + DEX mod',
+    primarySigil:'Nature', secondarySigil:'Air', resonanceBonus:1, instabilityMod:0,
+    biomes:['Plains / Grassland','Forest / Woodland','Mountain / Highland'],
+    traits:['Pack Tactics (ADV attacks if willing ally within 5 ft. of target)','Scent Tracking (track by scent; ADV Perception/Survival relying on smell)','Alpha\'s Howl (1/Short Rest: bonus action, 4 allies within 60 ft. gain ADV on next attack or save)','Night Eyes (Darkvision 60 ft.)'],
+  },
+  'Deerkin': {
+    thrael:"Lyraneth", essence:'Grace. Resonance. Nature\'s Will.',
+    stats:{STR:7,DEX:13,CON:8,INT:11,WIS:14,CHA:11},
+    asi:'+2 DEX, +1 WIS', hitDie:'d6', baseHP:7, speed:35, darkvision:0,
+    naturalWeapon:'Antler Ram 1d6 (STR, Piercing)', naturalAC:'10 + DEX mod',
+    primarySigil:'Nature', secondarySigil:'Light', resonanceBonus:3, instabilityMod:2,
+    biomes:['Forest / Woodland','Plains / Grassland','Mountain / Highland'],
+    traits:['Vein Sensitivity (detect Karanthian Veins within 60 ft.; near Vein +2 Resonance max, +1 Instability threshold)','Nature\'s Grace (natural difficult terrain costs no extra movement)','Grove Memory (1/Long Rest: touch vegetation or crystal, ask Keeper 1 yes/no about past month)','Spiritual Ward (resistance to Corruption dmg; ADV saves vs. Corruption effects)'],
+  },
+  'Badgerkin': {
+    thrael:'Groveth', essence:'Rage. Survival. Unbreakable.',
+    stats:{STR:12,DEX:8,CON:15,INT:8,WIS:9,CHA:7},
+    asi:'+1 STR, +2 CON', hitDie:'d10', baseHP:10, speed:25, burrowSpeed:15, darkvision:60,
+    naturalWeapon:'Claws 1d6 (STR, Slashing)', naturalAC:'13 + CON mod',
+    primarySigil:'Earth', secondarySigil:'Fire', resonanceBonus:0, instabilityMod:1,
+    biomes:['Forest / Woodland','Mountain / Highland','Dead Lands / Corrupted'],
+    traits:['Unyielding Grip (cannot be forced to release grapple unless incapacitated)','Rage Persistence (CON Save DC 12 to maintain rage when no attack/damage)','Burrower (burrow speed 15 ft. through loose earth, sand, or gravel)','Darkvision 60 ft.'],
+  },
+  'Goatkin': {
+    thrael:"Kurnath", essence:'Balance. Endurance. Unyielding.',
+    stats:{STR:10,DEX:12,CON:12,INT:9,WIS:13,CHA:8},
+    asi:'+1 DEX, +1 CON, +1 WIS', hitDie:'d8', baseHP:8, speed:30, climbSpeed:30, darkvision:0,
+    naturalWeapon:'Headbutt 1d4 (STR, Bludgeoning)', naturalAC:'12 + DEX mod',
+    primarySigil:'Earth', secondarySigil:'Air', resonanceBonus:0, instabilityMod:1,
+    biomes:['Mountain / Highland','Plains / Grassland','Arid / Desert'],
+    traits:['Sure-Footed (ADV saves vs. prone; auto-succeed balance checks on narrow/unstable surfaces)','Cliff Traversal (climb speed 30 ft. on natural stone; no equipment needed)','Stubbornness (ADV saves vs. compulsion to change course, flee, or abandon objective)','Balance Immunity (difficult terrain on flat surfaces does not affect movement)'],
+  },
+  'Serpentkin': {
+    thrael:"Xha'reth", essence:'Deception. Patience. Inevitability.',
+    stats:{STR:9,DEX:13,CON:11,INT:12,WIS:12,CHA:13},
+    asi:'+1 CON, +2 CHA', hitDie:'d8', baseHP:8, speed:30, darkvision:60,
+    naturalWeapon:'Venomous Bite 1d4 (STR, Piercing) + Poison', naturalAC:'13 + DEX mod',
+    primarySigil:'Chaos', secondarySigil:'Fire', resonanceBonus:0, instabilityMod:0,
+    biomes:['Arid / Desert','Forest / Woodland','Dead Lands / Corrupted'],
+    traits:['Natural Venom (on bite hit: CON save DC 8+CON+Prof or Poisoned 1 min; repeat save each turn)','Poison Resistance (resistance to poison dmg; ADV saves vs. Poisoned)','Heat Sense (detect living creatures within 30 ft. through light obstruction; fails vs. undead/constructs)','Patient Strike (natural weapon attack is critical on 18–20 vs. creature that hasn\'t acted or is unaware)'],
+  },
+  'Horsekin': {
+    thrael:"Vaelorin", essence:'Freedom. Momentum. Endless Horizon.',
+    stats:{STR:12,DEX:13,CON:12,INT:9,WIS:10,CHA:10},
+    asi:'+2 DEX, +1 CON', hitDie:'d8', baseHP:8, speed:40, darkvision:0,
+    naturalWeapon:'Kick 1d8 (STR, Bludgeoning)', naturalAC:'11 + DEX mod',
+    primarySigil:'Air', secondarySigil:'Nature', resonanceBonus:0, instabilityMod:0,
+    biomes:['Plains / Grassland','Mountain / Highland','Arid / Desert'],
+    traits:['Endless Stride (speed 40 ft.; no exhaustion from forced marching for +2 hrs beyond limit)','Charge Impact (1/Short Rest: 20 ft. charge + Kick → +2d6 dmg + 10 ft. knockback on failed STR save)','Wide Arc Vision (ADV Perception vs. flanking; flankers have disadv.)','Freedom\'s Constitution (ADV saves vs. restrained/grappled/imprisoned)'],
+  },
+  'Ratkin': {
+    thrael:"Skrel'ven", essence:'Resourcefulness. Guile. Survival.',
+    stats:{STR:7,DEX:14,CON:9,INT:13,WIS:10,CHA:10},
+    asi:'+2 DEX, +1 INT', hitDie:'d6', baseHP:7, speed:30, darkvision:60,
+    naturalWeapon:'Gnaw 1d4 (STR, Piercing)', naturalAC:'10 + DEX mod',
+    primarySigil:'Chaos', secondarySigil:'Air', resonanceBonus:0, instabilityMod:0,
+    biomes:['Urban / Civilized','Forest / Woodland','Dead Lands / Corrupted'],
+    traits:['Darkvision 60 ft.','Scavenger\'s Eye (Sleight of Hand + Investigation prof; auto-find hidden compartments DC 15 or lower)','Escape Artist (ADV saves vs. grapple/restraints; bonus action Disengage)','Network Memory (1/Long Rest: in settlement 50+ people, ask Keeper 1 question about social/criminal/info structure)'],
+  },
+  'Cowkin': {
+    thrael:"Bovarin", essence:'Nurture. Resilience. Provision.',
+    stats:{STR:12,DEX:8,CON:14,INT:9,WIS:12,CHA:11},
+    asi:'+1 STR, +2 CON', hitDie:'d10', baseHP:10, speed:30, darkvision:0,
+    naturalWeapon:'Horn Gore 1d6 (STR, Piercing)', naturalAC:'12 + CON mod',
+    primarySigil:'Nature', secondarySigil:'Earth', resonanceBonus:0, instabilityMod:0,
+    biomes:['Plains / Grassland','Forest / Woodland','Mountain / Highland'],
+    traits:['Provider\'s Resilience (1/Long Rest during Short Rest: up to 3 allies roll 1 extra Hit Die)','Powerful Build (count as Large for carry/grapple)','Bovarin Endurance (treat CON Save roll of 9 or lower as 10)','Provoked Defense (reaction: Horn Gore vs. attacker when ally within 10 ft. dropped to 0 HP)'],
+  },
+  'Lizardkin': {
+    thrael:"Saurik", essence:'Adaptation. Regeneration. Dominance.',
+    stats:{STR:12,DEX:12,CON:12,INT:9,WIS:10,CHA:9},
+    asi:'+1 CON, +1 STR, +1 DEX', hitDie:'d8', baseHP:8, speed:30, climbSpeed:20, darkvision:60,
+    naturalWeapon:'Tail Swipe 1d6 (STR, Bludgeoning)', naturalAC:'13 + DEX mod',
+    primarySigil:'Fire', secondarySigil:'Earth', resonanceBonus:0, instabilityMod:0,
+    biomes:['Arid / Desert','Forest / Woodland','Coastal / Maritime'],
+    traits:['Regeneration (regain 1 HP at start of turn if 1+ HP; fails if taken fire dmg or at 0 HP)','Natural Armor (unarmored AC = 13 + DEX)','Color Shift (bonus action: ADV Stealth until next turn or you attack)','Wide Arc Vision (cannot be flanked; ADV sight-based Perception)'],
+  },
+};
+
+// Drakonian Breath Types (PHB p.21–22 — all 30)
+const DRAKONIAN_BREATH_TYPES = {
+  'Inferno':         {type:'Fire',        area:'15-ft cone', save:'DEX', dmg:'2d6 fire',          effect:'Ignites flammable terrain.'},
+  'Stormstrike':     {type:'Lightning',   area:'30-ft line', save:'DEX', dmg:'2d8 lightning',     effect:'Target loses reaction until end of next turn.'},
+  'Frostfall':       {type:'Cold',        area:'15-ft cone', save:'CON', dmg:'2d6 cold',          effect:'Target speed −10 ft. for 1 round.'},
+  'Corrosive Spray': {type:'Acid',        area:'30-ft line', save:'DEX', dmg:'2d8 acid',          effect:'Metal armor damaged: −1 AC until repaired.'},
+  'Venomcloud':      {type:'Poison',      area:'15-ft cone', save:'CON', dmg:'2d6 poison',        effect:'Target Poisoned until end of next turn on failed save.'},
+  'Concussive Roar': {type:'Thunder',     area:'15-ft cone', save:'CON', dmg:'2d6 thunder',       effect:'Target knocked prone on failed save.'},
+  'Radiant Sear':    {type:'Radiant',     area:'15-ft cone', save:'CON', dmg:'2d6 radiant',       effect:'Undead and Corrupted creatures take double damage.'},
+  'Necrotic Exhale': {type:'Necrotic',    area:'15-ft cone', save:'CON', dmg:'2d6 necrotic',      effect:'Target cannot regain HP until start of its next turn.'},
+  'Force Wave':      {type:'Force',       area:'30-ft line', save:'STR', dmg:'2d6 force',         effect:'Target pushed 10 ft. away.'},
+  'Void Breath':     {type:'Psychic',     area:'15-ft cone', save:'WIS', dmg:'2d6 psychic',       effect:'Target Frightened until end of next turn on failed save.'},
+  'Shadowcloud':     {type:'Necrotic',    area:'20-ft cone', save:'DEX', dmg:'1d8 necrotic',      effect:'Area heavily obscured for 1 minute. Light dispels it.'},
+  'Steamblast':      {type:'Fire+Water',  area:'15-ft cone', save:'CON', dmg:'1d6 fire + 1d6 scalding', effect:'Area lightly obscured by steam for 1 minute.'},
+  'Sandstorm':       {type:'Abrasive',    area:'20-ft cone', save:'DEX', dmg:'2d6 slashing',      effect:'Target Blinded until end of their next turn on failed save.'},
+  'Crystal Shard':   {type:'Piercing',    area:'30-ft line', save:'DEX', dmg:'2d8 piercing',      effect:'Shards persist: difficult terrain in line for 1 minute.'},
+  'Paralytic Mist':  {type:'Poison',      area:'15-ft cone', save:'CON', dmg:'1d4 poison',        effect:'Target Paralyzed until end of their next turn on failed save.'},
+  'Ashcloud':        {type:'Fire',        area:'20-ft cone', save:'CON', dmg:'1d6 fire',          effect:'Area heavily obscured. Creatures in ash take 1d4 fire at start of their turn.'},
+  'Void Pulse':      {type:'Force',       area:'20-ft cone', save:'CON', dmg:'2d6 force',         effect:'Sigils with RC cost 3 or lower in the area are immediately dispelled.'},
+  'Magmajet':        {type:'Fire+Acid',   area:'30-ft line', save:'DEX', dmg:'1d6 fire + 1d6 acid', effect:'Terrain scorched: difficult terrain for 10 minutes.'},
+  'Gale Force':      {type:'Thunder',     area:'30-ft line', save:'STR', dmg:'1d8 thunder',       effect:'Target knocked back 15 ft. Smaller creatures knocked prone automatically.'},
+  'Blinding Flash':  {type:'Radiant',     area:'15-ft cone', save:'CON', dmg:'1d6 radiant',       effect:'Target Blinded until end of their next turn on failed save.'},
+  'Petrifying Mist': {type:'Necrotic',    area:'15-ft cone', save:'CON', dmg:'—',                 effect:'Target Restrained (Petrifying). On subsequent turn: full Petrification on failed save.'},
+  'Resonance Pulse': {type:'Force',       area:'15-ft cone', save:'CON', dmg:'2d6 force',         effect:'Casters caught in cone lose 3 RC from their Resonance Pool.'},
+  'Venom Web':       {type:'Poison',      area:'15-ft cone', save:'DEX', dmg:'1d6 poison',        effect:'Area webbed: difficult terrain, Restrained on failed save until end of next turn.'},
+  'Corrosive Fog':   {type:'Acid',        area:'15-ft cone', save:'CON', dmg:'1d6 acid',          effect:'Fog persists 1 minute (lightly obscured). Creatures in fog take 1d4 acid at start of their turn.'},
+  'Sleep Mist':      {type:'Psychic',     area:'15-ft cone', save:'WIS', dmg:'—',                 effect:'Creatures under 3× caster level HP: WIS save or fall Unconscious (1 min or until damaged).'},
+  'Fear Shriek':     {type:'Psychic',     area:'20-ft cone', save:'WIS', dmg:'—',                 effect:'All creatures: WIS save or Frightened of the Drakonian for 1 minute. Repeatable save each turn.'},
+  'Iron Spray':      {type:'Piercing',    area:'30-ft line', save:'DEX', dmg:'2d6 piercing',      effect:'Magnetic: armored targets have disadvantage on DEX saves for 1 round.'},
+  'Seismic Shout':   {type:'Thunder',     area:'30-ft cone', save:'CON', dmg:'1d8 thunder',       effect:'Structures in area take 2d10 damage automatically. Ground becomes difficult terrain.'},
+  'Blood Mist':      {type:'Necrotic',    area:'15-ft cone', save:'CON', dmg:'2d6 necrotic',      effect:'Caster regains HP equal to half damage dealt (max 10 HP per use).'},
+  'Abyssal Exhale':  {type:'Necrotic+Chaos', area:'15-ft cone', save:'CON', dmg:'1d6 necrotic + 1d6 force', effect:'Corruption presence in area +1 for 1 hour. Caster gains 1 Corruption.'},
+};
+
+function getDrakonianBreath(){ const el=document.getElementById('drakonianBreath'); return el?(el.value||''):''; }
+function onBreathTypeChange(){ updateRaceInfoPanel(); saveAll(); }
+
+// Get lineage data for current Beastkin character
+function getBeastkinLineage(){
+  const el = document.getElementById('beastkinLineage');
+  return el ? (el.value || '') : (window._state_beastkinLineage || '');
+}
+
+function onLineageChange(){
+  const lineage = getBeastkinLineage();
+  const data = BEASTKIN_LINEAGES[lineage];
+  if(data){
+    // Apply lineage stats
+    ABILITIES.forEach(ab=>{
+      const el=document.getElementById('ab_'+ab);
+      if(el) el.value=data.stats[ab];
+    });
+    const hitDieEl=document.getElementById('hitDie');
+    if(hitDieEl) hitDieEl.value=data.hitDie;
+    if(!document.getElementById('hpMax').value||document.getElementById('hpMax').value==='8'){
+      document.getElementById('hpMax').value=data.baseHP;
+      document.getElementById('hpCur').value=data.baseHP;
+    }
+    // Update biomes to lineage-specific list
+    const biomeEl=document.getElementById('charBiome');
+    biomeEl.innerHTML='<option value="">— Select —</option>';
+    data.biomes.forEach(b=>{
+      const o=document.createElement('option');
+      o.value=b; o.textContent=b;
+      biomeEl.appendChild(o);
+    });
+    if(data.biomes.length===1) biomeEl.value=data.biomes[0];
+  }
+  buildRacialSkillsDisplay();
+  updateRaceInfoPanel();
+  updateRacialTraitsDisplay();
+  saveAll();
+}
 
 const BIOMES = {
   'Human':['Plains / Grassland','Urban / Civilized','Coastal / Maritime','Arid / Desert','Mountain / Highland','Forest / Woodland','Dead Lands / Corrupted','Arctic / Tundra'],
@@ -12728,6 +13035,8 @@ function saveAll(){
   state.level = parseInt(document.getElementById('charLevel').value)||1;
   state.bg = document.getElementById('charBG').value||'';
   state.biome = document.getElementById('charBiome').value||'';
+  state.beastkinLineage = document.getElementById('beastkinLineage')?.value||'';
+  state.drakonianBreath = document.getElementById('drakonianBreath')?.value||'';
   state.arc = document.getElementById('charArc').value||'';
   state.xp = parseInt(document.getElementById('charXP').value)||0;
   state.origin = document.getElementById('charOrigin')?.value||'';
@@ -13419,6 +13728,20 @@ function updateArmorAC(){
 // ═══════════════════════════════════════════════════
 function onRaceChange(){
   const race=document.getElementById('charRace').value;
+  // Show/hide Beastkin lineage selector
+  const lineageRow=document.getElementById('beastkinLineageRow');
+  if(lineageRow) lineageRow.style.display=(race==='Beastkin')?'block':'none';
+  if(race!=='Beastkin'){
+    const lineageSel=document.getElementById('beastkinLineage');
+    if(lineageSel) lineageSel.value='';
+  }
+  // Show/hide Drakonian breath type selector
+  const breathRow=document.getElementById('drakonianBreathRow');
+  if(breathRow) breathRow.style.display=(race==='Drakonian')?'block':'none';
+  if(race!=='Drakonian'){
+    const breathSel=document.getElementById('drakonianBreath');
+    if(breathSel) breathSel.value='';
+  }
   const biomeEl=document.getElementById('charBiome');
   biomeEl.innerHTML='<option value="">— Select —</option>';
   if(BIOMES[race]){
@@ -13509,10 +13832,10 @@ function adjTracker(type,delta){
 
 const EP_CONDITIONS = [
   {min:0,max:0,label:'No Effect',desc:'No exhaustion. The body and resonance channels are operating normally.'},
-  {min:1,max:2,label:'Fatigued',desc:'Disadvantage on all ability checks. The body is straining but still functional.'},
-  {min:3,max:3,label:'Debilitated',desc:'Unconscious at end of turn — must be stabilized. Deep Rest required before continuing.'},
-  {min:4,max:4,label:'Critical Strain',desc:'Forced 12-hour Deep Rest before any Resonance casting. Take 2d6 physical damage.'},
-  {min:5,max:5,label:'Fatal Overreach',desc:'Immediate Deep Rest required. Each EP above 5: take 4d6 damage. Permanent damage risk without treatment.'},
+  {min:1,max:2,label:'Fatigued',desc:'Disadvantage on all skill checks. The body is straining but still functional. (Recovery Rest removes 1 EP.)'},
+  {min:3,max:3,label:'Unconscious',desc:'Unconscious — must be stabilized. Cannot benefit from standard rest until stabilized.'},
+  {min:4,max:4,label:'Critical Strain',desc:'Requires a 12-hour Deep Rest before any further Resonance casting is possible.'},
+  {min:5,max:5,label:'Critical Danger',desc:'Critical danger. Without treatment, permanent damage risk. Seek immediate medical or magical intervention.'},
 ];
 
 function getEpCondition(ep){
@@ -13530,10 +13853,10 @@ function buildDeathSaveBlips(){
     const slot = hist[i];
     if(slot === 'pass'){
       p.className = 'ds-blip pass';
-      p.title = 'Pass (roll 11–20)';
+      p.title = 'Pass (roll 10+)';
     } else if(slot === 'fail'){
       p.className = 'ds-blip fail';
-      p.title = 'Fail (roll 1–10)';
+      p.title = 'Fail (roll 9 or lower)';
     } else {
       p.className = 'ds-blip empty';
       p.title = 'No roll yet — use Roll · Death saving throw';
@@ -13583,7 +13906,7 @@ function buildScarTiers(){
   if(!c)return;
   c.innerHTML='';
   const labels=[
-    {t:'I',  tip:'Tier I — Instability 1–3: cosmetic mark, narrative scar'},
+    {t:'I',  tip:'Tier I — Instability 1–4: cosmetic mark, narrative scar'},
     {t:'II', tip:'Tier II — Instability 4–7: minor gameplay effect'},
     {t:'III',tip:'Tier III — Corruption 1–4: major mutation or drawback'},
     {t:'IV', tip:'Tier IV — Corruption 5–7+: catastrophic transformation risk'},
@@ -13866,25 +14189,60 @@ function updateRaceInfoPanel(){
   const panel=document.getElementById('raceInfoPanel');
   if(!race||!RACES[race]){panel.innerHTML='';return;}
   const r=RACES[race];
+  // For Beastkin, overlay lineage-specific data when a lineage is chosen
+  const lineage = (race==='Beastkin') ? getBeastkinLineage() : '';
+  const ld = (lineage && BEASTKIN_LINEAGES[lineage]) ? BEASTKIN_LINEAGES[lineage] : null;
+  const displayStats = ld ? ld.stats : r.stats;
+  const displayHitDie = ld ? ld.hitDie : r.hitDie;
+  const displayBaseHP = ld ? ld.baseHP : r.baseHP;
+  const displaySpeed = ld ? ld.speed : r.speed;
+  const displayASI = ld ? ld.asi : r.asi;
+  const displayTraits = ld ? ld.traits : r.traits;
+  const headerName = ld ? `Beastkin — ${lineage} (${ld.thrael})` : race;
+  const extraSpeeds = ld ? [
+    ld.swimSpeed ? `Swim: <strong style="color:var(--gold)">${ld.swimSpeed} ft.</strong>` : '',
+    ld.climbSpeed ? `Climb: <strong style="color:var(--gold)">${ld.climbSpeed} ft.</strong>` : '',
+    ld.burrowSpeed ? `Burrow: <strong style="color:var(--gold)">${ld.burrowSpeed} ft.</strong>` : '',
+    ld.darkvision ? `Darkvision: <strong style="color:var(--gold)">${ld.darkvision} ft.</strong>` : '',
+  ].filter(Boolean) : [];
   panel.innerHTML=`
-    <div class="sec-hdr">Racial Reference — ${race}</div>
+    <div class="sec-hdr">Racial Reference — ${headerName}</div>
     <div class="race-info-card">
-      <div class="ri-name">${race}</div>
+      <div class="ri-name">${headerName}</div>
+      ${ld ? `<div style="font-family:'EB Garamond',serif;font-size:11px;font-style:italic;color:var(--muted);margin-bottom:8px;">Essence: ${ld.essence}</div>` : ''}
       <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:var(--txt-dim);margin-bottom:4px;">BASELINE STATS</div>
       <div class="ri-stats">
-        ${ABILITIES.map(ab=>`<div class="ri-stat"><div class="ri-stat-n">${ab}</div><div class="ri-stat-v">${r.stats[ab]}</div></div>`).join('')}
+        ${ABILITIES.map(ab=>`<div class="ri-stat"><div class="ri-stat-n">${ab}</div><div class="ri-stat-v">${displayStats[ab]}</div></div>`).join('')}
       </div>
       <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:var(--txt-dim);margin-bottom:4px;">ASI</div>
-      <div class="ri-asi">${r.asi}</div>
-      <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:var(--txt-dim);margin:8px 0 4px;">RACIAL TRAITS</div>
-      <ul class="ri-traits">${r.traits.map(t=>`<li>${t}</li>`).join('')}</ul>
+      <div class="ri-asi">${displayASI}</div>
+      ${ld ? `<div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:var(--txt-dim);margin:8px 0 4px;">NATURAL WEAPON</div><div class="ri-asi">${ld.naturalWeapon}</div><div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:var(--txt-dim);margin:4px 0 4px;">NATURAL AC</div><div class="ri-asi">${ld.naturalAC}</div><div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:var(--txt-dim);margin:4px 0 4px;">PRIMARY / SECONDARY SIGIL</div><div class="ri-asi">${ld.primarySigil} / ${ld.secondarySigil}</div>` : ''}
+      <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:var(--txt-dim);margin:8px 0 4px;">${ld ? 'LINEAGE TRAITS' : 'RACIAL TRAITS'}</div>
+      <ul class="ri-traits">${displayTraits.map(t=>`<li>${t}</li>`).join('')}</ul>
       <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:var(--txt-dim);margin:8px 0 4px;">LANGUAGES</div>
       <ul class="ri-traits">${r.langs.map(l=>`<li>${l}</li>`).join('')}</ul>
       <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">
-        <span>Hit Die: <strong style="color:var(--gold)">${r.hitDie}</strong></span>
-        <span>Base HP (Standard): <strong style="color:var(--gold)">${r.baseHP}+CON</strong></span>
-        <span>Speed: <strong style="color:var(--gold)">${r.speed} ft.</strong></span>
+        <span>Hit Die: <strong style="color:var(--gold)">${displayHitDie}</strong></span>
+        <span>Base HP (Standard): <strong style="color:var(--gold)">${displayBaseHP}+CON</strong></span>
+        <span>Speed: <strong style="color:var(--gold)">${displaySpeed} ft.</strong></span>
+        ${extraSpeeds.map(s=>`<span>${s}</span>`).join('')}
       </div>
+      ${(()=>{
+        if(race!=='Drakonian') return '';
+        const bt = getDrakonianBreath();
+        const bd = bt ? DRAKONIAN_BREATH_TYPES[bt] : null;
+        if(!bt) return `<div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:var(--txt-dim);margin:8px 0 4px;">DRACONIC BREATH</div><div style="font-size:11px;color:var(--muted);font-style:italic;padding:6px 8px;background:var(--bg2);border-radius:4px;">Select a Breath Type above to see its details. (30 options available)</div>`;
+        return `<div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1px;color:var(--txt-dim);margin:8px 0 4px;">DRACONIC BREATH — ${bt}</div>
+        <div style="background:var(--bg2);border-radius:4px;border-left:2px solid var(--gold);padding:7px 9px;font-family:'EB Garamond',serif;font-size:12px;">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:5px;">
+            <span style="color:var(--txt-dim)">Type: <strong style="color:var(--gold)">${bd.type}</strong></span>
+            <span style="color:var(--txt-dim)">Area: <strong style="color:var(--gold)">${bd.area}</strong></span>
+            <span style="color:var(--txt-dim)">Save: <strong style="color:var(--gold)">${bd.save}</strong></span>
+            <span style="color:var(--txt-dim)">Damage: <strong style="color:var(--res)">${bd.dmg} (L1) · ×2 L6 · ×3 L11 · ×4 L17</strong></span>
+          </div>
+          <div style="color:var(--txt-dim);font-style:italic;">${bd.effect}</div>
+        </div>`;
+      })()}
       <div class="alas-heavy-card" style="margin-top:12px;">
         <div class="alas-heavy-lbl">⚔ Alas Heavy — ${race}</div>
         <div class="alas-heavy-grid">
@@ -14319,7 +14677,7 @@ function addSpell(data){
   const aeStats  = (()=>{ try{ return data.aeStats?JSON.parse(data.aeStats):{} }catch(e){return{}} })();
   const durType  = data.durType || 'Instant';
   const conditions = (data.conditions||'').split(',').filter(Boolean);
-  const CONDS = ['Stunned','Blinded','Frightened','Restrained','Poisoned','Paralyzed','Prone','Charmed','Incapacitated','Burning','Exhausted','Petrified'];
+  const CONDS = ['Stunned','Blinded','Frightened','Restrained','Poisoned','Paralyzed','Prone','Charmed','Incapacitated','Burning','Exhausted','Petrified','Frozen','Silenced','Deafened','Grappled','Invisible','Unconscious','Concentrating'];
   const condPills = CONDS.map(c=>`<button type="button" class="sp-pill sp-cond-grp${conditions.includes(c)?' sp-cond-on':''}" onclick="this.classList.toggle('sp-cond-on');spellSetAttr(this.closest('.item-card'),'conditions',[...this.closest('.sp-pill-row').querySelectorAll('.sp-cond-on')].map(b=>b.textContent).join(','))">${c}</button>`).join('');
   const spentAttr = data.dailySpent ? '1' : '0';
 
@@ -16632,11 +16990,84 @@ function buildLoreTab(){
     html += `</div>`;
   }
 
-  if(empty){
-    panel.innerHTML = '<div class="lore-empty">Select a Race, Class, or Background to load lore. Each selection adds a new section — race history, class identity, and background narrative will all appear here.</div>';
-  } else {
-    panel.innerHTML = html;
-  }
+  // Rules Quick Reference — always shown
+  html += `
+  <div class="lore-section" style="margin-top:${empty?'0':'10px'}">
+    <div class="lore-race-banner" style="border-color:rgba(150,100,220,.4);">
+      <div class="lore-race-name" style="color:var(--muted);font-size:13px;">Rules Quick Reference</div>
+      <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:var(--txt-dim);text-transform:uppercase;">Alas PHB Reference</div>
+    </div>
+
+    <div class="lore-category">Encounter Weights</div>
+    <div class="lore-body">
+      <table style="width:100%;border-collapse:collapse;font-family:'EB Garamond',serif;font-size:12px;">
+        <thead><tr style="color:var(--gold);font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;">
+          <th style="text-align:left;padding:3px 6px;border-bottom:1px solid var(--bdr-g);">Tier</th>
+          <th style="text-align:left;padding:3px 6px;border-bottom:1px solid var(--bdr-g);">Duration</th>
+          <th style="text-align:left;padding:3px 6px;border-bottom:1px solid var(--bdr-g);">Resonance Drain</th>
+          <th style="text-align:left;padding:3px 6px;border-bottom:1px solid var(--bdr-g);">Character</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:3px 6px;color:var(--res);">Skirmish</td><td style="padding:3px 6px;">2–3 rounds</td><td style="padding:3px 6px;">0–2 pts</td><td style="padding:3px 6px;color:var(--txt-dim);">Quick, focused, single objective.</td></tr>
+          <tr style="background:var(--bg2)"><td style="padding:3px 6px;color:var(--res);">Standard</td><td style="padding:3px 6px;">3–5 rounds</td><td style="padding:3px 6px;">2–5 pts</td><td style="padding:3px 6px;color:var(--txt-dim);">Core encounter type. Clear stakes.</td></tr>
+          <tr><td style="padding:3px 6px;color:var(--res);">Crucible</td><td style="padding:3px 6px;">5–8 rounds</td><td style="padding:3px 6px;">5–10 pts</td><td style="padding:3px 6px;color:var(--txt-dim);">Multi-phase or high-consequence.</td></tr>
+          <tr style="background:var(--bg2)"><td style="padding:3px 6px;color:var(--res);">Crisis</td><td style="padding:3px 6px;">8–12 rounds</td><td style="padding:3px 6px;">10–20 pts</td><td style="padding:3px 6px;color:var(--txt-dim);">Narrative weight. No clean resolution.</td></tr>
+          <tr><td style="padding:3px 6px;color:#c82030;">Worldscar</td><td style="padding:3px 6px;">12+ rounds</td><td style="padding:3px 6px;color:#c82030;">Overflow risk</td><td style="padding:3px 6px;color:var(--txt-dim);">Campaign-altering. The world is different after this.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="lore-category">Rest Types</div>
+    <div class="lore-body">
+      <table style="width:100%;border-collapse:collapse;font-family:'EB Garamond',serif;font-size:12px;">
+        <thead><tr style="color:var(--gold);font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;">
+          <th style="text-align:left;padding:3px 6px;border-bottom:1px solid var(--bdr-g);">Rest Type</th>
+          <th style="text-align:left;padding:3px 6px;border-bottom:1px solid var(--bdr-g);">Duration</th>
+          <th style="text-align:left;padding:3px 6px;border-bottom:1px solid var(--bdr-g);">Effect</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:3px 6px;color:var(--res);">Resonance Rest</td><td style="padding:3px 6px;">1 hour</td><td style="padding:3px 6px;color:var(--txt-dim);">Resets Instability only. HP, Corruption, and Scar Load unaffected.</td></tr>
+          <tr style="background:var(--bg2)"><td style="padding:3px 6px;color:var(--res);">Recovery Rest</td><td style="padding:3px 6px;">4 hours</td><td style="padding:3px 6px;color:var(--txt-dim);">Restores half Resonance Pool. Removes 1 Exhaustion Point. No HP recovery.</td></tr>
+          <tr><td style="padding:3px 6px;color:var(--res);">Deep Rest</td><td style="padding:3px 6px;">8 hours</td><td style="padding:3px 6px;color:var(--txt-dim);">Full Resonance Pool restore. Full HP recovery. Exhaustion −2.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="lore-category">Exhaustion Points</div>
+    <div class="lore-body">
+      <table style="width:100%;border-collapse:collapse;font-family:'EB Garamond',serif;font-size:12px;">
+        <thead><tr style="color:var(--gold);font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;">
+          <th style="text-align:left;padding:3px 6px;border-bottom:1px solid var(--bdr-g);">Points</th>
+          <th style="text-align:left;padding:3px 6px;border-bottom:1px solid var(--bdr-g);">Effect</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:3px 6px;color:var(--res);">1–2</td><td style="padding:3px 6px;color:var(--txt-dim);">Disadvantage on skill checks.</td></tr>
+          <tr style="background:var(--bg2)"><td style="padding:3px 6px;color:#d06020;">3+</td><td style="padding:3px 6px;color:var(--txt-dim);">Unconscious. Must be stabilized.</td></tr>
+          <tr><td style="padding:3px 6px;color:#c82030;">4+</td><td style="padding:3px 6px;color:var(--txt-dim);">Requires 12-hour Deep Rest before further Resonance casting.</td></tr>
+          <tr style="background:var(--bg2)"><td style="padding:3px 6px;color:#9030c0;">5+</td><td style="padding:3px 6px;color:var(--txt-dim);">Critical danger. Without treatment, permanent damage risk.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="lore-category">Death Saving Throws</div>
+    <div class="lore-body">
+      <table style="width:100%;border-collapse:collapse;font-family:'EB Garamond',serif;font-size:12px;">
+        <thead><tr style="color:var(--gold);font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;">
+          <th style="text-align:left;padding:3px 6px;border-bottom:1px solid var(--bdr-g);">Roll</th>
+          <th style="text-align:left;padding:3px 6px;border-bottom:1px solid var(--bdr-g);">Effect</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="padding:3px 6px;color:var(--res);">10+</td><td style="padding:3px 6px;color:var(--txt-dim);">1 success. Three successes = stable (unconscious).</td></tr>
+          <tr style="background:var(--bg2)"><td style="padding:3px 6px;color:#c82030;">9 or lower</td><td style="padding:3px 6px;color:var(--txt-dim);">1 failure. Three failures = death.</td></tr>
+          <tr><td style="padding:3px 6px;color:var(--gold);">Natural 20</td><td style="padding:3px 6px;color:var(--txt-dim);">Regain 1 HP immediately. Dying state ends.</td></tr>
+          <tr style="background:var(--bg2)"><td style="padding:3px 6px;color:#9030c0;">Natural 1</td><td style="padding:3px 6px;color:var(--txt-dim);">Counts as 2 failures.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+
+  panel.innerHTML = html;
+  if(empty) panel.innerHTML = '<div class="lore-empty">Select a Race, Class, or Background to load lore. Each selection adds a new section — race history, class identity, and background narrative will all appear here.</div>' + html;
 }
 
 // ═══════════════════════════════════════════════════
@@ -17521,8 +17952,7 @@ const RACIAL_SKILLS = {
     {name:'Archive Mind',type:'Passive',stat:'INT / History',desc:'Your memory is functionally perfect for factual information. You never forget a text you have read, a map you have studied, or a clearly-heard conversation. For purposes of historical, arcane, or geographical knowledge, you may always recall relevant details without a check. The Keeper may still rule that the information was never available to you — only that you remember everything you have encountered.',mechanics:'Perfect factual recall. No check for known historical, arcane, or geographic information. Keeper determines availability, not recall.'},
   ],
   'Dunesong Elf': [
-    {name:'Sandstrider',type:'Passive',stat:'DEX / Stealth',desc:'You ignore difficult terrain caused by sand, loose earth, or dunes. You gain a +2 bonus to Stealth checks while in desert, oasis, or beach environments. You do not leave tracks in sand unless you choose to. Your movement through arid terrain costs no additional effort and your footfall is nearly silent on loose ground.',mechanics:'+2 Stealth in arid terrain. Ignore sand/loose earth difficult terrain. No tracks in sand.'},
-    {name:'Heat-Bound Physiology',type:'Passive',stat:'CON',desc:'Your body is adapted to extreme heat. You have resistance to environmental heat damage and advantage on saving throws against exhaustion caused by heat exposure. You require only half the normal water intake to avoid dehydration. Extended exposure to cold environments imposes disadvantage on CON saves at the Keeper\'s discretion.',mechanics:'Heat dmg resistance. ADV vs heat exhaustion. Half water requirement.'},
+    {name:'Desert Stride',type:'Passive',stat:'DEX / Stealth',desc:'You ignore difficult terrain caused by sand, loose earth, dust, or dunes. You gain a +2 bonus to Stealth checks while in desert, oasis, or beach environments. You do not leave tracks in sand unless you choose to. You are immune to the effects of natural extreme heat. Your movement through arid terrain costs no additional effort and your footfall is nearly silent on loose ground.',mechanics:'+2 Stealth in arid terrain. Ignore sand/arid difficult terrain. No tracks in sand. Immune to natural extreme heat.'},
     {name:'Dunesong Agility',type:'Passive',stat:'DEX',desc:'Your movement flows like shifting sand. When you take the Dash action, you may ignore opportunity attacks until the end of your turn. Once per turn, you may move through a creature\'s space if it is your size or larger. You cannot end your turn in an occupied space.',mechanics:'Dash: ignore opportunity attacks. Move through same-or-larger creature\'s space 1/turn. Cannot end turn in occupied space.'},
     {name:'Geraki Bond',type:'Active — Rite Required',stat:'WIS',desc:'After completing the Rite of First Descent, you form a lifelong bond with a Geraki — an apex falcon of the Alasian Desert. Your Geraki is not a pet. It is a partner. It obeys your intentions through mutual understanding rather than commands. It fights independently, acts on its own judgment, can carry small objects, and communicates through posture and flight behavior. If your Geraki dies, you may not bond another for at least one year.',mechanics:'Desert Falcon companion (Rite of First Descent required). Acts independently. CR varies by breed. 1-year bond cooldown on death.'},
     {name:'Resonance Navigator',type:'Passive',stat:'WIS',desc:'You can sense the presence of a Karanthian Vein — a buried crystal conduit of raw magical energy — within 5 miles of your current location. You know its approximate direction but not its depth or stability. This sense does not function in areas of severe Corruption at Tier III or higher.',mechanics:'Detect Karanthian Vein within 5 mi. Direction only. Fails in Corruption Tier III+.'},
@@ -17564,7 +17994,7 @@ const RACIAL_SKILLS = {
     {name:'Gem Resonance',type:'Passive',stat:'INT / WIS',desc:'You can detect the presence of Sigil Gems within 30 ft., sensing their type and approximate power level without sight or touch. If you attune to a Gem that matches your Bloodline Sigil, your Resonance Pool maximum increases by 3 for as long as you remain attuned. Attuning to a mismatched Gem grants no Pool bonus and costs 2 Instability at the moment of attunement.',mechanics:'Detect Sigil Gems within 30 ft. +3 Resonance Pool max if Bloodline-matched gem attuned. Mismatched attunement: +2 Instability.'},
     {name:'Draconic Fortitude',type:'Passive / Reaction',stat:'CON',desc:'You have advantage on saving throws against the Frightened condition. Additionally, when you are reduced to 0 hit points, you may make a DC 12 CON Save. On a success, you drop to 1 hit point instead. Dragon blood does not break easily. It refuses. This ability refreshes on Deep Rest.',mechanics:'ADV vs. Frightened saves. CON Save DC 12 at 0 HP → 1 HP instead. 1/Deep Rest.'},
     {name:'Natural Armor',type:'Passive',stat:'STR',desc:'Your draconic scales provide a base Armor Class of 14 + your STR modifier. Compare this value to any armor you are wearing and use whichever is higher. You may still benefit from shields regardless of which AC calculation applies. This AC does not stack with other base-AC calculation effects, though it stacks fully with shields.',mechanics:'AC = 14 + STR mod. Use if higher than worn armor. Shields still apply. Does not stack with other base-AC calculations.'},
-    {name:'Draconic Breath',type:'Active — 1/Short Rest',stat:'CON (Save DC)',desc:'Choose one Draconic Breath type at character creation from the 30 available types. As an action, exhale your breath weapon in a 15 ft. cone or 30 ft. line — chosen at creation. Creatures in the area make a CON Save (DC = 8 + CON mod + Proficiency Bonus) or take 2d6 damage of your chosen type, half on success. Scales at Level 6 to 3d6, Level 11 to 4d6, and Level 17 to 5d6. Refreshes on Short Rest.',mechanics:'Action: 15 ft. cone or 30 ft. line. CON Save DC 8+CON+Prof or 2d6 (half on success). Scales L6 (3d6), L11 (4d6), L17 (5d6). 1/Short Rest.'},
+    {name:'Draconic Breath',type:'Active — 1/Short Rest',stat:'CON (Save DC)',desc:'Choose one Draconic Breath type at character creation from the 30 available types. As an action, exhale your breath weapon in a 15 ft. cone or 30 ft. line — chosen at creation. Creatures in the area make a CON Save (DC = 8 + CON mod + Proficiency Bonus) or take damage of your chosen type, half on success. At Level 10, during a Deep Rest after a significant draconic resonance event, you may learn a second breath type (shares the same uses-per-rest pool). Refreshes on Short Rest.',mechanics:'Action: 15 ft. cone or 30 ft. line. CON Save DC 8+CON+Prof. Damage: 2d6 (L1), 4d6 (L6), 6d6 (L11), 8d6 (L17). Half on success. 1/Short Rest. 2nd breath type at L10.'},
   ],
   'Goliath': [
     {name:'Powerful Build',type:'Passive',stat:'STR',desc:'You count as one size larger for all purposes of determining carry weight, push capacity, drag capacity, and lift capacity. You may also wield weapons with the Heavy property without disadvantage, regardless of your actual size. Other creatures cannot impede your movement by occupying your space unless they are also Large or larger.',mechanics:'Count as Large for carry/push/drag/lift. Wield Heavy weapons without DIS. Small/Medium creatures cannot block your movement.'},
@@ -17585,6 +18015,50 @@ function buildRacialSkillsDisplay(){
     panel.innerHTML='<div class="racial-skills-empty">Select a Race in the sidebar to load your Racial Skills.</div>';
     return;
   }
+
+  // Beastkin: merge lineage-specific traits with universal traits
+  if(race === 'Beastkin'){
+    const lineage = getBeastkinLineage();
+    const ld = lineage ? BEASTKIN_LINEAGES[lineage] : null;
+    const header = ld ? `Racial Skills — Beastkin · ${lineage} (${ld.thrael})` : 'Racial Skills — Beastkin';
+    let html = `<div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:14px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--bdr-g);">${header}</div>`;
+    if(!ld){
+      html += `<div style="font-size:11px;color:var(--muted);margin-bottom:12px;padding:8px;background:var(--bg2);border-radius:4px;">Select a Lineage above to see your lineage-specific traits.</div>`;
+    } else {
+      html += `<div style="font-size:10px;color:var(--muted);font-style:italic;margin-bottom:10px;padding:6px 8px;background:var(--bg2);border-radius:4px;border-left:2px solid var(--gold);">Essence: ${ld.essence}</div>`;
+      html += `<div style="font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:8px;">Lineage Traits — ${lineage}</div>`;
+      ld.traits.forEach(t => {
+        const m = t.match(/^([^(]+)\((.+)\)$/s);
+        const tname = m ? m[1].trim() : t;
+        const details = m ? m[2].trim() : '';
+        html += `<div class="racial-skill-card">
+          <div class="rsk-header">
+            <span class="rsk-name">${tname}</span>
+            <span class="rsk-type rsk-passive">Lineage Trait</span>
+            <span class="rsk-stat">${lineage}</span>
+          </div>
+          ${details ? `<div class="rsk-mechanic">⚙ ${details}</div>` : ''}
+        </div>`;
+      });
+      html += `<div style="font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin:14px 0 8px;padding-top:10px;border-top:1px solid var(--bdr-g);">Universal Beastkin Traits</div>`;
+    }
+    // Universal traits: skip the generic "Lineage Trait" placeholder (index 0) when a real lineage is loaded
+    RACIAL_SKILLS['Beastkin'].slice(ld ? 1 : 0).forEach(sk => {
+      const typeClass = sk.type.startsWith('Passive') ? 'rsk-passive' : sk.type.startsWith('Reaction') ? 'rsk-reaction' : 'rsk-active';
+      html += `<div class="racial-skill-card">
+        <div class="rsk-header">
+          <span class="rsk-name">${sk.name}</span>
+          <span class="rsk-type ${typeClass}">${sk.type}</span>
+          <span class="rsk-stat">${sk.stat}</span>
+        </div>
+        <div class="rsk-desc">${sk.desc}</div>
+        <div class="rsk-mechanic">⚙ ${sk.mechanics}</div>
+      </div>`;
+    });
+    panel.innerHTML = html;
+    return;
+  }
+
   const skills = RACIAL_SKILLS[race];
   let html = `<div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:14px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--bdr-g);">Racial Skills — ${race}</div>`;
   skills.forEach(sk => {
@@ -20557,7 +21031,7 @@ var _2d = {
   curSigil: 0,
   rollToastTimer: null,
   _raf: null,
-  CONDITIONS: ['Stunned','Blinded','Frightened','Poisoned','Paralyzed','Charmed','Prone','Invisible','Restrained','Exhausted'],
+  CONDITIONS: ['Stunned','Blinded','Frightened','Poisoned','Paralyzed','Charmed','Prone','Invisible','Restrained','Exhausted','Burning','Frozen','Silenced','Deafened','Grappled','Unconscious','Petrified','Incapacitated'],
 };
 
 function init2DVTTv2() {
@@ -24424,6 +24898,16 @@ function restoreSimpleInputs(){
   // Restore alternate movement speeds
   ['swimSpeed','flySpeed','climbSpeed','burrowSpeed'].forEach(id=>{const el=document.getElementById(id);if(el&&state[id]!==undefined)el.value=state[id];});
   const asSel = document.getElementById('attunedSigil'); if(asSel){ asSel.value = state.attunedSigil||''; renderAttunedSigilPanel(state.attunedSigil||''); }
+  // Restore Beastkin lineage selector
+  const blSel = document.getElementById('beastkinLineage');
+  if(blSel && state.beastkinLineage) blSel.value = state.beastkinLineage;
+  const blRow = document.getElementById('beastkinLineageRow');
+  if(blRow) blRow.style.display = (state.race === 'Beastkin') ? 'block' : 'none';
+  // Restore Drakonian breath type selector
+  const dbSel = document.getElementById('drakonianBreath');
+  if(dbSel && state.drakonianBreath) dbSel.value = state.drakonianBreath;
+  const dbRow = document.getElementById('drakonianBreathRow');
+  if(dbRow) dbRow.style.display = (state.race === 'Drakonian') ? 'block' : 'none';
 }
 
 // window load handler moved to DOMContentLoaded restructure above
@@ -24524,6 +25008,16 @@ function loadCharacterFile(input){
         BIOMES[race].forEach(b=>{const o=document.createElement('option');o.value=b;o.textContent=b;biomeEl.appendChild(o);});
         if(state.biome)biomeEl.value=state.biome;
       }
+      // Restore Beastkin lineage on file load
+      const _blRow=document.getElementById('beastkinLineageRow');
+      const _blSel=document.getElementById('beastkinLineage');
+      if(_blRow) _blRow.style.display=(race==='Beastkin')?'block':'none';
+      if(_blSel&&state.beastkinLineage) _blSel.value=state.beastkinLineage;
+      // Restore Drakonian breath type on file load
+      const _dbRow=document.getElementById('drakonianBreathRow');
+      const _dbSel=document.getElementById('drakonianBreath');
+      if(_dbRow) _dbRow.style.display=(race==='Drakonian')?'block':'none';
+      if(_dbSel&&state.drakonianBreath) _dbSel.value=state.drakonianBreath;
       document.getElementById('insVal').textContent=state.instability||0;
       document.getElementById('insState').textContent=getTrackerState(state.instability||0,INS_STATES);
       document.getElementById('corVal').textContent=state.corruption||0;
