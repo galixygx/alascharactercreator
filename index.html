@@ -8693,6 +8693,327 @@
             50%     { text-shadow: 0 0 30px rgba(201,162,39,.78), 0 0 60px rgba(232,197,71,.28); }
         }
         .alas-title { animation: alasTitlePulse 3.5s ease-in-out infinite; }
+
+        /* ═══════════════════════════════════════════════════════════
+           V4.6 — 15 IMMERSION FEATURES
+           ═══════════════════════════════════════════════════════════ */
+
+        /* ── 1. Character Portrait Circle ───────────────────────── */
+        .char-portrait-wrap { display:flex; justify-content:center; margin:8px 0 4px; }
+        .char-portrait-ring {
+            position:relative; width:68px; height:68px; border-radius:50%;
+            border:2px solid var(--gold-d); background:rgba(201,162,39,.06);
+            box-shadow:0 0 14px rgba(201,162,39,.22),inset 0 0 12px rgba(0,0,0,.5);
+            cursor:pointer; overflow:hidden;
+            display:flex; align-items:center; justify-content:center;
+            transition:border-color .25s,box-shadow .25s;
+        }
+        .char-portrait-ring:hover { border-color:var(--gold); box-shadow:0 0 22px rgba(201,162,39,.45); }
+        .char-portrait-ring img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+        .char-portrait-placeholder { font-size:26px; opacity:.5; user-select:none; pointer-events:none; }
+        .char-portrait-input { display:none; }
+
+        /* ── 2. Character Motto ─────────────────────────────────── */
+        .char-motto-wrap { margin:3px 0 6px; }
+        .char-motto {
+            width:100%; background:transparent; border:none;
+            border-bottom:1px solid rgba(201,162,39,.18);
+            color:rgba(201,162,39,.72); font-family:'EB Garamond',serif;
+            font-style:italic; font-size:10px; letter-spacing:.5px;
+            text-align:center; padding:2px 6px; outline:none;
+            box-sizing:border-box; transition:border-color .2s,color .2s;
+        }
+        .char-motto::placeholder { color:rgba(201,162,39,.28); }
+        .char-motto:focus { border-bottom-color:rgba(201,162,39,.55); color:rgba(201,162,39,.9); }
+
+        /* ── 3. Random Name Button ──────────────────────────────── */
+        .name-inp-wrap { position:relative; }
+        .random-name-btn {
+            position:absolute; right:0; top:50%; transform:translateY(-50%);
+            background:transparent; border:1px solid rgba(201,162,39,.22);
+            color:rgba(201,162,39,.5); font-size:12px; padding:1px 5px;
+            border-radius:3px; cursor:pointer; line-height:1;
+            transition:all .15s;
+        }
+        .random-name-btn:hover { border-color:var(--gold); color:var(--gold); }
+
+        /* ── 4. XP Progress Bar ─────────────────────────────────── */
+        .xp-progress-wrap { margin-top:4px; }
+        .xp-bar-track { height:3px; background:rgba(255,255,255,.06); border-radius:2px; overflow:hidden; }
+        .xp-bar-fill {
+            height:100%;
+            background:linear-gradient(90deg,rgba(201,162,39,.5),rgba(232,197,71,.85));
+            border-radius:2px; width:0%;
+            transition:width .5s cubic-bezier(.4,0,.2,1);
+        }
+        .xp-bar-label {
+            font-family:'Cinzel',serif; font-size:6px; letter-spacing:1px;
+            color:rgba(201,162,39,.45); text-align:right; margin-top:1px;
+        }
+
+        /* ── 5. Session Start Ritual ────────────────────────────── */
+        #sessionRitualOverlay {
+            position:fixed; inset:0; z-index:9990;
+            background:radial-gradient(ellipse at center,#08081a 0%,#000 100%);
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            opacity:0; pointer-events:none; transition:opacity .4s ease;
+        }
+        #sessionRitualOverlay.show { opacity:1; pointer-events:all; }
+        @keyframes sessionRise { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+        .session-ritual-title {
+            font-family:'Cinzel Decorative',serif; font-size:clamp(20px,4vw,38px);
+            color:var(--gold); letter-spacing:5px;
+            text-shadow:0 0 30px rgba(201,162,39,.6),0 0 70px rgba(201,162,39,.25);
+            animation:sessionRise 1.2s ease-out both;
+        }
+        .session-ritual-sub {
+            font-family:'EB Garamond',serif; font-style:italic;
+            font-size:clamp(13px,2vw,20px); color:rgba(201,162,39,.6);
+            letter-spacing:2px; margin-top:6px; animation:sessionRise 1.5s ease-out both;
+        }
+        .session-ritual-char {
+            font-family:'Cinzel',serif; font-size:clamp(10px,1.5vw,14px);
+            color:rgba(61,214,219,.7); letter-spacing:3px; margin-top:18px;
+            animation:sessionRise 1.8s ease-out both;
+        }
+        .session-ritual-close {
+            margin-top:42px; background:transparent;
+            border:1px solid rgba(201,162,39,.4); color:rgba(201,162,39,.7);
+            font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px;
+            padding:9px 26px; cursor:pointer; border-radius:3px;
+            animation:sessionRise 2.1s ease-out both; transition:all .2s;
+        }
+        .session-ritual-close:hover { border-color:var(--gold); color:var(--gold); }
+        .session-start-btn {
+            display:flex; align-items:center; justify-content:center; gap:5px;
+            width:100%; margin:8px 0 0; background:transparent;
+            border:1px solid rgba(201,162,39,.22); color:rgba(201,162,39,.55);
+            font-family:'Cinzel',serif; font-size:8px; letter-spacing:2px;
+            padding:5px 10px; cursor:pointer; border-radius:3px; transition:all .2s;
+        }
+        .session-start-btn:hover { border-color:var(--gold); color:var(--gold); background:rgba(201,162,39,.06); }
+
+        /* ── 6. Level-Up Celebration ────────────────────────────── */
+        #levelUpBurst {
+            position:fixed; inset:0; z-index:9980;
+            pointer-events:none; overflow:hidden;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .levelup-text {
+            font-family:'Cinzel Decorative',serif; font-size:clamp(22px,5vw,52px);
+            color:var(--gold); letter-spacing:5px; opacity:0; pointer-events:none;
+            text-shadow:0 0 40px rgba(201,162,39,.9),0 0 80px rgba(232,197,71,.4);
+        }
+        @keyframes levelUpAnim {
+            0%{opacity:0;transform:scale(.5)} 15%{opacity:1;transform:scale(1.12)}
+            35%{opacity:1;transform:scale(1)} 78%{opacity:1;transform:scale(1)}
+            100%{opacity:0;transform:scale(1.05)}
+        }
+        .levelup-text.burst { animation:levelUpAnim 2.5s ease-out forwards; }
+        .levelup-particle {
+            position:absolute; width:7px; height:7px; border-radius:50%;
+            pointer-events:none; opacity:0;
+        }
+        @keyframes particleBurst {
+            0%{transform:translate(0,0) scale(1);opacity:1}
+            100%{transform:translate(var(--px),var(--py)) scale(0);opacity:0}
+        }
+
+        /* ── 7. HP Critical Pulse ───────────────────────────────── */
+        @keyframes hpCriticalPulse {
+            0%,100%{box-shadow:0 0 8px rgba(200,32,48,.6);filter:brightness(1.1)}
+            50%{box-shadow:0 0 24px rgba(200,32,48,.95),0 0 48px rgba(200,32,48,.4);filter:brightness(1.45)}
+        }
+        .hp-fill.hp-critical { animation:hpCriticalPulse 1.4s ease-in-out infinite; }
+
+        /* ── 8. Instability Escalation ──────────────────────────── */
+        .trk-row.ins-caution .trk-name,.trk-row.ins-caution .trk-state,
+        .trk-row.ins-caution .trk-val { color:#c8a030 !important; }
+        .trk-row.ins-danger .trk-name,.trk-row.ins-danger .trk-state,
+        .trk-row.ins-danger .trk-val { color:#d06020 !important; }
+        .trk-row.ins-critical .trk-name,.trk-row.ins-critical .trk-state,
+        .trk-row.ins-critical .trk-val { color:#d82820 !important; }
+        @keyframes insCritShake {
+            0%,100%{transform:translateX(0)} 20%{transform:translateX(-2px)}
+            40%{transform:translateX(2px)} 60%{transform:translateX(-1px)} 80%{transform:translateX(1px)}
+        }
+        .trk-row.ins-critical .trk-ctrl { animation:insCritShake 2.5s ease-in-out infinite; }
+
+        /* ── 9. Corruption Border Creep ─────────────────────────── */
+        .sidebar { transition:border-right .7s ease,box-shadow .7s ease; }
+        .sidebar.cor-taint-1 { border-right:2px solid rgba(168,40,40,.28) !important; }
+        .sidebar.cor-taint-2 { border-right:2px solid rgba(168,40,40,.55) !important; }
+        .sidebar.cor-taint-3 { border-right:2px solid rgba(168,40,40,.85) !important; }
+        .sidebar.cor-taint-4 { border-right:2px solid rgba(200,32,48,1) !important; box-shadow:3px 0 20px rgba(200,32,48,.38); }
+
+        /* ── 10. Rest Ritual Overlay ────────────────────────────── */
+        #restRitualOverlay {
+            position:fixed; inset:0; z-index:9970;
+            background:rgba(6,6,14,.88); backdrop-filter:blur(6px);
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            opacity:0; pointer-events:none; transition:opacity .35s ease;
+        }
+        #restRitualOverlay.show { opacity:1; }
+        .rest-ritual-icon { font-size:42px; margin-bottom:14px; animation:restIconFloat 2s ease-in-out infinite; }
+        @keyframes restIconFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+        .rest-ritual-type {
+            font-family:'Cinzel',serif; font-size:9px; letter-spacing:3px;
+            color:var(--gold-d); text-transform:uppercase; margin-bottom:6px;
+        }
+        .rest-ritual-msg {
+            font-family:'EB Garamond',serif; font-style:italic; font-size:15px;
+            color:rgba(201,162,39,.7); text-align:center;
+            max-width:300px; line-height:1.7;
+        }
+
+        /* ── 11. Fate Die Oracle ────────────────────────────────── */
+        #fateDieModal {
+            position:fixed; inset:0; z-index:9960;
+            background:rgba(6,6,14,.92); backdrop-filter:blur(8px);
+            display:flex; align-items:center; justify-content:center;
+            opacity:0; pointer-events:none; transition:opacity .3s;
+        }
+        #fateDieModal.show { opacity:1; pointer-events:all; }
+        .fate-die-box {
+            background:var(--surf2); border:1px solid rgba(201,162,39,.35);
+            border-radius:6px; padding:24px 28px;
+            min-width:300px; max-width:430px; width:92vw; text-align:center;
+            box-shadow:0 0 40px rgba(201,162,39,.18);
+        }
+        .fate-die-title {
+            font-family:'Cinzel Decorative',serif; font-size:13px;
+            color:var(--gold); letter-spacing:2px; margin-bottom:3px;
+        }
+        .fate-die-sub {
+            font-family:'EB Garamond',serif; font-style:italic;
+            font-size:11px; color:rgba(201,162,39,.5); margin-bottom:16px;
+        }
+        .fate-roll-num {
+            font-family:'Raleway',sans-serif; font-size:54px; font-weight:900;
+            color:var(--gold); line-height:1; margin-bottom:10px;
+            text-shadow:0 0 30px rgba(201,162,39,.6); transition:all .1s;
+        }
+        .fate-result-tier {
+            font-family:'Cinzel',serif; font-size:8px; letter-spacing:2px;
+            color:rgba(61,214,219,.8); margin-bottom:6px;
+        }
+        .fate-result-text {
+            font-family:'EB Garamond',serif; font-size:13px; color:var(--txt);
+            line-height:1.65; margin-bottom:16px; min-height:44px;
+        }
+        .fate-tier-btns { display:flex; gap:6px; margin-bottom:14px; }
+        .fate-tier-btn {
+            flex:1; background:rgba(61,214,219,.07);
+            border:1px solid rgba(61,214,219,.22); color:rgba(61,214,219,.6);
+            font-family:'Cinzel',serif; font-size:8px; letter-spacing:1px;
+            padding:6px; border-radius:3px; cursor:pointer; transition:all .15s;
+        }
+        .fate-tier-btn:hover,.fate-tier-btn.active {
+            border-color:rgba(61,214,219,.7); color:rgba(61,214,219,1);
+            background:rgba(61,214,219,.15);
+        }
+        .fate-roll-btn {
+            width:100%;
+            background:linear-gradient(135deg,rgba(201,162,39,.14),rgba(201,162,39,.24));
+            border:1px solid rgba(201,162,39,.5); color:var(--gold);
+            font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px;
+            padding:9px; border-radius:3px; cursor:pointer; margin-bottom:9px;
+            transition:all .2s;
+        }
+        .fate-roll-btn:hover { background:linear-gradient(135deg,rgba(201,162,39,.25),rgba(201,162,39,.42)); }
+        .fate-close-btn {
+            background:transparent; border:1px solid rgba(255,255,255,.1);
+            color:rgba(255,255,255,.3); font-family:'Cinzel',serif;
+            font-size:8px; letter-spacing:1px; padding:5px 14px;
+            border-radius:3px; cursor:pointer; transition:all .15s;
+        }
+        .fate-close-btn:hover { border-color:rgba(255,255,255,.3); color:rgba(255,255,255,.6); }
+        .fate-die-oracle-btn {
+            width:100%; background:transparent;
+            border:1px solid rgba(201,162,39,.16); color:rgba(201,162,39,.48);
+            font-family:'Cinzel',serif; font-size:7.5px; letter-spacing:1.5px;
+            padding:5px 8px; border-radius:3px; cursor:pointer;
+            margin-top:8px; transition:all .2s;
+        }
+        .fate-die-oracle-btn:hover { border-color:rgba(201,162,39,.5); color:rgba(201,162,39,.8); }
+
+        /* ── 12. Milestone Announcement ─────────────────────────── */
+        #milestoneOverlay {
+            position:fixed; inset:0; z-index:9985;
+            background:radial-gradient(ellipse at center,rgba(10,10,22,.96) 40%,rgba(0,0,0,.99) 100%);
+            backdrop-filter:blur(4px);
+            display:flex; flex-direction:column; align-items:center; justify-content:center;
+            opacity:0; pointer-events:none; transition:opacity .5s;
+        }
+        #milestoneOverlay.show { opacity:1; pointer-events:all; }
+        .milestone-sigil { font-size:52px; margin-bottom:18px; animation:milestoneSpin 9s linear infinite; }
+        @keyframes milestoneSpin { to{transform:rotate(360deg)} }
+        .milestone-reached {
+            font-family:'Cinzel',serif; font-size:8px; letter-spacing:4px;
+            color:rgba(61,214,219,.7); text-transform:uppercase; margin-bottom:8px;
+        }
+        .milestone-level {
+            font-family:'Cinzel Decorative',serif; font-size:clamp(30px,6vw,54px);
+            color:var(--gold); text-shadow:0 0 40px rgba(201,162,39,.8),0 0 80px rgba(232,197,71,.3);
+            margin-bottom:4px;
+        }
+        .milestone-tier-name {
+            font-family:'Cinzel',serif; font-size:clamp(10px,2vw,16px);
+            color:rgba(201,162,39,.7); letter-spacing:4px; margin-bottom:18px;
+        }
+        .milestone-flavor {
+            font-family:'EB Garamond',serif; font-style:italic;
+            font-size:clamp(12px,2vw,16px); color:rgba(255,255,255,.55);
+            max-width:360px; text-align:center; line-height:1.75; margin-bottom:30px;
+        }
+        .milestone-dismiss {
+            background:transparent; border:1px solid rgba(201,162,39,.35);
+            color:rgba(201,162,39,.6); font-family:'Cinzel',serif;
+            font-size:9px; letter-spacing:2px; padding:9px 26px;
+            cursor:pointer; border-radius:3px; transition:all .2s;
+        }
+        .milestone-dismiss:hover { border-color:var(--gold); color:var(--gold); }
+
+        /* ── 14. Vein Pulse Background Layer ────────────────────── */
+        #veinPulseLayer {
+            position:fixed; inset:0; z-index:0; pointer-events:none;
+            opacity:0; transition:opacity .8s ease;
+        }
+        #veinPulseLayer.amber {
+            background:repeating-linear-gradient(
+                45deg, transparent 0px, transparent 8px,
+                rgba(201,162,39,.035) 8px, rgba(201,162,39,.035) 9px
+            );
+            animation:veinGlowAmber 2.6s ease-in-out infinite;
+            opacity:1;
+        }
+        #veinPulseLayer.red {
+            background:repeating-linear-gradient(
+                45deg, transparent 0px, transparent 6px,
+                rgba(200,32,48,.04) 6px, rgba(200,32,48,.04) 7px
+            );
+            animation:veinGlowRed 1.6s ease-in-out infinite;
+            opacity:1;
+        }
+        @keyframes veinGlowAmber { 0%,100%{opacity:.5} 50%{opacity:1} }
+        @keyframes veinGlowRed { 0%,100%{opacity:.6} 50%{opacity:1} }
+
+        /* ── 15. Death Save Drama ────────────────────────────────── */
+        #deathSaveDrama {
+            position:fixed; inset:0; z-index:9975;
+            background:radial-gradient(ellipse at center,transparent 30%,rgba(200,32,48,.18) 70%,rgba(140,0,0,.38) 100%);
+            pointer-events:none; opacity:0; transition:opacity .8s ease;
+        }
+        @keyframes deathDramaPulse { 0%,100%{opacity:.8} 50%{opacity:1} }
+        #deathSaveDrama.show { animation:deathDramaPulse 2s ease-in-out infinite; opacity:1; }
+        #deathSaveText {
+            position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+            font-family:'Cinzel Decorative',serif; font-size:clamp(13px,3vw,26px);
+            color:rgba(200,32,48,.9); letter-spacing:4px; text-align:center;
+            text-shadow:0 0 22px rgba(200,32,48,.85); pointer-events:none;
+            opacity:0; transition:opacity .8s; z-index:9976;
+        }
+        #deathSaveText.show { opacity:1; }
     </style>
 
     <!-- ── Site Protection ─────────────────────────────────────── -->
@@ -29137,6 +29458,546 @@ window.qkScrollTop=qkScrollTop;
 window.updateGoldTotal=updateGoldTotal;
 
 })(); /* end IIFE */
+</script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   V4.6 — 15 IMMERSION FEATURES
+   ═══════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+
+/* ── 13. Web Audio Sound Engine ─────────────────────────────── */
+var _AC=null;
+function _getAC(){ if(!_AC){try{_AC=new(window.AudioContext||window.webkitAudioContext)();}catch(e){}}return _AC; }
+function _playTone(opts){
+  var ac=_getAC(); if(!ac)return;
+  try{
+    var o=ac.createOscillator(); var g=ac.createGain();
+    o.connect(g); g.connect(ac.destination);
+    o.type=opts.type||'sine';
+    o.frequency.setValueAtTime(opts.freq||440,ac.currentTime);
+    if(opts.freqEnd) o.frequency.linearRampToValueAtTime(opts.freqEnd,ac.currentTime+(opts.dur||0.3));
+    g.gain.setValueAtTime(opts.vol||0.1,ac.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+(opts.dur||0.3));
+    o.start(ac.currentTime); o.stop(ac.currentTime+(opts.dur||0.3)+0.05);
+  }catch(e){}
+}
+function sndHPDamage(){ _playTone({type:'sawtooth',freq:160,freqEnd:80,vol:0.09,dur:0.18}); }
+function sndHPHeal(){ _playTone({type:'sine',freq:440,freqEnd:560,vol:0.08,dur:0.22}); }
+function sndRPCast(){
+  _playTone({type:'sine',freq:660,freqEnd:880,vol:0.09,dur:0.25});
+  setTimeout(function(){ _playTone({type:'sine',freq:880,freqEnd:1100,vol:0.06,dur:0.2}); },150);
+}
+function sndRest(t){
+  if(t==='long'){
+    _playTone({type:'sine',freq:280,freqEnd:360,vol:0.1,dur:0.65});
+    setTimeout(function(){ _playTone({type:'sine',freq:360,freqEnd:440,vol:0.08,dur:0.85}); },420);
+  } else {
+    _playTone({type:'sine',freq:320,freqEnd:390,vol:0.09,dur:0.4});
+  }
+}
+function sndLevelUp(){
+  var notes=[440,554,660,880]; var d=0;
+  notes.forEach(function(f){ setTimeout(function(){ _playTone({type:'sine',freq:f,vol:0.11,dur:0.26}); },d); d+=185; });
+}
+function sndDeath(){
+  _playTone({type:'sawtooth',freq:80,freqEnd:38,vol:0.13,dur:0.95});
+}
+function sndMilestone(){
+  _playTone({type:'sine',freq:528,vol:0.1,dur:0.35});
+  setTimeout(function(){ _playTone({type:'sine',freq:660,vol:0.12,dur:0.38}); },230);
+  setTimeout(function(){ _playTone({type:'sine',freq:792,vol:0.14,dur:0.55}); },460);
+}
+function sndFateDie(n){
+  _playTone({type:'sine',freq:200+(n/100)*600,freqEnd:(200+(n/100)*600)*1.3,vol:0.1,dur:0.32});
+}
+function sndOracle(){
+  _playTone({type:'sine',freq:330,freqEnd:220,vol:0.07,dur:0.4});
+}
+
+/* ── ALAS Name Tables (Race-Matched) ────────────────────────── */
+var _NAMES={
+  'Human':             ['Aldric','Maren','Corvin','Sela','Brennan','Lysa','Tomas','Vera','Edric','Nara','Cael','Dwyn'],
+  'High Elf':          ['Aelorin','Sylvara','Caeldath','Thiriel','Vareth','Lirien','Araneth','Sylmir','Caelith','Naevara'],
+  'Dunesong Elf':      ['Sahira','Zephrel','Kahari','Solene','Rashmir','Aelith','Kafara','Zemira','Solath','Dune'],
+  'Drow':              ['Xarveth','Zilryn','Shivra','Duskara','Zareth','Nilryn','Xildra','Shaevra','Zolveth','Nilara'],
+  'Wood Elf':          ['Theron','Vesca','Lirael','Brynn','Ashen','Taevel','Gwenir','Sylca','Feryn','Naevin'],
+  'Ember Forge Dwarf': ['Gorvak','Brunda','Khorgrim','Valda','Torvus','Hilga','Durnak','Belda','Khelgan','Morda'],
+  'Stoneheart Dwarf':  ['Dolgrin','Ingra','Bofgar','Thordis','Keldrik','Ulma','Grimvar','Thordra','Beldak','Hruna'],
+  'Beastkin':          ['Kasar','Fenna','Ryuk','Shael','Goran','Mira','Talon','Vex','Sable','Jax'],
+  'Drakonian':         ['Vyraxis','Kethara','Zhurath','Rexara','Draveth','Zaruun','Thyrak','Vesara','Kethrix','Dravara'],
+  'Goliath':           ['Grask','Vorna','Thorak','Ulda','Brannor','Yska','Garruk','Tolva','Krask','Urna'],
+  'default':           ['Aeren','Veth','Karn','Syla','Dorn','Mira','Talvyn','Sera','Gorvath','Lynel']
+};
+function _randName(){
+  var race=(document.getElementById('charRace')||{}).value||'';
+  var pool=_NAMES[race]||_NAMES['default'];
+  return pool[Math.floor(Math.random()*pool.length)];
+}
+
+/* ── Milestone Data ─────────────────────────────────────────── */
+var _MS={
+  5:  {tier:'Awakened',     sigil:'✦', flavor:'The Vein stirs. Your name is beginning to echo in circles beyond your own.'},
+  10: {tier:'Ascendant',    sigil:'⬡', flavor:'You have crossed into legend. The Resonance bends to acknowledge your presence.'},
+  15: {tier:'Shattered',    sigil:'◈', flavor:'Reality fractures where you stand. The Instability knows your face now.'},
+  20: {tier:'Mythic',       sigil:'⬢', flavor:'The chronicles of Alas record your deeds. Even the Corruptors speak your name.'},
+  25: {tier:'Transcendent', sigil:'✧', flavor:'Between the Veins, between worlds — you are a force unto yourself.'},
+  30: {tier:'Worldscar',    sigil:'⊕', flavor:'You are the Worldscar. The Last Vein trembles. Alas will never forget this name.'}
+};
+
+/* ── Fate Die State ─────────────────────────────────────────── */
+var _fateTier=1;
+var _fateLastRoll=null;
+
+/* ─────────────────────────────────────────────────────────────
+   DOMContentLoaded — Inject all UI elements
+   ───────────────────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded',function(){
+
+  /* ── 1. Portrait Circle ──────────────────────────────────── */
+  var sbHead=document.querySelector('.sb-head.sb-head-dice');
+  if(sbHead){
+    var pw=document.createElement('div'); pw.className='char-portrait-wrap';
+    pw.innerHTML='<input type="file" class="char-portrait-input" id="charPortraitInput" accept="image/*">'
+      +'<div class="char-portrait-ring" id="charPortraitRing" title="Click to upload portrait">'
+      +'<span class="char-portrait-placeholder" id="charPortraitPH">⚔</span>'
+      +'<img id="charPortraitImg" style="display:none" alt="Portrait"></div>';
+    sbHead.insertAdjacentElement('afterend',pw);
+    document.getElementById('charPortraitRing').addEventListener('click',function(){ document.getElementById('charPortraitInput').click(); });
+    document.getElementById('charPortraitInput').addEventListener('change',function(e){
+      var f=e.target.files[0]; if(!f)return;
+      var fr=new FileReader();
+      fr.onload=function(ev){ _setPortrait(ev.target.result); _savePortrait(ev.target.result); };
+      fr.readAsDataURL(f);
+    });
+  }
+
+  /* ── 2+3. Motto + Random Name Button ─────────────────────── */
+  var nameInp=document.getElementById('charName');
+  if(nameInp){
+    var nw=document.createElement('div'); nw.className='name-inp-wrap';
+    nameInp.parentNode.insertBefore(nw,nameInp);
+    nw.appendChild(nameInp);
+    var rBtn=document.createElement('button');
+    rBtn.type='button'; rBtn.className='random-name-btn';
+    rBtn.title='Generate random ALAS name'; rBtn.textContent='⚄';
+    rBtn.addEventListener('click',function(){
+      nameInp.value=_randName();
+      nameInp.dispatchEvent(new Event('input'));
+      if(typeof saveAll==='function') saveAll();
+    });
+    nw.appendChild(rBtn);
+    var mw=document.createElement('div'); mw.className='char-motto-wrap';
+    mw.innerHTML='<input class="char-motto" id="charMotto" placeholder="A motto, a creed, or a dying word…" maxlength="80" autocomplete="off">';
+    nw.insertAdjacentElement('afterend',mw);
+    document.getElementById('charMotto').addEventListener('input',function(){
+      if(typeof saveAll==='function') saveAll();
+    });
+  }
+
+  /* ── 4. XP Progress Bar ──────────────────────────────────── */
+  var xpInp=document.getElementById('charXP');
+  if(xpInp){
+    var xpWrap=document.createElement('div'); xpWrap.className='xp-progress-wrap';
+    xpWrap.innerHTML='<div class="xp-bar-track"><div class="xp-bar-fill" id="xpBarFill"></div></div>'
+      +'<div class="xp-bar-label" id="xpBarLabel"></div>';
+    xpInp.closest('.fld').insertAdjacentElement('afterend',xpWrap);
+    xpInp.addEventListener('input',_updateXpBar);
+    _updateXpBar();
+  }
+
+  /* ── 5. Session Ritual Overlay + Begin Button ────────────── */
+  var sro=document.createElement('div'); sro.id='sessionRitualOverlay';
+  sro.innerHTML='<div class="session-ritual-title">ALAS</div>'
+    +'<div class="session-ritual-sub">The Vein Awakens</div>'
+    +'<div class="session-ritual-char" id="sessionRitualName"></div>'
+    +'<button class="session-ritual-close" onclick="_alasImm.closeSessionRitual()">Begin</button>';
+  document.body.appendChild(sro);
+  var sbSec=document.querySelector('.sb-sec');
+  if(sbSec){
+    var ssBtn=document.createElement('button');
+    ssBtn.type='button'; ssBtn.className='session-start-btn';
+    ssBtn.innerHTML='▶ Begin Session';
+    ssBtn.title='Open session start ritual';
+    ssBtn.addEventListener('click',function(){ _alasImm.openSessionRitual(); });
+    sbSec.insertAdjacentElement('afterend',ssBtn);
+  }
+
+  /* ── 6. Level-Up Burst Overlay ───────────────────────────── */
+  var lub=document.createElement('div'); lub.id='levelUpBurst';
+  lub.innerHTML='<div class="levelup-text" id="levelUpText">LEVEL UP</div>';
+  document.body.appendChild(lub);
+
+  /* ── 10. Rest Ritual Overlay ─────────────────────────────── */
+  var rro=document.createElement('div'); rro.id='restRitualOverlay';
+  rro.innerHTML='<div class="rest-ritual-icon" id="restRitualIcon">🌙</div>'
+    +'<div class="rest-ritual-type" id="restRitualType">Short Rest</div>'
+    +'<div class="rest-ritual-msg" id="restRitualMsg">The Resonance settles.</div>';
+  document.body.appendChild(rro);
+
+  /* ── 11. Fate Die Oracle Modal ───────────────────────────── */
+  var fdm=document.createElement('div'); fdm.id='fateDieModal';
+  fdm.innerHTML='<div class="fate-die-box">'
+    +'<div class="fate-die-title">FATE DIE ORACLE</div>'
+    +'<div class="fate-die-sub">Roll against the Instability Casting Scale</div>'
+    +'<div class="fate-roll-num" id="fateRollNum">—</div>'
+    +'<div class="fate-result-tier" id="fateResultTier"></div>'
+    +'<div class="fate-result-text" id="fateResultText">Select a Tier and roll the Oracle.</div>'
+    +'<div class="fate-tier-btns">'
+    +'<button class="fate-tier-btn active" id="fateTierBtn1" onclick="_alasImm.setFateTier(1)">Tier I</button>'
+    +'<button class="fate-tier-btn" id="fateTierBtn2" onclick="_alasImm.setFateTier(2)">Tier II</button>'
+    +'<button class="fate-tier-btn" id="fateTierBtn3" onclick="_alasImm.setFateTier(3)">Tier III</button>'
+    +'</div>'
+    +'<button class="fate-roll-btn" onclick="_alasImm.rollFateDie()">⚄ Cast the Fate Die (d100)</button>'
+    +'<button class="fate-close-btn" onclick="_alasImm.closeFateDie()">Close Oracle</button>'
+    +'</div>';
+  document.body.appendChild(fdm);
+
+  /* ── 12. Milestone Overlay ───────────────────────────────── */
+  var mso=document.createElement('div'); mso.id='milestoneOverlay';
+  mso.innerHTML='<div class="milestone-sigil" id="milestoneSigil">⬡</div>'
+    +'<div class="milestone-reached">Milestone Reached</div>'
+    +'<div class="milestone-level" id="milestoneLevelTxt"></div>'
+    +'<div class="milestone-tier-name" id="milestoneTierTxt"></div>'
+    +'<div class="milestone-flavor" id="milestoneFlavor"></div>'
+    +'<button class="milestone-dismiss" onclick="_alasImm.closeMilestone()">Continue Your Journey</button>';
+  document.body.appendChild(mso);
+
+  /* ── 14. Vein Pulse Layer ────────────────────────────────── */
+  var vpl=document.createElement('div'); vpl.id='veinPulseLayer';
+  document.body.appendChild(vpl);
+
+  /* ── 15. Death Save Drama ────────────────────────────────── */
+  var dsd=document.createElement('div'); dsd.id='deathSaveDrama';
+  document.body.appendChild(dsd);
+  var dst=document.createElement('div'); dst.id='deathSaveText';
+  dst.innerHTML='DEATH SAVES<br><span style="font-size:.55em;letter-spacing:2px;opacity:.8;">Tether to the Vein or fall</span>';
+  document.body.appendChild(dst);
+
+  /* ── Fate Oracle button in trackers section ──────────────── */
+  var trkSec=document.querySelector('.trk-sec');
+  if(trkSec){
+    var foBtn=document.createElement('button');
+    foBtn.type='button'; foBtn.className='fate-die-oracle-btn';
+    foBtn.textContent='⚄ Fate Die Oracle';
+    foBtn.title='Open the Instability Casting Scale Oracle';
+    foBtn.addEventListener('click',function(){ _alasImm.openFateDie(); });
+    trkSec.appendChild(foBtn);
+  }
+
+  /* ── Wire HP/RP monitoring ───────────────────────────────── */
+  var hpEl=document.getElementById('hpCur');
+  if(hpEl) hpEl.addEventListener('input',function(){ _monHP(); });
+  var hpMxEl=document.getElementById('hpMax');
+  if(hpMxEl) hpMxEl.addEventListener('input',function(){ _monHP(); });
+
+  /* ── MutationObserver for insVal/corVal (updated by JS) ─── */
+  var insEl=document.getElementById('insVal');
+  var corEl=document.getElementById('corVal');
+  var _obs=new MutationObserver(function(){ setTimeout(_monTrackers,20); });
+  var _obsOpts={childList:true,characterData:true,subtree:true};
+  if(insEl) _obs.observe(insEl,_obsOpts);
+  if(corEl) _obs.observe(corEl,_obsOpts);
+
+  /* ── Load persisted portrait + motto ─────────────────────── */
+  setTimeout(_loadImmState,120);
+  _monHP(); _monTrackers();
+
+}); /* end DOMContentLoaded */
+
+/* ─────────────────────────────────────────────────────────────
+   Feature Logic
+   ───────────────────────────────────────────────────────────── */
+
+/* 1. Portrait helpers */
+function _setPortrait(src){
+  var img=document.getElementById('charPortraitImg');
+  var ph=document.getElementById('charPortraitPH');
+  if(!img)return;
+  img.src=src; img.style.display='block';
+  if(ph) ph.style.display='none';
+}
+var _PORT_KEY='alas_portrait_v1';
+function _savePortrait(src){ try{ localStorage.setItem(_PORT_KEY,src); }catch(e){} }
+function _loadImmState(){
+  try{
+    var p=localStorage.getItem(_PORT_KEY);
+    if(p && p.length>50) _setPortrait(p);
+  }catch(e){}
+  try{
+    var d=JSON.parse(localStorage.getItem('alas_imm_v1')||'{}');
+    if(d.motto){ var m=document.getElementById('charMotto'); if(m) m.value=d.motto; }
+  }catch(e){}
+}
+function _saveImmMotto(){
+  try{
+    var m=document.getElementById('charMotto');
+    localStorage.setItem('alas_imm_v1',JSON.stringify({motto:m?m.value:''}));
+  }catch(e){}
+}
+
+/* 4. XP bar */
+function _updateXpBar(){
+  var xpInp=document.getElementById('charXP'); if(!xpInp)return;
+  var xp=parseInt(xpInp.value)||0;
+  var fill=document.getElementById('xpBarFill');
+  var lbl=document.getElementById('xpBarLabel');
+  if(typeof ALAS_XP_TABLE==='undefined'||!fill)return;
+  var curRow=null,nextRow=null;
+  for(var i=0;i<ALAS_XP_TABLE.length;i++){
+    if(xp>=ALAS_XP_TABLE[i].xp) curRow=ALAS_XP_TABLE[i];
+  }
+  if(curRow&&curRow.level<30){
+    nextRow=ALAS_XP_TABLE.find(function(r){ return r.level===curRow.level+1; });
+  }
+  if(curRow&&nextRow){
+    var pct=Math.max(0,Math.min(100,((xp-curRow.xp)/(nextRow.xp-curRow.xp)*100)));
+    fill.style.width=pct.toFixed(1)+'%';
+    if(lbl) lbl.textContent=xp.toLocaleString()+' / '+nextRow.xp.toLocaleString()+' XP';
+  } else if(curRow&&curRow.level>=30){
+    fill.style.width='100%';
+    if(lbl) lbl.textContent='MAX LEVEL';
+  } else {
+    fill.style.width='0%';
+    if(lbl) lbl.textContent='';
+  }
+}
+
+/* 7. HP critical pulse + 15. Death drama */
+function _monHP(){
+  var cur=parseInt((document.getElementById('hpCur')||{}).value)||0;
+  var max=parseInt((document.getElementById('hpMax')||{}).value)||1;
+  var bar=document.getElementById('hpBar');
+  var drama=document.getElementById('deathSaveDrama');
+  var dText=document.getElementById('deathSaveText');
+  if(bar){
+    if(cur>0&&cur<=Math.max(1,Math.floor(max*0.25))) bar.classList.add('hp-critical');
+    else bar.classList.remove('hp-critical');
+  }
+  if(drama){
+    if(cur<=0){ drama.classList.add('show'); if(dText) dText.classList.add('show'); }
+    else { drama.classList.remove('show'); if(dText) dText.classList.remove('show'); }
+  }
+  _monVein();
+}
+
+/* 8+9+14. Instability/Corruption/Vein monitoring */
+function _monTrackers(){
+  var ins=parseInt((document.getElementById('insVal')||{}).textContent)||0;
+  var cor=parseInt((document.getElementById('corVal')||{}).textContent)||0;
+  // 8. Instability escalation
+  var insName=document.querySelector('.trk-row .trk-name.ins-c');
+  var insRow=insName?insName.closest('.trk-row'):null;
+  if(insRow){
+    insRow.classList.remove('ins-caution','ins-danger','ins-critical');
+    if(ins>=7) insRow.classList.add('ins-critical');
+    else if(ins>=4) insRow.classList.add('ins-danger');
+    else if(ins>=1) insRow.classList.add('ins-caution');
+  }
+  // 9. Corruption border creep
+  var sb=document.querySelector('.sidebar');
+  if(sb){
+    sb.classList.remove('cor-taint-1','cor-taint-2','cor-taint-3','cor-taint-4');
+    if(cor>=7) sb.classList.add('cor-taint-4');
+    else if(cor>=5) sb.classList.add('cor-taint-3');
+    else if(cor>=3) sb.classList.add('cor-taint-2');
+    else if(cor>=1) sb.classList.add('cor-taint-1');
+  }
+  _monVein();
+}
+
+function _monVein(){
+  var ins=parseInt((document.getElementById('insVal')||{}).textContent)||0;
+  var cor=parseInt((document.getElementById('corVal')||{}).textContent)||0;
+  var cur=parseInt((document.getElementById('hpCur')||{}).value)||0;
+  var max=parseInt((document.getElementById('hpMax')||{}).value)||1;
+  var hpPct=max>0?cur/max:1;
+  var vpl=document.getElementById('veinPulseLayer');
+  if(!vpl)return;
+  vpl.classList.remove('amber','red');
+  if(cur<=0||ins>=7||cor>=7) vpl.classList.add('red');
+  else if(ins>=4||cor>=5||hpPct<=0.25) vpl.classList.add('amber');
+}
+
+/* 6+12. Level tracking — patch onLevelChange */
+var _prevLvl=0;
+(function(){
+  var _orig=window.onLevelChange;
+  if(typeof _orig!=='function')return;
+  window.onLevelChange=function(){
+    var newLvl=parseInt((document.getElementById('charLevel')||{}).value)||1;
+    _orig.apply(this,arguments);
+    if(newLvl>_prevLvl&&_prevLvl>0){
+      _doCelebration(newLvl);
+    }
+    _prevLvl=newLvl;
+    _updateXpBar();
+  };
+  _prevLvl=parseInt((document.getElementById('charLevel')||{}).value)||1;
+})();
+
+function _doCelebration(lvl){
+  // Level-up burst
+  var txt=document.getElementById('levelUpText');
+  if(txt){ txt.textContent='LEVEL '+lvl; txt.classList.remove('burst'); void txt.offsetWidth; txt.classList.add('burst'); }
+  _spawnParticles();
+  sndLevelUp();
+  // Milestone check
+  if(_MS[lvl]) setTimeout(function(){ _showMilestone(lvl); },1500);
+}
+
+function _spawnParticles(){
+  var burst=document.getElementById('levelUpBurst'); if(!burst)return;
+  var cols=['#c9a227','#e8c547','#3dd6db','#ffffff','#c82030'];
+  for(var i=0;i<30;i++){
+    var p=document.createElement('div'); p.className='levelup-particle';
+    var angle=Math.random()*Math.PI*2;
+    var dist=70+Math.random()*170;
+    p.style.cssText='left:50%;top:50%;background:'+cols[Math.floor(Math.random()*cols.length)]
+      +';--px:'+Math.cos(angle)*dist+'px;--py:'+Math.sin(angle)*dist+'px'
+      +';animation:particleBurst '+(0.6+Math.random()*0.9)+'s ease-out '+(Math.random()*0.25)+'s forwards';
+    burst.appendChild(p);
+    setTimeout(function(pp){ if(pp.parentNode) pp.parentNode.removeChild(pp); },2200,p);
+  }
+}
+
+function _showMilestone(lvl){
+  var m=_MS[lvl]; if(!m)return;
+  var el=document.getElementById('milestoneOverlay'); if(!el)return;
+  document.getElementById('milestoneSigil').textContent=m.sigil;
+  document.getElementById('milestoneLevelTxt').textContent='Level '+lvl;
+  document.getElementById('milestoneTierTxt').textContent=m.tier;
+  document.getElementById('milestoneFlavor').textContent=m.flavor;
+  el.classList.add('show');
+  sndMilestone();
+}
+
+/* 10. Patch doRest */
+(function(){
+  var _orig=window.doRest;
+  if(typeof _orig!=='function')return;
+  window.doRest=function(type){
+    _orig.apply(this,arguments);
+    var o=document.getElementById('restRitualOverlay');
+    var ic=document.getElementById('restRitualIcon');
+    var ty=document.getElementById('restRitualType');
+    var mg=document.getElementById('restRitualMsg');
+    if(!o)return;
+    if(type==='long'){
+      if(ic) ic.textContent='🌙';
+      if(ty) ty.textContent='Long Rest';
+      if(mg) mg.textContent='The Resonance fully restores. The Vein holds your wounds in memory.';
+      sndRest('long');
+    } else {
+      if(ic) ic.textContent='☀';
+      if(ty) ty.textContent='Short Rest';
+      if(mg) mg.textContent='A moment of stillness. The Resonance partly mends.';
+      sndRest('short');
+    }
+    o.classList.add('show');
+    setTimeout(function(){ o.classList.remove('show'); },2200);
+  };
+})();
+
+/* Patch adjTracker for live monitoring */
+(function(){
+  var _orig=window.adjTracker;
+  if(typeof _orig!=='function')return;
+  window.adjTracker=function(type,delta){
+    _orig.apply(this,arguments);
+    setTimeout(_monTrackers,40);
+  };
+})();
+
+/* Patch _debouncedSave for XP bar + immersion state */
+(function(){
+  var _orig=window._debouncedSave;
+  if(typeof _orig!=='function')return;
+  window._debouncedSave=function(){
+    _orig.apply(this,arguments);
+    _updateXpBar(); _monHP(); _monTrackers(); _saveImmMotto();
+  };
+})();
+
+/* 11. Fate Die Oracle */
+function _parseRange(s){
+  var parts=s.split(/[–—\-]/);
+  if(parts.length===2) return {min:parseInt(parts[0]),max:parseInt(parts[1])};
+  var n=parseInt(s); return {min:n,max:n};
+}
+function _setFateTier(t){
+  _fateTier=t;
+  [1,2,3].forEach(function(i){
+    var b=document.getElementById('fateTierBtn'+i);
+    if(b) b.classList.toggle('active',i===t);
+  });
+  if(_fateLastRoll!==null) _showFateResult(_fateLastRoll);
+}
+function _rollFateDie(){
+  var n=Math.floor(Math.random()*100)+1;
+  _fateLastRoll=n;
+  var numEl=document.getElementById('fateRollNum');
+  if(numEl){
+    var start=Date.now(); var dur=380;
+    (function tick(){
+      if(Date.now()-start<dur){ numEl.textContent=Math.floor(Math.random()*100)+1; requestAnimationFrame(tick); }
+      else { numEl.textContent=n; _showFateResult(n); sndFateDie(n); }
+    })();
+  }
+}
+function _showFateResult(n){
+  if(typeof CASTING_SCALES==='undefined')return;
+  var scale=CASTING_SCALES[_fateTier]; if(!scale)return;
+  var tierEl=document.getElementById('fateResultTier');
+  var textEl=document.getElementById('fateResultText');
+  if(tierEl) tierEl.textContent=scale.subtitle||scale.title||('Tier '+_fateTier);
+  if(!textEl)return;
+  var entries=scale.entries||[]; var found=null;
+  for(var i=0;i<entries.length;i++){
+    var rng=_parseRange(entries[i].range||'');
+    if(n>=rng.min&&n<=rng.max){ found=entries[i]; break; }
+  }
+  if(found){ textEl.textContent=found.text||''; }
+  else {
+    var lbl;
+    if(n<=10) lbl='Catastrophic — the Vein tears.';
+    else if(n<=25) lbl='Severe backlash — Instability surges.';
+    else if(n<=50) lbl='Moderate disturbance — the casting holds, barely.';
+    else if(n<=75) lbl='Minor disruption — the Resonance steadies.';
+    else if(n<=90) lbl='Controlled — the Vein accepts your will.';
+    else lbl='Perfect Resonance — the casting manifests cleanly.';
+    textEl.textContent=lbl;
+  }
+  sndOracle();
+}
+
+/* ── Public API ─────────────────────────────────────────────── */
+window._alasImm={
+  openSessionRitual:function(){
+    var o=document.getElementById('sessionRitualOverlay'); if(!o)return;
+    var cn=(document.getElementById('charName')||{}).value||'Unknown Traveller';
+    var snEl=document.getElementById('sessionRitualName');
+    if(snEl) snEl.textContent=cn;
+    o.classList.add('show');
+  },
+  closeSessionRitual:function(){
+    var o=document.getElementById('sessionRitualOverlay'); if(o) o.classList.remove('show');
+  },
+  closeMilestone:function(){
+    var o=document.getElementById('milestoneOverlay'); if(o) o.classList.remove('show');
+  },
+  openFateDie:function(){
+    var o=document.getElementById('fateDieModal'); if(o) o.classList.add('show');
+  },
+  closeFateDie:function(){
+    var o=document.getElementById('fateDieModal'); if(o) o.classList.remove('show');
+  },
+  setFateTier:_setFateTier,
+  rollFateDie:_rollFateDie
+};
+
+})(); /* end V4.6 IIFE */
 </script>
 
 </body>
