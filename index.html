@@ -8121,6 +8121,18 @@
             text-align: center;
             flex-shrink: 0;
         }
+        .encounter-init-inp {
+            width: 36px; background: transparent; border: 1px solid transparent;
+            color: var(--gold); padding: 2px 0; border-radius: 3px;
+            font-family: 'Cinzel',serif; font-size: 13px; font-weight: 700;
+            text-align: center; outline: none; flex-shrink: 0;
+            cursor: default; transition: border-color .15s, background .15s;
+            -moz-appearance: textfield;
+        }
+        .encounter-init-inp::-webkit-outer-spin-button,
+        .encounter-init-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .encounter-init-inp:hover { border-color: rgba(201,162,39,.3); background: rgba(201,162,39,.05); cursor: text; }
+        .encounter-init-inp:focus { border-color: var(--gold-d); background: var(--surf); cursor: text; box-shadow: 0 0 4px rgba(201,162,39,.2); }
         .encounter-name-block { flex: 1; min-width: 0; }
         .encounter-name { font-weight: 600; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .encounter-meta { font-size: 9px; color: var(--txt-dim); margin-top: 1px; }
@@ -18931,6 +18943,18 @@ body{background:#06060e;color:#d0d0e8;font-family:'Raleway',Arial,sans-serif;ove
   text-align: center;
   flex-shrink: 0;
 }
+.encounter-init-inp {
+  width: 36px; background: transparent; border: 1px solid transparent;
+  color: var(--gold); padding: 2px 0; border-radius: 3px;
+  font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
+  text-align: center; outline: none; flex-shrink: 0;
+  cursor: default; transition: border-color .15s, background .15s;
+  -moz-appearance: textfield;
+}
+.encounter-init-inp::-webkit-outer-spin-button,
+.encounter-init-inp::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.encounter-init-inp:hover { border-color: rgba(201,162,39,.3); background: rgba(201,162,39,.05); cursor: text; }
+.encounter-init-inp:focus { border-color: var(--gold-d); background: var(--surf); cursor: text; box-shadow: 0 0 4px rgba(201,162,39,.2); }
 .encounter-name-block { flex: 1; min-width: 0; }
 .encounter-name { font-weight: 600; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .encounter-meta { font-size: 9px; color: var(--txt-dim); margin-top: 1px; }
@@ -25880,7 +25904,7 @@ function renderEncounterList(){
     const isPlayer = c.type === 'player';
     const typeColor = isPlayer ? 'var(--res)' : '#c87060';
     return `<div class="encounter-row${isActive?' active-turn':''}${isDead?' dead':''}${isPlayer?' player-row':' enemy-row'}">
-      <div class="encounter-init-badge">${c.initiative||'—'}</div>
+      <input class="encounter-init-inp" type="number" value="${c.initiative||0}" title="Click to edit initiative — list re-sorts on change" onchange="encounterSetInit(${i},this.value)" onkeydown="if(event.key==='Enter')this.blur()">
       <div class="encounter-name-block">
         <div class="encounter-name" style="color:${typeColor}">${c.name}</div>
         <div class="encounter-meta">AC ${c.ac||'—'} · ${isPlayer?'Player':'Enemy'}${isDead?' · <span style="color:var(--cor)">DEFEATED</span>':''}</div>
@@ -25929,6 +25953,24 @@ function encounterMath(i, resource, op){
   else newVal = curVal;
   c[curKey] = newVal;
   if(inp) inp.value = '';
+  renderEncounterList();
+  saveKeeperState();
+}
+
+function encounterSetInit(idx, val){
+  const c = encounterCombatants[idx];
+  if(!c) return;
+  const newInit = parseInt(val);
+  if(isNaN(newInit)) return;
+  // Remember which combatant is currently active so we can re-anchor after sort
+  const activeName = (encounterRound > 0 && encounterCombatants[encounterTurn])
+    ? encounterCombatants[encounterTurn].name : null;
+  c.initiative = newInit;
+  encounterCombatants.sort((a, b) => b.initiative - a.initiative);
+  if(activeName !== null){
+    const newIdx = encounterCombatants.findIndex(x => x.name === activeName);
+    if(newIdx >= 0) encounterTurn = newIdx;
+  }
   renderEncounterList();
   saveKeeperState();
 }
