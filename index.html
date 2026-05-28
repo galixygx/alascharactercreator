@@ -14112,24 +14112,31 @@ function updateRacialTraitsDisplay(){
 // ═══════════════════════════════════════════════════
 function updateSigilRCUI(card){
   if(!card) return;
-  const rcInp = card.querySelectorAll('.c-inp')[1];
-  const rc = parseInt(rcInp && rcInp.value)||0;
+  // FIX: read from .sig-rc-inp (RC Cost), not .c-inp[1] (which is SpellLevel)
+  const rcInp   = card.querySelector('.sig-rc-inp');
+  const rc      = parseInt(rcInp && rcInp.value) || 0;
   const dailyWrap = card.querySelector('.sig-rc-daily');
-  const atWill = card.querySelector('.sig-atwill');
-  const btn = card.querySelector('.sig-avail-btn');
+  const atWill    = card.querySelector('.sig-atwill');
+  // The daily-toggle button has data-spent; Complete & Dupe do not
+  const trackBtn  = card.querySelector('.sig-avail-btn[data-spent]');
+  const usageLbl  = card.querySelector('.sig-usage-lbl');
   if(rc >= 1){
+    // RC spell: show wrapper, hide at-will badge, show toggle button
     if(dailyWrap) dailyWrap.style.display = 'flex';
-    if(atWill) atWill.style.display = 'none';
-    if(btn){
-      btn.style.display = '';
-      const spent = btn.getAttribute('data-spent')==='1';
-      btn.textContent = spent ? 'Used today (toggle)' : 'Available (tap when used)';
-      btn.classList.toggle('spent', spent);
+    if(atWill)    atWill.style.display    = 'none';
+    if(usageLbl)  usageLbl.style.display  = '';
+    if(trackBtn){
+      trackBtn.style.display = '';
+      const spent = trackBtn.getAttribute('data-spent') === '1';
+      trackBtn.textContent = spent ? 'Used today (toggle)' : 'Available (tap when used)';
+      trackBtn.classList.toggle('spent', spent);
     }
   } else {
-    if(dailyWrap) dailyWrap.style.display = 'none';
-    if(atWill) atWill.style.display = 'block';
-    if(btn) btn.style.display = 'none';
+    // RC 0 (at-will): keep wrapper visible so Complete & Dupe remain accessible
+    if(dailyWrap) dailyWrap.style.display = 'flex';
+    if(atWill)    atWill.style.display    = 'block';
+    if(usageLbl)  usageLbl.style.display  = 'none';
+    if(trackBtn)  trackBtn.style.display  = 'none';
   }
 }
 
@@ -14146,7 +14153,9 @@ function castSigil(btn){
   if(!card) return;
   const inps = card.querySelectorAll('.c-inp');
   const name = (inps[0]||{}).value || 'Sigil';
-  const rc   = parseInt((inps[1]||{}).value) || 0;   // 2nd c-inp = RC Cost
+  // FIX: read RC from .sig-rc-inp (c-inp[1] is SpellLevel, c-inp[2] is RC)
+  const rcEl = card.querySelector('.sig-rc-inp');
+  const rc   = parseInt(rcEl && rcEl.value) || 0;
   const ip   = parseInt((inps[3]||{}).value) || 0;   // 4th c-inp = Instability+
   const aff  = (card.querySelector('.c-sel')||{}).value || 'Common';
   castSigilByRC(rc, ip, name, aff, card);
