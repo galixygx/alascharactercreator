@@ -15176,6 +15176,21 @@ function removeCompletedAbility(id){
   if(ab) showToast('"' + ab.name + '" removed from Ability List.');
 }
 
+function editCompletedAbility(id){
+  if(!Array.isArray(state.completedAbilities)) return;
+  const idx = state.completedAbilities.findIndex(function(a){ return a.id === id; });
+  if(idx === -1){ showToast('Ability not found.'); return; }
+  const ab = state.completedAbilities[idx];
+  state.completedAbilities.splice(idx, 1);
+  _debouncedSave();
+  addAbility(ab);
+  renderAbilityList();
+  saveCards('abilitiesList', 'abilities');
+  const list = document.getElementById('abilitiesList');
+  if(list && list.lastChild) list.lastChild.scrollIntoView({behavior:'smooth', block:'start'});
+  showToast('"' + ab.name + '" moved back to builder — edit and press Complete when done.');
+}
+
 function sortAbilityList(key){
   _alSortKey = key;
   ['name','action'].forEach(function(k){
@@ -15253,6 +15268,7 @@ function renderAbilityList(){
       '<div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">' +
         (!isPassive ? '<button type="button" class="sig-cast-btn" onclick="castCompletedAbility(\'' + ab.id + '\')" style="font-size:7.5px;padding:5px 12px;letter-spacing:1.5px;">⟳ Cast</button>' : '') +
         (hasAE ? '<button type="button" onclick="toggleCompletedAbilityActive(\'' + ab.id + '\')" style="font-family:\'Cinzel\',serif;font-size:7.5px;padding:4px 10px;border:1px solid;border-radius:4px;cursor:pointer;white-space:nowrap;' + effBtnStyle + '">' + (isActive ? '⚡ Effect On' : '○ Effect Off') + '</button>' : '') +
+        '<button type="button" onclick="editCompletedAbility(\'' + ab.id + '\')" title="Move back to builder to edit" style="font-family:\'Cinzel\',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(201,162,39,.35);border-radius:4px;color:rgba(201,162,39,.75);cursor:pointer;white-space:nowrap;">✎ Edit</button>' +
         '<button type="button" onclick="removeCompletedAbility(\'' + ab.id + '\')" title="Remove from Ability List" style="font-family:\'Cinzel\',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(200,32,48,.3);border-radius:4px;color:rgba(200,32,48,.6);cursor:pointer;white-space:nowrap;">✕ Remove</button>' +
       '</div>';
     grid.appendChild(div);
@@ -15605,17 +15621,17 @@ function renderDismantleList(){
   if(!listEl) return;
   listEl.innerHTML='';
   let count=0;
-  document.querySelectorAll('#inventoryList .inv-card').forEach((card,cardIdx)=>{
+  document.querySelectorAll('#inventoryList .inv-card').forEach(function(card){
     const name = (card.querySelectorAll('.c-inp')[0]||{}).value||'';
     const type = (card.querySelector('.inv-type')||{}).value||'gear';
     const qty  = parseInt((card.querySelector('.inv-qty')||{}).value)||0;
     const notes= (card.querySelector('.inv-notes')||{}).value||'';
-    if(!name||qty<1||type==='material'||type==='gem') return; // gems and mats yield poorly; allow but could filter
+    if(!name||qty<1||type==='material'||type==='gem') return;
     const qualKey = detectItemQuality(name, notes);
     const yieldTable = DISMANTLE_YIELD[type] || DISMANTLE_YIELD.other;
     const yieldList  = yieldTable ? (yieldTable[qualKey]||yieldTable.common) : null;
     if(!yieldList) return;
-    const yieldDesc = yieldList.map(y=>`${y.qty[0]}–${y.qty[1]}× ${y.name}`).join(', ');
+    const yieldDesc = yieldList.map(function(y){ return y.qty[0]+'–'+y.qty[1]+'× '+y.name; }).join(', ');
     const div = document.createElement('div');
     div.className='craft-dismantle-item';
     div.innerHTML=`
@@ -15623,8 +15639,16 @@ function renderDismantleList(){
         <div class="craft-dismantle-name">${name} <span style="color:var(--txt-dim);font-size:8px">[${type}] ×${qty}</span></div>
         <div class="craft-dismantle-yield">Yields: ${yieldDesc}</div>
       </div>
-      <button type="button" class="craft-dismantle-btn" onclick="dismantleItem(${cardIdx},'${qualKey}','${type}')">Dismantle</button>
+      <button type="button" class="craft-dismantle-btn">Dismantle</button>
     `;
+    // FIX: store name+type in dataset so the click is stable even if inventory order changes
+    const btn = div.querySelector('.craft-dismantle-btn');
+    btn.dataset.invName = name;
+    btn.dataset.invType = type;
+    btn.dataset.qualKey = qualKey;
+    btn.addEventListener('click', function(){
+      dismantleItem(this.dataset.invName, this.dataset.qualKey, this.dataset.invType);
+    });
     listEl.appendChild(div);
     count++;
   });
@@ -15641,12 +15665,18 @@ function detectItemQuality(name, notes){
   return 'common';
 }
 
-function dismantleItem(cardIdx, qualKey, type){
-  const cards = document.querySelectorAll('#inventoryList .inv-card');
-  const card = cards[cardIdx];
-  if(!card) return;
-  const name = (card.querySelectorAll('.c-inp')[0]||{}).value||'Unknown';
-  if(!confirm(`Dismantle "${name}"? This will remove it from inventory and add material components.`)) return;
+function dismantleItem(itemName, qualKey, type){
+  // FIX: find card by name+type scan instead of fragile array index
+  var targetCard = null;
+  document.querySelectorAll('#inventoryList .inv-card').forEach(function(card){
+    if(targetCard) return;
+    var n = (card.querySelectorAll('.c-inp')[0]||{}).value||'';
+    var t = (card.querySelector('.inv-type')||{}).value||'gear';
+    if(n === itemName && t === type) targetCard = card;
+  });
+  if(!targetCard){ showToast('"'+itemName+'" not found — refresh the Dismantle list.'); return; }
+  const name = itemName;
+  if(!confirm('Dismantle "'+name+'"? This will remove it from inventory and add material components.')) return;
   const yieldTable = DISMANTLE_YIELD[type]||DISMANTLE_YIELD.other;
   const yieldList  = yieldTable ? (yieldTable[qualKey]||yieldTable.common) : [];
   for(const y of yieldList){
@@ -15655,9 +15685,9 @@ function dismantleItem(cardIdx, qualKey, type){
       addInventory({name:y.name,qty,ac:0,type:y.type,slot:'none',set:'',equipped:false,notes:'Dismantled from: '+name});
     }
   }
-  const qtyEl = card.querySelector('.inv-qty');
+  const qtyEl = targetCard.querySelector('.inv-qty');
   const curQty = parseInt((qtyEl||{}).value)||1;
-  if(curQty<=1){ card.remove(); }
+  if(curQty<=1){ targetCard.remove(); }
   else { if(qtyEl) qtyEl.value=curQty-1; }
   saveCards('inventoryList','inventory');
   renderEquipSlots();
