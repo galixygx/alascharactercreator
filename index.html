@@ -5420,7 +5420,8 @@
         .units-conv-overlay.open { opacity: 1; pointer-events: all; }
         .units-conv-modal {
           background: var(--surf); border: 1px solid var(--bdr-g);
-          border-radius: 8px; padding: 20px 22px; width: 340px; max-width: 95vw;
+          border-radius: 8px; padding: 20px 22px; width: 360px; max-width: 95vw;
+          max-height: 88vh; overflow-y: auto;
           box-shadow: 0 0 30px rgba(201,162,39,0.15);
         }
         .units-conv-title { font-family: 'Cinzel',serif; font-size: 12px; letter-spacing: 3px; color: var(--gold); margin-bottom: 14px; }
@@ -28915,6 +28916,90 @@ function copyReport(){
         <span class="units-conv-result" id="uc_gal_res">— gal</span>
       </div>
     </div>
+    <!-- Speed -->
+    <div class="units-conv-section">
+      <div class="units-conv-lbl">Speed</div>
+      <div class="units-conv-row">
+        <input class="units-conv-inp" type="number" id="uc_mph" placeholder="mph" oninput="ucConvert('mph',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">mph →</span>
+        <span class="units-conv-result" id="uc_kph">— km/h</span>
+      </div>
+      <div class="units-conv-row" style="margin-top:5px">
+        <input class="units-conv-inp" type="number" id="uc_kph_inp" placeholder="km/h" oninput="ucConvert('kph',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">km/h →</span>
+        <span class="units-conv-result" id="uc_mph_res">— mph</span>
+      </div>
+    </div>
+    <!-- Distance (Travel) -->
+    <div class="units-conv-section">
+      <div class="units-conv-lbl">Distance (Travel)</div>
+      <div class="units-conv-row">
+        <input class="units-conv-inp" type="number" id="uc_mi" placeholder="miles" oninput="ucConvert('mi',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">mi →</span>
+        <span class="units-conv-result" id="uc_km">— km</span>
+      </div>
+      <div class="units-conv-row" style="margin-top:5px">
+        <input class="units-conv-inp" type="number" id="uc_km_inp" placeholder="km" oninput="ucConvert('km',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">km →</span>
+        <span class="units-conv-result" id="uc_mi_res">— miles</span>
+      </div>
+    </div>
+    <!-- Area (Spell / Zone) -->
+    <div class="units-conv-section">
+      <div class="units-conv-lbl">Area (Spell / Zone)</div>
+      <div class="units-conv-row">
+        <input class="units-conv-inp" type="number" id="uc_sqft" placeholder="ft²" oninput="ucConvert('sqft',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">ft² →</span>
+        <span class="units-conv-result" id="uc_sqm">— m²</span>
+      </div>
+      <div class="units-conv-row" style="margin-top:5px">
+        <input class="units-conv-inp" type="number" id="uc_sqm_inp" placeholder="m²" oninput="ucConvert('sqm',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">m² →</span>
+        <span class="units-conv-result" id="uc_sqft_res">— ft²</span>
+      </div>
+    </div>
+    <!-- Combat Speed -->
+    <div class="units-conv-section">
+      <div class="units-conv-lbl">Combat Speed (6-sec round)</div>
+      <div class="units-conv-row">
+        <input class="units-conv-inp" type="number" id="uc_ftrd" placeholder="ft/rnd" oninput="ucConvert('ftrd',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">ft/rnd →</span>
+        <span class="units-conv-result" id="uc_ftrd_res">— mph / km/h</span>
+      </div>
+    </div>
+    <!-- Currency -->
+    <div class="units-conv-section">
+      <div class="units-conv-lbl">Currency (GP / SP / CP)</div>
+      <div class="units-conv-row">
+        <input class="units-conv-inp" type="number" id="uc_gp" placeholder="GP" oninput="ucConvert('gp',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">GP →</span>
+        <span class="units-conv-result" id="uc_gp_res">— SP / CP</span>
+      </div>
+      <div class="units-conv-row" style="margin-top:5px">
+        <input class="units-conv-inp" type="number" id="uc_sp_uc" placeholder="SP" oninput="ucConvert('sp',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">SP →</span>
+        <span class="units-conv-result" id="uc_sp_res">— GP / CP</span>
+      </div>
+      <div class="units-conv-row" style="margin-top:5px">
+        <input class="units-conv-inp" type="number" id="uc_cp_uc" placeholder="CP" oninput="ucConvert('cp',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">CP →</span>
+        <span class="units-conv-result" id="uc_cp_res">— GP / SP</span>
+      </div>
+    </div>
+    <!-- Coin Weight -->
+    <div class="units-conv-section">
+      <div class="units-conv-lbl">Coin Weight (50 coins = 1 lb)</div>
+      <div class="units-conv-row">
+        <input class="units-conv-inp" type="number" id="uc_coins" placeholder="# coins" oninput="ucConvert('coins',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">coins →</span>
+        <span class="units-conv-result" id="uc_coins_res">— lb / kg</span>
+      </div>
+      <div class="units-conv-row" style="margin-top:5px">
+        <input class="units-conv-inp" type="number" id="uc_coinlb" placeholder="lb" oninput="ucConvert('coinlb',this.value)">
+        <span style="color:var(--txt-dim);font-size:11px">lb →</span>
+        <span class="units-conv-result" id="uc_coinlb_res">— # coins</span>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -28937,6 +29022,28 @@ function ucConvert(from, val){
   else if(from==='ml'){ const el=document.getElementById('uc_floz_res'); if(el)el.textContent=r(v/29.5735)+' fl oz'; }
   else if(from==='gal'){ const el=document.getElementById('uc_L'); if(el)el.textContent=r(v*3.78541)+' L'; }
   else if(from==='liter'){ const el=document.getElementById('uc_gal_res'); if(el)el.textContent=r(v/3.78541)+' gal'; }
+  // Speed
+  else if(from==='mph'){ const el=document.getElementById('uc_kph'); if(el)el.textContent=r(v*1.60934)+' km/h'; }
+  else if(from==='kph'){ const el=document.getElementById('uc_mph_res'); if(el)el.textContent=r(v/1.60934)+' mph'; }
+  // Distance
+  else if(from==='mi'){ const el=document.getElementById('uc_km'); if(el)el.textContent=r(v*1.60934)+' km'; }
+  else if(from==='km'){ const el=document.getElementById('uc_mi_res'); if(el)el.textContent=r(v/1.60934)+' miles'; }
+  // Area
+  else if(from==='sqft'){ const el=document.getElementById('uc_sqm'); if(el)el.textContent=r(v*0.092903)+' m²'; }
+  else if(from==='sqm'){ const el=document.getElementById('uc_sqft_res'); if(el)el.textContent=r(v/0.092903)+' ft²'; }
+  // Combat Speed: ft per 6-sec round → mph & km/h
+  else if(from==='ftrd'){
+    const mph=r(v/5280*600); const kph=r(mph*1.60934);
+    const el=document.getElementById('uc_ftrd_res');
+    if(el)el.textContent=mph+' mph  /  '+kph+' km/h';
+  }
+  // Currency (1 GP = 10 SP = 100 CP)
+  else if(from==='gp'){ const el=document.getElementById('uc_gp_res'); if(el)el.textContent=r(v*10)+' SP  /  '+r(v*100)+' CP'; }
+  else if(from==='sp'){ const el=document.getElementById('uc_sp_res'); if(el)el.textContent=r(v/10)+' GP  /  '+r(v*10)+' CP'; }
+  else if(from==='cp'){ const el=document.getElementById('uc_cp_res'); if(el)el.textContent=r(v/100)+' GP  /  '+r(v/10)+' SP'; }
+  // Coin weight (50 coins = 1 lb)
+  else if(from==='coins'){ const lbs=r(v/50); const el=document.getElementById('uc_coins_res'); if(el)el.textContent=lbs+' lb  /  '+r(lbs*0.453592)+' kg'; }
+  else if(from==='coinlb'){ const el=document.getElementById('uc_coinlb_res'); if(el)el.textContent=r(v*50)+' coins'; }
 }
 </script>
 
