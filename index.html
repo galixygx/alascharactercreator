@@ -13787,7 +13787,7 @@ function doRest(type){
   } else if(type==='recovery'){
     const restore=Math.floor(rpMax/2);
     const newRp=Math.min(rpMax,(parseInt(rpCurEl.value)||0)+restore);
-    rpCurEl.value=newRp;
+    rpCurEl.value=newRp; state.rpCur=newRp;   // FIX: keep state in sync so save/reload keeps the restored value
     state.exhaustion=Math.max(0,(state.exhaustion||0)-1);
     buildExhaustionPips();
     updateBar('rp');updateRpState();
@@ -24721,6 +24721,8 @@ function loadCharacterFile(input){
       updateEpDesc();
       renderEquipSlots();
       renderActiveEffectsList();
+      if(typeof renderSpellList   === 'function') renderSpellList();   // FIX: show completed spells after file load
+      if(typeof renderAbilityList === 'function') renderAbilityList(); // FIX: show completed abilities after file load
       updateEffectsRpBadge();
       initDice3DButton();
       initDiceUI();
@@ -25173,6 +25175,8 @@ window.addEventListener('load', function(){
   updateEpDesc();
   renderEquipSlots();
   renderActiveEffectsList();
+  if(typeof renderSpellList   === 'function') renderSpellList();   // FIX: show completed spells on page load
+  if(typeof renderAbilityList === 'function') renderAbilityList(); // FIX: show completed abilities on page load
   updateEffectsRpBadge();
   // Wire auto-save on any user input (V2-parity)
   document.addEventListener('input', saveAll);
@@ -27019,6 +27023,8 @@ function clearSheet(){
   if(biomePnl) biomePnl.innerHTML='';
   state._biomeInitBonus=0; state._biomePerceptionBonus=0;
   state._biomeSocialBonus=0; state._biomeWaterSigilRC=0; state._biomeFireSigilRC=0;
+  if(typeof renderSpellList   === 'function') renderSpellList();   // FIX: clear spell list on New Character
+  if(typeof renderAbilityList === 'function') renderAbilityList(); // FIX: clear ability list on New Character
 }
 
 function _loadStateObject(loaded){
@@ -27359,15 +27365,17 @@ function restoreAllSpells(){
 function duplicateSpell(card){
   if(!card) return;
   saveCards('sigilsList','sigils');
-  const nameEl = card.querySelectorAll('.c-inp')[0];
-  const name   = nameEl ? nameEl.value : '';
-  const src    = (state.sigils||[]).find(function(s){ return s.name===name; });
-  const clone  = src ? Object.assign({}, src, { name: src.name+' (Copy)' }) : {};
+  // FIX: use card's DOM position to find its state entry — avoids wrong-card duplication when names collide
+  const list  = document.getElementById('sigilsList');
+  const cards = list ? Array.from(list.querySelectorAll('.item-card')) : [];
+  const idx   = cards.indexOf(card);
+  const src   = idx >= 0 ? (state.sigils||[])[idx] : null;
+  if(!src){ showToast('Could not duplicate — try saving the card first.'); return; }
+  const clone = Object.assign({}, src, { name: src.name + ' (Copy)' });
   addSpell(clone);
   saveCards('sigilsList','sigils');
-  const list = document.getElementById('sigilsList');
   if(list && list.lastChild) list.lastChild.scrollIntoView({behavior:'smooth',block:'start'});
-  showToast('"'+(src?src.name:'Spell')+'" duplicated.');
+  showToast('"' + src.name + '" duplicated.');
 }
 
 function spellUpdateAffColor(sel){
@@ -30120,7 +30128,7 @@ function _refreshGoldTotal(){
   var sp=parseFloat((document.getElementById('goldSP')||{}).value)||0;
   var cp=parseFloat((document.getElementById('goldCP')||{}).value)||0;
   var el=document.getElementById('goldTotalDisplay');
-  if(el) el.textContent=(gp+sp/10+cp/100).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})+' GP equiv.';
+  if(el) el.textContent=(gp+sp/100+cp/100000).toLocaleString('en-US',{minimumFractionDigits:0,maximumFractionDigits:2})+' GP equiv.'; // FIX: Alas rates: 1 GP = 100 SP = 100,000 CP
 }
 function updateGoldTotal(){
   _refreshGoldTotal();
