@@ -13794,6 +13794,11 @@ function doRest(type){
     } else {
       msg='Deep Rest — Full restore. Corruption unchanged.';
     }
+    // Restore all spell list availability on Deep Rest (long rest equivalent)
+    if(Array.isArray(state.completedSpells)){
+      state.completedSpells.forEach(function(s){ s.available = true; });
+      if(typeof renderSpellList === 'function') renderSpellList();
+    }
   }
   _debouncedSave();
   showToast(msg);
@@ -14487,7 +14492,7 @@ function addSpell(data){
 
     <!-- Row 2: Timing -->
     <div class="c-row c-3col">
-      <div class="c-fld"><span class="c-fld-lbl">Cast Time</span><select class="c-sel" onchange="saveCards('sigilsList','sigils')">
+      <div class="c-fld"><span class="c-fld-lbl">Cast Time</span><select class="c-sel sp-ct-sel" onchange="saveCards('sigilsList','sigils')">
         ${['Action','Bonus Action','Reaction','1 Minute','1 Hour'].map(v=>`<option${(data.ct||'Action')===v?' selected':''}>${v}</option>`).join('')}
       </select></div>
       <div class="c-fld">
@@ -14497,7 +14502,7 @@ function addSpell(data){
         </select>
         ${durSubHTML}
       </div>
-      <div class="c-fld"><span class="c-fld-lbl">Range</span><select class="c-sel" onchange="saveCards('sigilsList','sigils')">
+      <div class="c-fld"><span class="c-fld-lbl">Range</span><select class="c-sel sp-range-sel" onchange="saveCards('sigilsList','sigils')">
         ${['Touch','Self','5 ft.','30 ft.','60 ft.','90 ft.','120 ft.','300 ft.','Sight'].map(v=>`<option${(data.range||'60 ft.')===v?' selected':''}>${v}</option>`).join('')}
       </select></div>
     </div>
@@ -27312,10 +27317,12 @@ function completeSpell(card){
     }
   }
 
-  const sels = card.querySelectorAll('.c-sel');
-  const ctVal    = (sels[1]||{}).value || 'Action';
-  const durVal   = (sels[2]||{}).value || 'Instant';
-  const rangeVal = (sels[3]||{}).value || '—';
+  const ctEl     = card.querySelector('.sp-ct-sel');
+  const durEl    = card.querySelector('.sp-dur-sel');
+  const rangeEl  = card.querySelector('.sp-range-sel');
+  const ctVal    = (ctEl    ||{}).value || 'Action';
+  const durVal   = (durEl   ||{}).value || 'Instant';
+  const rangeVal = (rangeEl ||{}).value || '—';
 
   const aePanel = card.querySelector('.sp-ae-panel .eff-stat-panel');
   const hasAE   = card.dataset.hasActiveEffect === '1';
@@ -27335,6 +27342,18 @@ function completeSpell(card){
     ct:              ctVal,
     dur:             durVal,
     range:           rangeVal,
+    attackType:      card.dataset.attackType  || 'none',
+    saveType:        card.dataset.saveType    || 'none',
+    saveHalf:        card.dataset.saveHalf    || '0',
+    aeAc:            card.dataset.aeAc        || '0',
+    aeRp:            card.dataset.aeRp        || '0',
+    aeIns:           card.dataset.aeIns       || '0',
+    aeDur:           card.dataset.aeDur       || '1',
+    aeDurUnit:       card.dataset.aeDurUnit   || 'rounds',
+    durType:         card.dataset.durType     || 'Instant',
+    durAmt:          card.dataset.durAmt      || '1',
+    concUnit:        card.dataset.concUnit    || 'minutes',
+    concAmt:         card.dataset.concAmt     || '1',
     conditions:      card.dataset.conditions || '',
     notes:           (notesEl ||{}).value || '',
     unstableMagic:   unstableMagic,
@@ -27366,6 +27385,21 @@ function removeCompletedSpell(id){
   renderSpellList();
   updateCalcs();
   if(sp) showToast(`"${sp.name}" removed from Spell List.`);
+}
+
+function editCompletedSpell(id){
+  if(!Array.isArray(state.completedSpells)) return;
+  const idx = state.completedSpells.findIndex(s => s.id === id);
+  if(idx === -1){ showToast('Spell not found.'); return; }
+  const sp = state.completedSpells[idx];
+  state.completedSpells.splice(idx, 1);
+  _debouncedSave();
+  addSpell(sp);
+  renderSpellList();
+  saveCards('sigilsList', 'sigils');
+  const list = document.getElementById('sigilsList');
+  if(list && list.lastChild) list.lastChild.scrollIntoView({behavior:'smooth', block:'start'});
+  showToast(`"${sp.name}" moved back to builder — edit and press Complete when done.`);
 }
 
 function sortSpellList(key){
@@ -27437,9 +27471,11 @@ function renderSpellList(){
         <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:${sp.notes||conds?'8px':'0'};">
           <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">RC <strong style="color:rgba(61,214,219,.8);">${sp.rc}</strong></span>
           ${parseInt(sp.ip||0)>0 ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">INS+ <strong style="color:rgba(208,112,48,.8);">${sp.ip}</strong></span>` : ''}
-          <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">${sp.ct}</span>
-          <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">${sp.range}</span>
-          <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">${sp.dur}</span>
+          ${sp.ct ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Cast: <strong style="color:rgba(255,255,255,.7);">${sp.ct}</strong></span>` : ''}
+          ${sp.range && sp.range !== '—' ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Range: <strong style="color:rgba(255,255,255,.7);">${sp.range}</strong></span>` : ''}
+          ${sp.dur ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Dur: <strong style="color:rgba(255,255,255,.7);">${sp.dur}</strong></span>` : ''}
+          ${sp.saveType && sp.saveType !== 'none' ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Save: <strong style="color:rgba(200,160,255,.85);">${sp.saveType}</strong>${sp.saveHalf==='1' ? ' <em style="font-size:10px">½</em>' : ''}</span>` : ''}
+          ${sp.attackType && sp.attackType !== 'none' ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Atk: <strong style="color:rgba(200,160,255,.85);">${sp.attackType}</strong></span>` : ''}
           ${sp.element && sp.element !== '—' ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">⚡ ${sp.element}</span>` : ''}
           ${dmg !== '—' ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">🎲 ${dmg}</span>` : ''}
         </div>
@@ -27450,6 +27486,7 @@ function renderSpellList(){
         <button type="button" onclick="toggleSpellAvailable('${sp.id}')" style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;padding:5px 11px;border:1px solid;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .2s;${availBtnStyle}">${availLabel}</button>
         <button type="button" class="sig-cast-btn" onclick="castCompletedSpell('${sp.id}')" style="font-size:7.5px;padding:5px 12px;letter-spacing:1.5px;">⟳ Cast</button>
         ${hasAE ? `<button type="button" onclick="toggleCompletedSpellActive('${sp.id}')" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;border:1px solid;border-radius:4px;cursor:pointer;white-space:nowrap;${effBtnStyle}">${isActive ? '⚡ Effect On' : '○ Effect Off'}</button>` : ''}
+        <button type="button" onclick="editCompletedSpell('${sp.id}')" title="Move back to builder to edit" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(201,162,39,.35);border-radius:4px;color:rgba(201,162,39,.75);cursor:pointer;white-space:nowrap;">✎ Edit</button>
         <button type="button" onclick="removeCompletedSpell('${sp.id}')" title="Remove from Spell List" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(200,32,48,.3);border-radius:4px;color:rgba(200,32,48,.6);cursor:pointer;white-space:nowrap;">✕ Remove</button>
       </div>`;
     grid.appendChild(div);
@@ -27480,6 +27517,13 @@ function castCompletedSpell(spId){
 
   // Use the core engine: RC deduction → Instability → toast → Smart Roll → Casting Scale
   castSigilByRC(rc, ip, sp.name, sp.aff, null);
+
+  // Mark spell as used after casting if it costs RC (restored on Deep Rest)
+  if(rc > 0){
+    sp.available = false;
+    _debouncedSave();
+    renderSpellList();
+  }
 
   // Override Smart Roll with richer effect data (fires after castSigilByRC's 80ms timeout)
   if(spellEffect){
