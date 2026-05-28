@@ -10002,11 +10002,26 @@
                     <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:14px;">
                         Completed spells locked in from your Custom &amp; Additional Sigils above. Press <em>Complete</em> on any spell card to add it here as a permanent reference.
                     </div>
-                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px;">
                         <span style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;">Sort by:</span>
                         <button onclick="sortSpellList('level')" id="slSortLevel" class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;border-color:rgba(201,162,39,.4);color:var(--gold-d);">Level ▲</button>
                         <button onclick="sortSpellList('name')"  id="slSortName"  class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;">Name A–Z</button>
                         <button onclick="sortSpellList('aff')"   id="slSortAff"   class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;">Affinity</button>
+                        <button onclick="restoreAllSpells()" class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;border-color:rgba(61,214,219,.4);color:rgba(61,214,219,.85);margin-left:auto;">◉ Restore All</button>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px;">
+                        <input id="slSearchInput" type="text" placeholder="🔍 Search spells…"
+                               style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.5px;padding:5px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:4px;color:var(--txt-main);width:170px;"
+                               oninput="_slSearch=this.value.toLowerCase();renderSpellList()">
+                        <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;">Filter:</span>
+                        <button type="button" class="sl-aff-btn add-btn" data-aff="All"    onclick="_slSetAff('All')"    style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:1;">All</button>
+                        <button type="button" class="sl-aff-btn add-btn" data-aff="Light"  onclick="_slSetAff('Light')"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#e8d070;border-color:rgba(232,208,112,.35);">Light</button>
+                        <button type="button" class="sl-aff-btn add-btn" data-aff="Nature" onclick="_slSetAff('Nature')" style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#7cd46a;border-color:rgba(124,212,106,.35);">Nature</button>
+                        <button type="button" class="sl-aff-btn add-btn" data-aff="Water"  onclick="_slSetAff('Water')"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#50b8e0;border-color:rgba(80,184,224,.35);">Water</button>
+                        <button type="button" class="sl-aff-btn add-btn" data-aff="Air"    onclick="_slSetAff('Air')"    style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#b0d8f0;border-color:rgba(176,216,240,.35);">Air</button>
+                        <button type="button" class="sl-aff-btn add-btn" data-aff="Fire"   onclick="_slSetAff('Fire')"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#e07040;border-color:rgba(224,112,64,.35);">Fire</button>
+                        <button type="button" class="sl-aff-btn add-btn" data-aff="Chaos"  onclick="_slSetAff('Chaos')"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#e050a0;border-color:rgba(224,80,160,.35);">Chaos</button>
+                        <button type="button" class="sl-aff-btn add-btn" data-aff="Common" onclick="_slSetAff('Common')" style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#a0a0b8;border-color:rgba(160,160,184,.35);">Common</button>
                     </div>
                     <div id="spellListGrid" style="display:flex;flex-direction:column;gap:8px;"></div>
                     <div id="spellListEmpty" style="font-family:'EB Garamond',serif;font-size:13px;color:var(--txt-dim);font-style:italic;padding:10px 0;">No completed spells yet — press <strong style="color:var(--gold-d)">Complete</strong> on a spell card above to add it to your list.</div>
@@ -14468,7 +14483,7 @@ function addSpell(data){
     <!-- Row 1: Identity -->
     <div class="c-row" style="grid-template-columns:2fr 1fr 80px 80px 80px">
       <div class="c-fld"><span class="c-fld-lbl">Spell Name</span><input class="c-inp" value="${data.name||''}" placeholder="Name…" oninput="saveCards('sigilsList','sigils')"></div>
-      <div class="c-fld"><span class="c-fld-lbl">Affinity</span><select class="c-sel" onchange="saveCards('sigilsList','sigils')">${affOpts}</select></div>
+      <div class="c-fld"><span class="c-fld-lbl">Affinity</span><select class="c-sel" onchange="spellUpdateAffColor(this)">${affOpts}</select></div>
       <div class="c-fld"><span class="c-fld-lbl">Spell Level</span><input class="c-inp" type="number" value="${data.spellLevel||1}" min="0" max="9" style="text-align:center" oninput="this.closest('.item-card').dataset.spellLevel=this.value;saveCards('sigilsList','sigils')" title="Spell level (0–9)"></div>
       <div class="c-fld"><span class="c-fld-lbl">RC Cost</span><input class="c-inp sig-rc-inp" type="number" value="${data.rc!==undefined?data.rc:2}" min="0" oninput="updateSigilRCUI(this.closest('.item-card'));saveCards('sigilsList','sigils')"></div>
       <div class="c-fld"><span class="c-fld-lbl">Instability+</span><input class="c-inp" type="number" value="${data.ip||0}" min="0" oninput="saveCards('sigilsList','sigils')"></div>
@@ -14493,7 +14508,7 @@ function addSpell(data){
     <!-- Row 2: Timing -->
     <div class="c-row c-3col">
       <div class="c-fld"><span class="c-fld-lbl">Cast Time</span><select class="c-sel sp-ct-sel" onchange="saveCards('sigilsList','sigils')">
-        ${['Action','Bonus Action','Reaction','1 Minute','1 Hour'].map(v=>`<option${(data.ct||'Action')===v?' selected':''}>${v}</option>`).join('')}
+        ${['Action','Bonus Action','Reaction','Free Action','2 Actions','1 Minute','10 Minutes','1 Hour'].map(v=>`<option${(data.ct||'Action')===v?' selected':''}>${v}</option>`).join('')}
       </select></div>
       <div class="c-fld">
         <span class="c-fld-lbl">Duration</span>
@@ -14503,7 +14518,7 @@ function addSpell(data){
         ${durSubHTML}
       </div>
       <div class="c-fld"><span class="c-fld-lbl">Range</span><select class="c-sel sp-range-sel" onchange="saveCards('sigilsList','sigils')">
-        ${['Touch','Self','5 ft.','30 ft.','60 ft.','90 ft.','120 ft.','300 ft.','Sight'].map(v=>`<option${(data.range||'60 ft.')===v?' selected':''}>${v}</option>`).join('')}
+        ${['Self','Touch','5 ft.','10 ft.','15 ft.','20 ft.','30 ft.','60 ft.','90 ft.','120 ft.','300 ft.','500 ft.','1 mile','Sight','Unlimited','Special'].map(v=>`<option${(data.range||'60 ft.')===v?' selected':''}>${v}</option>`).join('')}
       </select></div>
     </div>
 
@@ -14701,6 +14716,7 @@ function addSpell(data){
       <span class="sig-usage-lbl" style="font-family:'Cinzel',serif;font-size:7px;color:var(--txt-dim);text-transform:uppercase;">Once/Day if RC ≥ 1 — toggle after use</span>
       <button type="button" class="sig-avail-btn" data-spent="${spentAttr}" onclick="toggleSigilDaily(this)">Available</button>
       <button type="button" class="sig-avail-btn" style="background:rgba(201,162,39,.1);border-color:rgba(201,162,39,.45);color:var(--gold-d);" onclick="completeSpell(this.closest('.item-card'))">✓ Complete</button>
+      <button type="button" class="sig-avail-btn" style="background:rgba(61,214,219,.06);border-color:rgba(61,214,219,.35);color:rgba(61,214,219,.75);" onclick="duplicateSpell(this.closest('.item-card'))">⧉ Dupe</button>
     </div>
     <div class="sig-atwill" style="display:none;font-family:'Cinzel',serif;font-size:7px;color:var(--res);letter-spacing:1px;">AT-WILL (RC 0)</div>
   `;
@@ -14731,6 +14747,12 @@ function addSpell(data){
   }
   list.appendChild(card);
   updateSigilRCUI(card);
+  // Apply initial affinity border color
+  (function(){
+    const _AC={Light:'#e8d070',Nature:'#7cd46a',Water:'#50b8e0',Air:'#b0d8f0',Fire:'#e07040',Chaos:'#e050a0',Common:'#a0a0b8'};
+    const affSel = card.querySelector('.c-sel');
+    if(affSel) card.style.borderLeft = '3px solid ' + (_AC[affSel.value] || '#7878a0');
+  })();
 }
 
 // Legacy alias
@@ -27281,7 +27303,91 @@ function castingScaleRoll(tier){
 // SIGILS — SPELL LIST (completed / locked spells)
 // ═══════════════════════════════════════════════════════════════
 
-let _slSortKey = 'level';
+let _slSortKey       = 'level';
+let _slSearch        = '';
+let _slFilterAff     = 'All';
+let _slExpandedNotes = new Set();
+
+// ── Spell List helpers ────────────────────────────────────────────
+function _spDurDisplay(sp){
+  const d = sp.dur || 'Instant';
+  if(d === 'Rounds'){
+    const n = parseInt(sp.durAmt)||1;
+    return n + ' round' + (n!==1?'s':'');
+  }
+  if(d === 'Minutes') return (parseInt(sp.durAmt)||1) + ' min';
+  if(d === 'Hours')   return (parseInt(sp.durAmt)||1) + ' hr';
+  if(d === 'Concentration'){
+    const amt  = parseInt(sp.concAmt)||1;
+    const unit = (sp.concUnit||'minutes') === 'hours' ? 'hr' : 'min';
+    return 'Conc. ' + amt + ' ' + unit;
+  }
+  return d;
+}
+
+function _slSetAff(aff){
+  _slFilterAff = aff;
+  document.querySelectorAll('.sl-aff-btn').forEach(function(b){
+    const on = b.dataset.aff === aff;
+    b.style.borderColor = on ? 'rgba(201,162,39,.8)' : '';
+    b.style.color       = on ? 'var(--gold)' : '';
+    b.style.opacity     = on ? '1' : '.5';
+  });
+  renderSpellList();
+}
+
+function restoreAllSpells(){
+  if(!Array.isArray(state.completedSpells)||!state.completedSpells.length) return;
+  const used = state.completedSpells.filter(function(s){ return s.available===false; }).length;
+  if(!used){ showToast('All spells are already available.'); return; }
+  state.completedSpells.forEach(function(s){ s.available=true; });
+  _debouncedSave();
+  renderSpellList();
+  showToast(used + ' spell'+(used!==1?'s':'')+' restored.');
+}
+
+function duplicateSpell(card){
+  if(!card) return;
+  saveCards('sigilsList','sigils');
+  const nameEl = card.querySelectorAll('.c-inp')[0];
+  const name   = nameEl ? nameEl.value : '';
+  const src    = (state.sigils||[]).find(function(s){ return s.name===name; });
+  const clone  = src ? Object.assign({}, src, { name: src.name+' (Copy)' }) : {};
+  addSpell(clone);
+  saveCards('sigilsList','sigils');
+  const list = document.getElementById('sigilsList');
+  if(list && list.lastChild) list.lastChild.scrollIntoView({behavior:'smooth',block:'start'});
+  showToast('"'+(src?src.name:'Spell')+'" duplicated.');
+}
+
+function spellUpdateAffColor(sel){
+  const card = sel.closest('.item-card');
+  if(!card) return;
+  const _AC={Light:'#e8d070',Nature:'#7cd46a',Water:'#50b8e0',Air:'#b0d8f0',Fire:'#e07040',Chaos:'#e050a0',Common:'#a0a0b8'};
+  card.style.borderLeft = '3px solid ' + (_AC[sel.value]||'#7878a0');
+  saveCards('sigilsList','sigils');
+}
+
+function copySpellText(spId){
+  const sp=(state.completedSpells||[]).find(function(s){ return s.id===spId; });
+  if(!sp){ showToast('Spell not found.'); return; }
+  const durStr = _spDurDisplay(sp);
+  const lvlStr = parseInt(sp.spellLevel||0)===0 ? 'Cantrip' : 'Level '+sp.spellLevel;
+  const lines = [
+    '✦ '+sp.name+' ['+lvlStr+' · '+sp.aff+']',
+    'RC: '+sp.rc+(parseInt(sp.ip||0)>0 ? '  |  Instability+: '+sp.ip : ''),
+    'Cast: '+sp.ct+'  ·  Range: '+sp.range+'  ·  Duration: '+durStr,
+  ];
+  if(sp.saveType&&sp.saveType!=='none')   lines.push('Save: '+sp.saveType+(sp.saveHalf==='1'?' (half on save)':''));
+  if(sp.attackType&&sp.attackType!=='none') lines.push('Attack Roll: '+sp.attackType);
+  const dmg = sp.dmgDie&&sp.dmgDie!=='none' ? (sp.dmgCount||1)+sp.dmgDie+(sp.dmgType?' '+sp.dmgType:'') : '';
+  if(dmg) lines.push('Damage: '+dmg);
+  if(sp.conditions) lines.push('On Hit: '+sp.conditions.split(',').filter(Boolean).join(', '));
+  if(sp.notes) lines.push('—\n'+sp.notes);
+  navigator.clipboard.writeText(lines.join('\n'))
+    .then(function(){ showToast('"'+sp.name+'" copied to clipboard.'); })
+    .catch(function(){ showToast('Copy failed — try again.'); });
+}
 
 function completeSpell(card){
   if(!card) return;
@@ -27416,17 +27522,27 @@ function renderSpellList(){
   const empty = document.getElementById('spellListEmpty');
   const hdr   = document.getElementById('spellListHdr');
   if(!grid) return;
-  const spells = Array.isArray(state.completedSpells) ? [...state.completedSpells] : [];
-  if(empty) empty.style.display = spells.length ? 'none' : '';
-  if(hdr)   hdr.textContent = spells.length ? `Spell List (${spells.length})` : 'Spell List';
+
+  const allSpells = Array.isArray(state.completedSpells) ? [...state.completedSpells] : [];
+  const totalReady = allSpells.filter(s => s.available !== false).length;
+  if(empty) empty.style.display = allSpells.length ? 'none' : '';
+  if(hdr)   hdr.textContent = allSpells.length
+    ? `Spell List (${allSpells.length})  •  ${totalReady}/${allSpells.length} Ready`
+    : 'Spell List';
 
   // Sort
-  spells.sort((a, b) => {
+  allSpells.sort((a, b) => {
     if(_slSortKey === 'level') return (parseInt(a.spellLevel)||0) - (parseInt(b.spellLevel)||0);
     if(_slSortKey === 'name')  return (a.name||'').localeCompare(b.name||'');
     if(_slSortKey === 'aff')   return (a.aff||'').localeCompare(b.aff||'');
     return 0;
   });
+
+  // Filter
+  let spells = allSpells;
+  if(_slFilterAff && _slFilterAff !== 'All') spells = spells.filter(s => s.aff === _slFilterAff);
+  if(_slSearch) spells = spells.filter(s =>
+    (s.name||'').toLowerCase().includes(_slSearch) || (s.notes||'').toLowerCase().includes(_slSearch));
 
   const AFF_COLORS = {
     Light:'#e8d070', Nature:'#7cd46a', Water:'#50b8e0', Air:'#b0d8f0',
@@ -27434,56 +27550,88 @@ function renderSpellList(){
   };
 
   grid.innerHTML = '';
+
+  // No-match message when filter yields nothing
+  if(spells.length === 0 && allSpells.length > 0){
+    const msg = document.createElement('div');
+    msg.style.cssText = "font-family:'EB Garamond',serif;font-size:13px;color:var(--txt-dim);font-style:italic;padding:10px 0;";
+    msg.textContent = 'No spells match the current filter.';
+    grid.appendChild(msg);
+    return;
+  }
+
   spells.forEach(sp => {
-    const col  = AFF_COLORS[sp.aff] || '#c9a227';
-    const dmg  = sp.dmgDie !== 'none' ? `${sp.dmgCount}${sp.dmgDie} ${sp.dmgType||''}`.trim() : '—';
-    const conds = sp.conditions ? sp.conditions.split(',').filter(Boolean).map(c =>
+    const col      = AFF_COLORS[sp.aff] || '#c9a227';
+    const dmg      = sp.dmgDie !== 'none' ? `${sp.dmgCount}${sp.dmgDie} ${sp.dmgType||''}`.trim() : '—';
+    const conds    = sp.conditions ? sp.conditions.split(',').filter(Boolean).map(c =>
       `<span style="display:inline-block;padding:1px 6px;background:rgba(200,32,48,.12);border:1px solid rgba(200,32,48,.3);border-radius:3px;font-size:10px;color:#c84050;">${c}</span>`
     ).join('') : '';
 
     const hasAE    = sp.hasActiveEffect === '1';
     const isActive = !!(sp.isActive);
     const avail    = sp.available !== false;
+    const isAtWill = parseInt(sp.rc||0) === 0;
+    const isConc   = sp.dur === 'Concentration';
+    const durStr   = _spDurDisplay(sp);
+
     const effBtnStyle = isActive
       ? 'background:rgba(61,214,219,.15);border-color:rgba(61,214,219,.6);color:rgba(61,214,219,.9);'
       : 'background:transparent;border-color:rgba(255,255,255,.15);color:var(--txt-dim);';
     const availBtnStyle = avail
       ? 'background:rgba(61,214,219,.1);border-color:rgba(61,214,219,.55);color:rgba(61,214,219,.95);'
       : 'background:rgba(200,32,48,.07);border-color:rgba(200,32,48,.35);color:rgba(200,32,48,.7);';
-    const availLabel = avail
-      ? '◉ AVAILABLE (TAP WHEN USED)'
-      : '✕ USED — TAP TO RESTORE';
+    const availLabel = avail ? '◉ AVAILABLE (TAP WHEN USED)' : '✕ USED — TAP TO RESTORE';
+
+    // Notes with expand / collapse for long entries
+    let notesHtml = '';
+    if(sp.notes){
+      const NOTE_LIMIT = 140;
+      const isExp      = _slExpandedNotes.has(sp.id);
+      const nStyle     = "font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:rgba(208,208,232,.6);line-height:1.5;";
+      const moreBtnS   = "font-family:'Cinzel',serif;font-size:7px;background:transparent;border:none;color:rgba(201,162,39,.75);cursor:pointer;padding:0 4px;";
+      const safeTxt    = sp.notes.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      if(sp.notes.length > NOTE_LIMIT && !isExp){
+        notesHtml = `<div style="${nStyle}">${safeTxt.slice(0,NOTE_LIMIT)}… <button type="button" onclick="_slExpandedNotes.add('${sp.id}');renderSpellList()" style="${moreBtnS}">▼ more</button></div>`;
+      } else if(sp.notes.length > NOTE_LIMIT && isExp){
+        notesHtml = `<div style="${nStyle}">${safeTxt} <button type="button" onclick="_slExpandedNotes.delete('${sp.id}');renderSpellList()" style="${moreBtnS}">▲ less</button></div>`;
+      } else {
+        notesHtml = `<div style="${nStyle}">${safeTxt}</div>`;
+      }
+    }
 
     const div = document.createElement('div');
     div.style.cssText = `background:rgba(10,10,18,.6);border:1px solid ${!avail?'rgba(200,32,48,.12)':isActive&&hasAE?'rgba(61,214,219,.25)':'rgba(255,255,255,.08)'};border-left:3px solid ${avail?col:'rgba(200,32,48,.5)'};border-radius:6px;padding:12px 16px;display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;opacity:${avail?'1':'.6'};transition:opacity .2s,border-color .2s;`;
     div.innerHTML = `
       <div>
-        <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;flex-wrap:wrap;">
           <span style="font-family:'Cinzel Decorative',serif;font-size:12px;color:${avail?col:'rgba(200,32,48,.7)'};">${sp.name}</span>
           <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:rgba(201,162,39,.7);padding:1px 6px;border:1px solid rgba(201,162,39,.25);border-radius:3px;">LVL ${sp.spellLevel}</span>
           <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:${col};opacity:.7;">${sp.aff}</span>
+          ${isAtWill ? `<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:rgba(80,220,160,.9);padding:1px 6px;border:1px solid rgba(80,220,160,.3);border-radius:3px;">∞ AT-WILL</span>` : ''}
+          ${isConc   ? `<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:rgba(180,140,255,.9);padding:1px 6px;border:1px solid rgba(180,140,255,.3);border-radius:3px;">◎ CONC</span>` : ''}
           ${sp.unstableMagic ? `<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:rgba(208,112,48,.85);padding:1px 6px;border:1px solid rgba(208,112,48,.3);border-radius:3px;">⚡ UNSTABLE</span>` : ''}
           ${hasAE && isActive ? `<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:rgba(61,214,219,.9);padding:1px 6px;border:1px solid rgba(61,214,219,.35);border-radius:3px;">⚡ EFFECT ACTIVE</span>` : ''}
           ${!avail ? `<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.2px;color:rgba(200,32,48,.7);padding:1px 6px;border:1px solid rgba(200,32,48,.3);border-radius:3px;">USED</span>` : ''}
         </div>
-        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:${sp.notes||conds?'8px':'0'};">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:${sp.notes||conds?'8px':'0'};">
           <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">RC <strong style="color:rgba(61,214,219,.8);">${sp.rc}</strong></span>
           ${parseInt(sp.ip||0)>0 ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">INS+ <strong style="color:rgba(208,112,48,.8);">${sp.ip}</strong></span>` : ''}
           ${sp.ct ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Cast: <strong style="color:rgba(255,255,255,.7);">${sp.ct}</strong></span>` : ''}
           ${sp.range && sp.range !== '—' ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Range: <strong style="color:rgba(255,255,255,.7);">${sp.range}</strong></span>` : ''}
-          ${sp.dur ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Dur: <strong style="color:rgba(255,255,255,.7);">${sp.dur}</strong></span>` : ''}
+          <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Dur: <strong style="color:${isConc?'rgba(180,140,255,.85)':'rgba(255,255,255,.7)'};">${durStr}</strong></span>
           ${sp.saveType && sp.saveType !== 'none' ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Save: <strong style="color:rgba(200,160,255,.85);">${sp.saveType}</strong>${sp.saveHalf==='1' ? ' <em style="font-size:10px">½</em>' : ''}</span>` : ''}
           ${sp.attackType && sp.attackType !== 'none' ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Atk: <strong style="color:rgba(200,160,255,.85);">${sp.attackType}</strong></span>` : ''}
           ${sp.element && sp.element !== '—' ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">⚡ ${sp.element}</span>` : ''}
           ${dmg !== '—' ? `<span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">🎲 ${dmg}</span>` : ''}
         </div>
         ${conds ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">${conds}</div>` : ''}
-        ${sp.notes ? `<div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:rgba(208,208,232,.6);line-height:1.5;">${sp.notes}</div>` : ''}
+        ${notesHtml}
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;">
         <button type="button" onclick="toggleSpellAvailable('${sp.id}')" style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;padding:5px 11px;border:1px solid;border-radius:4px;cursor:pointer;white-space:nowrap;transition:all .2s;${availBtnStyle}">${availLabel}</button>
         <button type="button" class="sig-cast-btn" onclick="castCompletedSpell('${sp.id}')" style="font-size:7.5px;padding:5px 12px;letter-spacing:1.5px;">⟳ Cast</button>
         ${hasAE ? `<button type="button" onclick="toggleCompletedSpellActive('${sp.id}')" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;border:1px solid;border-radius:4px;cursor:pointer;white-space:nowrap;${effBtnStyle}">${isActive ? '⚡ Effect On' : '○ Effect Off'}</button>` : ''}
+        <button type="button" onclick="copySpellText('${sp.id}')" title="Copy spell summary to clipboard" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(120,120,160,.3);border-radius:4px;color:rgba(160,160,200,.65);cursor:pointer;white-space:nowrap;">⧉ Copy</button>
         <button type="button" onclick="editCompletedSpell('${sp.id}')" title="Move back to builder to edit" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(201,162,39,.35);border-radius:4px;color:rgba(201,162,39,.75);cursor:pointer;white-space:nowrap;">✎ Edit</button>
         <button type="button" onclick="removeCompletedSpell('${sp.id}')" title="Remove from Spell List" style="font-family:'Cinzel',serif;font-size:7.5px;padding:4px 10px;background:transparent;border:1px solid rgba(200,32,48,.3);border-radius:4px;color:rgba(200,32,48,.6);cursor:pointer;white-space:nowrap;">✕ Remove</button>
       </div>`;
