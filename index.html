@@ -18479,11 +18479,9 @@ function saveCards(listId, stateKey){
       d.concUnit     = card.dataset.concUnit         || 'minutes';
       d.concAmt      = card.dataset.concAmt          || '1';
       d.spellLevel   = card.dataset.spellLevel       || '1';
-      // Legacy compat: also grab cast time, duration, range from selects
-      const sels = card.querySelectorAll('.c-sel');
-      d.ct = (sels[1]||{}).value || 'Action';
-      d.dur = (sels[2]||{}).value || 'Instant';
-      d.range = (sels[3]||{}).value || '60 ft.';
+      d.ct    = (card.querySelector('.sp-ct-sel')    ||{}).value || 'Action';
+      d.dur   = (card.querySelector('.sp-dur-sel')   ||{}).value || 'Instant';
+      d.range = (card.querySelector('.sp-range-sel') ||{}).value || '60 ft.';
       const sb = card.querySelector('.sig-avail-btn');
       d.dailySpent = sb && sb.getAttribute('data-spent')==='1';
       // Unstable Magic — persist toggle + 6 result boxes
