@@ -29037,10 +29037,10 @@ function ucConvert(from, val){
     const el=document.getElementById('uc_ftrd_res');
     if(el)el.textContent=mph+' mph  /  '+kph+' km/h';
   }
-  // Currency (1 GP = 10 SP = 100 CP)
-  else if(from==='gp'){ const el=document.getElementById('uc_gp_res'); if(el)el.textContent=r(v*10)+' SP  /  '+r(v*100)+' CP'; }
-  else if(from==='sp'){ const el=document.getElementById('uc_sp_res'); if(el)el.textContent=r(v/10)+' GP  /  '+r(v*10)+' CP'; }
-  else if(from==='cp'){ const el=document.getElementById('uc_cp_res'); if(el)el.textContent=r(v/100)+' GP  /  '+r(v/10)+' SP'; }
+  // Currency (1 GP = 100 SP = 100,000 CP  |  1 SP = 1,000 CP)
+  else if(from==='gp'){ const el=document.getElementById('uc_gp_res'); if(el)el.textContent=r(v*100)+' SP  /  '+r(v*100000)+' CP'; }
+  else if(from==='sp'){ const el=document.getElementById('uc_sp_res'); if(el)el.textContent=r(v/100)+' GP  /  '+r(v*1000)+' CP'; }
+  else if(from==='cp'){ const el=document.getElementById('uc_cp_res'); if(el)el.textContent=r(v/100000)+' GP  /  '+r(v/1000)+' SP'; }
   // Coin weight (50 coins = 1 lb)
   else if(from==='coins'){ const lbs=r(v/50); const el=document.getElementById('uc_coins_res'); if(el)el.textContent=lbs+' lb  /  '+r(lbs*0.453592)+' kg'; }
   else if(from==='coinlb'){ const el=document.getElementById('uc_coinlb_res'); if(el)el.textContent=r(v*50)+' coins'; }
