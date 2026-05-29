@@ -31724,6 +31724,594 @@ function kpInjectConditionsIntoCards(){
 </script>
 
 <!-- ══════════════════════════════════════════════════════════
+     ALAS V4 — 25 USER-FRIENDLY UPDATES
+     ══════════════════════════════════════════════════════════ -->
+<style>
+/* U01 — Tab bar horizontal scroll on narrow screens */
+.tab-bar {
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+}
+.tab-bar::-webkit-scrollbar { display: none; }
+
+/* U02 — Tab button keyboard focus ring */
+.tab-btn:focus-visible {
+  outline: 2px solid rgba(201,162,39,.7);
+  outline-offset: -2px;
+  border-radius: 3px;
+}
+
+/* U03 — HP/RP quick ± buttons */
+.res-adj-btn {
+  width: 18px; height: 18px;
+  background: rgba(255,255,255,.06);
+  border: 1px solid var(--bdr);
+  color: var(--txt-lbl); font-size: 13px; font-weight: 700;
+  border-radius: 3px; cursor: pointer; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all .12s; user-select: none;
+}
+.res-adj-btn:hover { background: rgba(255,255,255,.12); border-color: var(--gold-d); color: var(--gold); }
+.res-adj-btn.dmg:hover { border-color: var(--cor); color: var(--cor); }
+
+/* U04 — Delete confirmation highlight (brief flash on removal) */
+.card-removing {
+  animation: cardRemove .22s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes cardRemove {
+  0%   { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(12px); }
+}
+
+/* U07 — HP number flash on damage */
+@keyframes hpNumFlash {
+  0%   { color: var(--cor); text-shadow: 0 0 8px rgba(200,32,48,.8); }
+  100% { color: var(--txt); text-shadow: none; }
+}
+.hp-damage-num { animation: hpNumFlash .55s ease-out forwards; }
+
+/* U09 — Save button flash state */
+.save-btn.saving { opacity: .6; pointer-events: none; }
+
+/* U10 — Search bars for Inventory & Abilities */
+.ux-search-bar {
+  width: 100%; background: var(--surf2); border: 1px solid var(--bdr);
+  color: var(--txt); font-family: 'Raleway',sans-serif; font-size: 12px;
+  padding: 6px 10px 6px 28px; border-radius: 4px; outline: none;
+  margin-bottom: 10px; transition: border-color .2s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23707090'%3E%3Ccircle cx='6.5' cy='6.5' r='4.5' stroke='%23707090' stroke-width='1.5' fill='none'/%3E%3Cline x1='10' y1='10' x2='14' y2='14' stroke='%23707090' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: 8px center; background-size: 14px;
+}
+.ux-search-bar:focus { border-color: var(--gold-d); }
+
+/* U16 — Near-limit warning pulse */
+@keyframes nearLimitPulse { 0%,100%{color:var(--ins)} 50%{color:#ffb830} }
+.near-limit-warn { animation: nearLimitPulse 1.8s ease-in-out 3; }
+
+/* U19 — Keyboard shortcut help overlay */
+#kbHelpOverlay {
+  position: fixed; inset: 0; z-index: 9800;
+  background: rgba(6,6,14,.92);
+  display: none; align-items: center; justify-content: center;
+}
+#kbHelpOverlay.show { display: flex; }
+.kb-help-modal {
+  background: var(--surf2); border: 1px solid var(--bdr-g); border-radius: 8px;
+  padding: 22px 26px; max-width: 480px; width: 90%;
+  max-height: 80vh; overflow-y: auto;
+}
+.kb-help-title {
+  font-family: 'Cinzel Decorative', serif; font-size: 14px; color: var(--gold);
+  letter-spacing: 3px; margin-bottom: 16px; text-align: center;
+}
+.kb-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 8px; }
+.kb-key {
+  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px;
+  background: rgba(255,255,255,.08); border: 1px solid var(--bdr);
+  border-radius: 3px; padding: 2px 7px; color: var(--gold); flex-shrink: 0; min-width: 90px; text-align: center;
+}
+.kb-desc { font-family: 'EB Garamond', serif; font-size: 13px; color: var(--txt-lbl); }
+.kb-close-btn {
+  display: block; margin: 16px auto 0; background: transparent;
+  border: 1px solid rgba(201,162,39,.4); color: rgba(201,162,39,.7);
+  font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 2px;
+  padding: 7px 20px; cursor: pointer; border-radius: 3px; transition: all .2s;
+}
+.kb-close-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+/* U23 — Gold total display */
+.gold-total-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 6px; padding: 4px 8px;
+  background: rgba(201,162,39,.06); border: 1px solid rgba(201,162,39,.2);
+  border-radius: 4px;
+}
+.gold-total-lbl { font-family: 'Cinzel', serif; font-size: 7px; letter-spacing: 1.5px; color: var(--gold-d); }
+.gold-total-val { font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 700; color: var(--gold); }
+
+/* U25 — Copy stats button */
+.copy-stats-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: transparent; border: 1px solid rgba(61,214,219,.3);
+  color: rgba(61,214,219,.7); font-family: 'Cinzel', serif; font-size: 7.5px;
+  letter-spacing: 1.5px; padding: 4px 10px; border-radius: 3px;
+  cursor: pointer; transition: all .15s; margin-top: 6px;
+}
+.copy-stats-btn:hover { border-color: var(--res); color: var(--res); background: rgba(61,214,219,.06); }
+</style>
+
+<script>
+(function(){
+'use strict';
+
+/* ── U01+U02: Tab bar CSS already in <style> above ─────────── */
+
+/* ── U03: HP/RP ± quick adjust buttons ──────────────────────── */
+(function(){
+  function injectAdjButtons(inputId, type, isHP){
+    var inp = document.getElementById(inputId);
+    if(!inp || inp.dataset.adjDone) return;
+    inp.dataset.adjDone = '1';
+    var minus = document.createElement('button');
+    minus.type = 'button';
+    minus.className = 'res-adj-btn dmg';
+    minus.textContent = '−';
+    minus.title = isHP ? 'Take 1 damage' : 'Spend 1 RC';
+    var plus = document.createElement('button');
+    plus.type = 'button';
+    plus.className = 'res-adj-btn';
+    plus.textContent = '+';
+    plus.title = isHP ? 'Heal 1 HP' : 'Recover 1 RC';
+    minus.addEventListener('click', function(){
+      var v = parseInt(inp.value)||0;
+      inp.value = Math.max(0, v - 1);
+      inp.dispatchEvent(new Event('input'));
+      if(isHP && v > 0) inp.classList.add('hp-damage-num');
+      setTimeout(function(){ inp.classList.remove('hp-damage-num'); }, 600);
+    });
+    plus.addEventListener('click', function(){
+      var max = parseInt(document.getElementById(type+'Max').value)||999;
+      inp.value = Math.min(max, (parseInt(inp.value)||0) + 1);
+      inp.dispatchEvent(new Event('input'));
+    });
+    // Insert minus before input, plus after
+    inp.parentNode.insertBefore(minus, inp);
+    inp.parentNode.insertBefore(plus, inp.nextSibling);
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){
+      injectAdjButtons('hpCur','hp',true);
+      injectAdjButtons('rpCur','rp',false);
+    });
+  } else {
+    injectAdjButtons('hpCur','hp',true);
+    injectAdjButtons('rpCur','rp',false);
+  }
+})();
+
+/* ── U04: Delete confirmation via event delegation ──────────── */
+document.addEventListener('click', function(e){
+  var btn = e.target.closest('.c-remove');
+  if(!btn) return;
+  // Skip if already handled by confirm wrapper or no parent card
+  var card = btn.closest('.item-card') || btn.closest('.inv-card') || btn.parentElement;
+  if(!card) return;
+  var name = '';
+  var nameInp = card.querySelector('.c-inp, input[type="text"]');
+  if(nameInp) name = nameInp.value.trim();
+  var label = name ? '"' + name.substring(0,30) + '"' : 'this item';
+  if(!confirm('Remove ' + label + '?')) { e.stopImmediatePropagation(); e.preventDefault(); }
+}, true); // capture phase so we intercept before onclick
+
+/* ── U05: Cast sigil feedback toast ─────────────────────────── */
+(function(){
+  var _orig = window.castSigilByRC;
+  if(typeof _orig !== 'function') return;
+  window.castSigilByRC = function(rc, ip, name, aff, card){
+    var result = _orig.apply(this, arguments);
+    var msg = (name || 'Sigil') + ' cast';
+    if(rc > 0) msg += ' — −' + rc + ' RP';
+    if(ip > 0) msg += ' · +' + ip + ' Instability';
+    if(typeof showToast === 'function') showToast(msg);
+    return result;
+  };
+})();
+
+/* ── U06: Level out-of-range validation ─────────────────────── */
+(function(){
+  var _orig = window.onLevelChange;
+  if(typeof _orig !== 'function') return;
+  window.onLevelChange = function(){
+    var el = document.getElementById('charLevel');
+    if(el){
+      var v = parseInt(el.value);
+      if(isNaN(v) || v < 1){ el.value = 1; if(typeof showToast==='function') showToast('Level must be 1–30.'); }
+      else if(v > 30){ el.value = 30; if(typeof showToast==='function') showToast('Maximum level is 30 (Mythic tier).'); }
+    }
+    return _orig.apply(this, arguments);
+  };
+})();
+
+/* ── U07: HP number flash on damage (already CSS, hook into existing updateBar) ─ */
+(function(){
+  var _origUpdateBar = window.updateBar;
+  if(typeof _origUpdateBar !== 'function') return;
+  var _lastHP = null;
+  window.updateBar = function(type){
+    var result = _origUpdateBar.apply(this, arguments);
+    if(type === 'hp'){
+      var cur = parseInt((document.getElementById('hpCur')||{}).value)||0;
+      if(_lastHP !== null && cur < _lastHP){
+        var el = document.getElementById('hpCur');
+        if(el){ el.classList.remove('hp-damage-num'); void el.offsetWidth; el.classList.add('hp-damage-num'); setTimeout(function(){ el.classList.remove('hp-damage-num'); }, 600); }
+      }
+      _lastHP = cur;
+    }
+    return result;
+  };
+})();
+
+/* ── U08: New card auto-scroll + autofocus ───────────────────── */
+function _autoFocusNewCard(listId){
+  setTimeout(function(){
+    var list = document.getElementById(listId);
+    if(!list) return;
+    var cards = list.querySelectorAll('.item-card,.inv-card');
+    var last = cards[cards.length - 1];
+    if(!last) return;
+    last.scrollIntoView({ behavior:'smooth', block:'nearest' });
+    var first = last.querySelector('input.c-inp, input[type="text"], textarea.c-ta');
+    if(first) first.focus();
+  }, 80);
+}
+(function(){
+  var fns = [['addAbility', 'abilitiesList'],['addSigil', 'sigilsList'],['addInventory','inventoryList'],['addFeature','featuresList']];
+  fns.forEach(function(pair){
+    var orig = window[pair[0]];
+    if(typeof orig !== 'function') return;
+    window[pair[0]] = function(){
+      var r = orig.apply(this, arguments);
+      _autoFocusNewCard(pair[1]);
+      return r;
+    };
+  });
+})();
+
+/* ── U09: Save button flash ──────────────────────────────────── */
+(function(){
+  var _orig = window.saveCharacterFile;
+  if(typeof _orig !== 'function') return;
+  window.saveCharacterFile = function(){
+    var btns = document.querySelectorAll('.save-btn');
+    btns.forEach(function(b){ if(b.textContent.includes('Save')) b.classList.add('saving'); });
+    setTimeout(function(){ btns.forEach(function(b){ b.classList.remove('saving'); }); }, 1200);
+    return _orig.apply(this, arguments);
+  };
+})();
+
+/* ── U10: Inventory search bar ───────────────────────────────── */
+(function(){
+  var invPanel = document.getElementById('inventoryList');
+  if(!invPanel) return;
+  var wrap = invPanel.parentElement;
+  if(!wrap) return;
+  var bar = document.createElement('input');
+  bar.type = 'text';
+  bar.className = 'ux-search-bar';
+  bar.placeholder = 'Filter inventory by name, type, or notes…';
+  bar.id = 'invSearchBar';
+  wrap.insertBefore(bar, invPanel);
+  bar.addEventListener('input', function(){
+    var q = bar.value.toLowerCase();
+    invPanel.querySelectorAll('.inv-card,.item-card').forEach(function(card){
+      var text = card.textContent.toLowerCase();
+      card.style.display = (!q || text.includes(q)) ? '' : 'none';
+    });
+  });
+})();
+
+/* ── U11: Abilities list search bar ─────────────────────────── */
+(function(){
+  var abList = document.getElementById('abilityListGrid');
+  if(!abList) return;
+  var wrap = abList.parentElement;
+  if(!wrap) return;
+  var bar = document.createElement('input');
+  bar.type = 'text';
+  bar.className = 'ux-search-bar';
+  bar.placeholder = 'Filter abilities by name or type…';
+  bar.id = 'abilitySearchBar';
+  wrap.insertBefore(bar, abList);
+  bar.addEventListener('input', function(){
+    var q = bar.value.toLowerCase();
+    abList.querySelectorAll('[data-abl-id],[class*="abl-"],.ab-list-card,div[data-name]').forEach(function(card){
+      var text = card.textContent.toLowerCase();
+      card.style.display = (!q || text.includes(q)) ? '' : 'none';
+    });
+    // Also filter by any child text
+    abList.children && Array.from(abList.children).forEach(function(c){
+      if(q && !c.textContent.toLowerCase().includes(q)) c.style.display='none';
+      else c.style.display='';
+    });
+  });
+})();
+
+/* ── U12: Death save reset confirmation ─────────────────────── */
+(function(){
+  var btn = document.querySelector('.ds-reset[onclick*="clearDeathSaveBlips"]');
+  if(!btn) return;
+  var origOnclick = btn.onclick;
+  btn.onclick = function(e){
+    if(!confirm('Clear death save history?')) return;
+    if(origOnclick) origOnclick.call(this, e);
+  };
+})();
+
+/* ── U13: Tab state persistence via sessionStorage ───────────── */
+(function(){
+  var SK = 'alas_last_tab';
+  var _origShow = window.showTab;
+  if(typeof _origShow !== 'function') return;
+  window.showTab = function(id, btn){
+    var r = _origShow.apply(this, arguments);
+    try{ sessionStorage.setItem(SK, id); }catch(e){}
+    // U18: scroll active tab button into view
+    if(btn) btn.scrollIntoView({ behavior:'smooth', inline:'nearest', block:'nearest' });
+    return r;
+  };
+  // Restore last tab on load
+  var saved = ''; try{ saved = sessionStorage.getItem(SK)||''; }catch(e){}
+  if(saved && saved !== 'attributes'){
+    setTimeout(function(){
+      var btn = document.querySelector('.tab-btn[onclick*="showTab(\''+saved+'\'"]');
+      if(btn) btn.click();
+    }, 300);
+  }
+})();
+
+/* ── U14: Character name syncs title on restore ──────────────── */
+(function(){
+  var _orig = window.restoreSimpleInputs;
+  if(typeof _orig !== 'function') return;
+  window.restoreSimpleInputs = function(){
+    var r = _orig.apply(this, arguments);
+    if(typeof updateDocTitle === 'function') updateDocTitle();
+    return r;
+  };
+})();
+
+/* ── U15: Tracker cascade tooltips ──────────────────────────── */
+(function(){
+  var insLabel = document.querySelector('.trk-name.ins-c');
+  var corLabel = document.querySelector('.trk-name.cor-c');
+  if(insLabel) insLabel.title = 'Instability — 0: Stable | 1–2: Flickers (minor artefacts) | 3–4: Surges (+2 casting DCs) | 5–6: Backlash Risk (each cast: CON DC 15 or gain a Scar) | 7+: Critical. Overflow → adds to Corruption.';
+  if(corLabel) corLabel.title = 'Corruption — 0: Clean | 1–2: Trace Taint (no effect) | 3–4: Visible Corruption (+4 to all focus checks) | 5–6: Severe Warping (major mutation/behavioural change) | 7+: Catastrophic. Resets only on Deep Rest + Circlewarden treatment.';
+})();
+
+/* ── U16: Spell near-limit warning ──────────────────────────── */
+(function(){
+  var _orig = window.updateSpellLimitDisplay;
+  if(typeof _orig !== 'function') return;
+  window.updateSpellLimitDisplay = function(){
+    var r = _orig.apply(this, arguments);
+    var el = document.getElementById('spellLimitDisplay');
+    if(!el) return r;
+    var txt = el.textContent || '';
+    var m = txt.match(/(\d+)\s*\/\s*(\d+)/);
+    if(m){
+      var cur = parseInt(m[1]), max = parseInt(m[2]);
+      if(max > 0 && cur >= Math.ceil(max * 0.66) && cur < max){
+        el.classList.add('near-limit-warn');
+        setTimeout(function(){ el.classList.remove('near-limit-warn'); }, 5500);
+      }
+    }
+    return r;
+  };
+})();
+
+/* ── U17: Craft ingredient autofocus ────────────────────────── */
+(function(){
+  var _orig = window.craftAddIngredient;
+  if(typeof _orig !== 'function') return;
+  window.craftAddIngredient = function(){
+    var r = _orig.apply(this, arguments);
+    setTimeout(function(){
+      var grid = document.getElementById('craftIngGrid');
+      if(!grid) return;
+      var rows = grid.querySelectorAll('.craft-ing-row');
+      var last = rows[rows.length-1];
+      if(!last) return;
+      var inp = last.querySelector('input.c-inp, input[type="text"]');
+      if(inp){ inp.focus(); inp.select(); }
+    }, 60);
+    return r;
+  };
+})();
+
+/* ── U18: Tab button scrolls into view on click (handled in U13 showTab patch) ─ */
+
+/* ── U19: Keyboard shortcut help overlay (press ?) ──────────── */
+(function(){
+  var overlay = document.createElement('div');
+  overlay.id = 'kbHelpOverlay';
+  overlay.innerHTML = '<div class="kb-help-modal">'
+    + '<div class="kb-help-title">KEYBOARD SHORTCUTS</div>'
+    + '<div class="kb-row"><span class="kb-key">Ctrl + S</span><span class="kb-desc">Save character as .alas file</span></div>'
+    + '<div class="kb-row"><span class="kb-key">Alt + 1 – 9</span><span class="kb-desc">Switch to tab 1–9</span></div>'
+    + '<div class="kb-row"><span class="kb-key">Alt + Home</span><span class="kb-desc">Scroll to top of current tab</span></div>'
+    + '<div class="kb-row"><span class="kb-key">Escape</span><span class="kb-desc">Close open modals / overlays</span></div>'
+    + '<div class="kb-row"><span class="kb-key">?</span><span class="kb-desc">Show this help overlay</span></div>'
+    + '<div class="kb-row"><span class="kb-key">◀  button</span><span class="kb-desc">Collapse / expand sidebar</span></div>'
+    + '<div class="kb-row"><span class="kb-key">▲  button</span><span class="kb-desc">Scroll to top (appears after scrolling)</span></div>'
+    + '<div class="kb-row"><span class="kb-key">HP  −  /  +</span><span class="kb-desc">Lose / heal 1 HP (quick buttons)</span></div>'
+    + '<div class="kb-row"><span class="kb-key">RP  −  /  +</span><span class="kb-desc">Spend / recover 1 Resonance Point</span></div>'
+    + '<button class="kb-close-btn" onclick="document.getElementById(\'kbHelpOverlay\').classList.remove(\'show\')">Close  [Escape]</button>'
+    + '</div>';
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e){
+    if(e.target === overlay) overlay.classList.remove('show');
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === '?' && !e.ctrlKey && !e.altKey){
+      var active = document.activeElement;
+      var tag = active ? active.tagName : '';
+      if(tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+      overlay.classList.toggle('show');
+    }
+    if(e.key === 'Escape') overlay.classList.remove('show');
+  });
+})();
+
+/* ── U20: Autofocus charName when "New Character" is clicked ── */
+(function(){
+  var newBtn = document.querySelector('.ts-btn-primary[onclick*="newCharacter"], .ts-btn-primary');
+  if(!newBtn) return;
+  var orig = newBtn.onclick;
+  newBtn.addEventListener('click', function(){
+    setTimeout(function(){
+      var n = document.getElementById('charName');
+      if(n && document.getElementById('alasTitleScreen') && document.getElementById('alasTitleScreen').classList.contains('ts-fade-out')){
+        n.focus();
+      }
+    }, 800);
+  });
+})();
+
+/* ── U21: Attuned sigil selector tooltip ────────────────────── */
+(function(){
+  var sel = document.getElementById('attunedSigil');
+  if(sel && !sel.title) sel.title = 'Attuned Sigil — your chosen gemstone alignment. Grants bonus scaling when matched to your Sigil school. Drakonian: must match bloodline affinity for +3 Resonance Pool bonus.';
+})();
+
+/* ── U22: Gold GP + SP + CP → total GP display ──────────────── */
+(function(){
+  function updateGoldTotal(){
+    var gp = parseFloat((document.getElementById('goldGP')||{}).value)||0;
+    var sp = parseFloat((document.getElementById('goldSP')||{}).value)||0;
+    var cp = parseFloat((document.getElementById('goldCP')||{}).value)||0;
+    var total = gp + sp/10 + cp/100;
+    var el = document.getElementById('goldTotalDisplay');
+    if(el) el.textContent = total.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2}) + ' GP total';
+  }
+  // Inject the display row after the gold inputs
+  var goldGP = document.getElementById('goldGP');
+  if(goldGP){
+    var wrap = goldGP.closest('.s-card') || goldGP.parentElement;
+    // Walk up to find a reasonable parent
+    var parent = goldGP;
+    for(var i=0;i<6;i++){ if(parent.parentElement) parent = parent.parentElement; }
+    var row = document.createElement('div');
+    row.className = 'gold-total-row';
+    row.innerHTML = '<span class="gold-total-lbl">TOTAL VALUE</span><span class="gold-total-val" id="goldTotalDisplay">0 GP total</span>';
+    // Find the gold section
+    var gemsEl = document.getElementById('gemsHeld');
+    if(gemsEl && gemsEl.parentElement && gemsEl.parentElement.parentElement){
+      gemsEl.parentElement.parentElement.parentElement.appendChild(row);
+    }
+    // Listen
+    ['goldGP','goldSP','goldCP'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.addEventListener('input', updateGoldTotal);
+    });
+    updateGoldTotal();
+  }
+})();
+
+/* ── U23: Copy character stats to clipboard ─────────────────── */
+(function(){
+  // Inject into Attributes tab below the ability grid
+  var abilGrid = document.getElementById('abilityGrid');
+  if(!abilGrid) return;
+  var btn = document.createElement('button');
+  btn.className = 'copy-stats-btn';
+  btn.innerHTML = '⎘ Copy Stats to Clipboard';
+  btn.title = 'Copy your character\'s core stats as text for use in Discord, notes, etc.';
+  btn.addEventListener('click', function(){
+    var name = (document.getElementById('charName')||{}).value||'Character';
+    var race = (document.getElementById('charRace')||{}).value||'—';
+    var cls  = (document.getElementById('charClass')||{}).value||'—';
+    var lvl  = (document.getElementById('charLevel')||{}).value||'1';
+    var hp   = (document.getElementById('hpCur')||{}).value+'/'+((document.getElementById('hpMax')||{}).value);
+    var rp   = (document.getElementById('rpCur')||{}).value+'/'+((document.getElementById('rpMax')||{}).value);
+    var ins  = (document.getElementById('insVal')||{}).textContent||'0';
+    var cor  = (document.getElementById('corVal')||{}).textContent||'0';
+    var stats = ['STR','DEX','CON','INT','WIS','CHA'].map(function(a){
+      var el = document.getElementById('ab_'+a); return a+' '+(el?el.value:'?');
+    }).join(' · ');
+    var ac   = (document.getElementById('combatAC')||{}).value||'—';
+    var txt = '**'+name+'** | '+race+' '+cls+' Lv.'+lvl
+      +'\nHP: '+hp+' | RP: '+rp+' | AC: '+ac
+      +'\nInstability: '+ins+' | Corruption: '+cor
+      +'\n'+stats;
+    navigator.clipboard.writeText(txt).then(function(){
+      if(typeof showToast==='function') showToast('Stats copied to clipboard!');
+    }).catch(function(){
+      prompt('Copy this:', txt);
+    });
+  });
+  abilGrid.parentElement.appendChild(btn);
+})();
+
+/* ── U24: Improved load character confirm message ────────────── */
+(function(){
+  var _orig = window.loadCharacterFile;
+  if(typeof _orig !== 'function') return;
+  window.loadCharacterFile = function(input){
+    // Patch the confirm() call inside by replacing with our own check
+    // We intercept by temporarily overriding confirm
+    var _origConfirm = window.confirm;
+    window.confirm = function(msg){
+      if(msg && msg.includes('Load')) {
+        return _origConfirm.call(window, 'Load this character?\n\nThis replaces: all stats, HP/RP, notes, spells, abilities, and inventory.\nProceed?');
+      }
+      return _origConfirm.apply(window, arguments);
+    };
+    var result = _orig.apply(this, arguments);
+    window.confirm = _origConfirm;
+    return result;
+  };
+})();
+
+/* ── U25: Empty state helper messages ───────────────────────── */
+(function(){
+  // Add better empty-state observer for inventory
+  var invList = document.getElementById('inventoryList');
+  if(invList){
+    var invEmpty = document.createElement('div');
+    invEmpty.id = 'invEmptyState';
+    invEmpty.style.cssText = 'font-family:\'EB Garamond\',serif;font-size:13px;color:var(--txt-dim);font-style:italic;padding:10px 0;display:none';
+    invEmpty.textContent = 'No items yet — click "+ Add Item" above to start building your inventory. Items from the Compendium or shops can be added directly from those panels.';
+    invList.parentElement.insertBefore(invEmpty, invList.nextSibling);
+    function checkInvEmpty(){
+      var hasCards = invList.children.length > 0;
+      invEmpty.style.display = hasCards ? 'none' : 'block';
+    }
+    new MutationObserver(checkInvEmpty).observe(invList, {childList:true});
+    checkInvEmpty();
+  }
+
+  // Sigils empty state
+  var sigilList = document.getElementById('sigilsList');
+  if(sigilList){
+    var sigEmpty = document.createElement('div');
+    sigEmpty.id = 'sigilEmptyState';
+    sigEmpty.style.cssText = 'font-family:\'EB Garamond\',serif;font-size:13px;color:var(--txt-dim);font-style:italic;padding:10px 0;display:none';
+    sigEmpty.textContent = 'No custom sigils yet — select a Class in the sidebar to load your class sigil pool above, or click "+ Add Spell" to add sigils learned through play or Arc-Type unlocks.';
+    sigilList.parentElement.insertBefore(sigEmpty, sigilList.nextSibling);
+    function checkSigilEmpty(){
+      sigEmpty.style.display = sigilList.children.length > 0 ? 'none' : 'block';
+    }
+    new MutationObserver(checkSigilEmpty).observe(sigilList, {childList:true});
+    checkSigilEmpty();
+  }
+})();
+
+})(); // end 25 UX upgrades IIFE
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
      ALAS V4 — PHB MISSING CONTENT
      ══════════════════════════════════════════════════════════ -->
 <style>
