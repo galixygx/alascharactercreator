@@ -9533,6 +9533,8 @@
                     <div id="rollFlash" class="roll-flash"></div>
                     <button type="button" class="settings-btn" onclick="openSettings()" title="Performance &amp; Display Settings">⚙</button>
                     <button type="button" class="settings-btn" onclick="openUnitsConverter()" title="Imperial ↔ Metric Converter" style="margin-left:3px;font-size:11px">⇄</button>
+                    <!-- UPGRADE 5 — Sidebar collapse toggle -->
+                    <button type="button" id="sidebarCollapseBtn" class="settings-btn" onclick="toggleSidebar()" title="Collapse / Expand sidebar" style="margin-left:3px;font-size:13px">◀</button>
                 </div>
                 <div class="sb-head-center">
                     <div class="alas-title">ALAS</div>
@@ -9821,16 +9823,16 @@
         <!-- ═══════════ MAIN ═══════════ -->
         <main class="main-content">
             <nav class="tab-bar">
-                <button class="tab-btn active" onclick="showTab('attributes',this)">Attributes</button>
-                <button class="tab-btn" onclick="showTab('skills',this)">Skills &amp; Features</button>
-                <button class="tab-btn" onclick="showTab('sigils',this)">Sigils</button>
-                <button class="tab-btn" onclick="showTab('abilities',this)">Abilities</button>
-                <button class="tab-btn" onclick="showTab('inventory',this)">Inventory &amp; Craft</button>
-                <button class="tab-btn" onclick="showTab('world',this)">World &amp; Lore</button>
-                <button class="tab-btn" onclick="showTab('companions',this)">Creatures</button>
-                <button class="tab-btn" onclick="showTab('gems',this)">Gems</button>
-                <button class="tab-btn" onclick="showTab('places',this)">Places</button>
-                <button class="tab-btn" onclick="showTab('notes',this)">Notes</button>
+                <button class="tab-btn active" onclick="showTab('attributes',this)" data-tab-index="1">⚡ Attributes</button>
+                <button class="tab-btn" onclick="showTab('skills',this)" data-tab-index="2">🎯 Skills</button>
+                <button class="tab-btn" onclick="showTab('sigils',this)" data-tab-index="3">✨ Sigils</button>
+                <button class="tab-btn" onclick="showTab('abilities',this)" data-tab-index="4">💥 Abilities</button>
+                <button class="tab-btn" onclick="showTab('inventory',this)" data-tab-index="5">🎒 Inventory</button>
+                <button class="tab-btn" onclick="showTab('world',this)" data-tab-index="6">📖 World</button>
+                <button class="tab-btn" onclick="showTab('companions',this)" data-tab-index="7">🐾 Creatures</button>
+                <button class="tab-btn" onclick="showTab('gems',this)" data-tab-index="8">💎 Gems</button>
+                <button class="tab-btn" onclick="showTab('places',this)" data-tab-index="9">🗺 Places</button>
+                <button class="tab-btn" onclick="showTab('notes',this)" data-tab-index="0">📝 Notes</button>
                 <button class="tab-btn" onclick="showTab('vtt',this)">⚔ VTT</button>
                 <button class="tab-btn" onclick="showTab('report',this)">📋 Report</button>
             </nav>
@@ -13505,6 +13507,8 @@ function updateBar(type){
   const max=parseInt(document.getElementById(type+'Max').value)||1;
   const pct=Math.max(0,Math.min(100,(cur/max)*100));
   const _bar=document.getElementById(type+'Bar'); if(_bar) _bar.style.width=pct+'%';
+  // UPGRADE 1 — HP critical pulse at ≤25% (wires existing @keyframes hpCriticalPulse)
+  if(type==='hp'&&_bar){ if(pct<=25&&pct>0) _bar.classList.add('hp-critical'); else _bar.classList.remove('hp-critical'); }
 }
 
 function updateRpState(){
@@ -31506,5 +31510,202 @@ function kpInjectConditionsIntoCards(){
 })(); /* end V4.7 IIFE */
 </script>
 
+<!-- ══════════════════════════════════════════════════════════
+     ALAS V4 — 10 UX UPGRADES
+     ══════════════════════════════════════════════════════════ -->
+<style>
+/* UPGRADE 5 — Sidebar collapse */
+.app.sidebar-collapsed { grid-template-columns: 0px 1fr; }
+.app.sidebar-collapsed .sidebar { overflow: hidden; border-right-width: 0; }
+.app.sidebar-collapsed #sidebarCollapseBtn { transform: scaleX(-1); }
+.sidebar { transition: width .28s cubic-bezier(.4,0,.2,1); }
+
+/* UPGRADE 7 — Ambient background breathing animation */
+@keyframes ambientBreath {
+  0%,100% { opacity: .7; }
+  50%      { opacity: 1; }
+}
+body::before { animation: ambientBreath 8s ease-in-out infinite; }
+
+/* UPGRADE 8 — Scroll-to-top button */
+#scrollTopBtn {
+  position: fixed; bottom: 22px; right: 18px; z-index: 9000;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: rgba(201,162,39,.12); border: 1px solid rgba(201,162,39,.38);
+  color: var(--gold); font-size: 15px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s, background .2s, box-shadow .2s;
+  font-family: sans-serif; line-height: 1;
+}
+#scrollTopBtn.visible { opacity: 1; pointer-events: all; }
+#scrollTopBtn:hover { background: rgba(201,162,39,.24); box-shadow: 0 0 14px rgba(201,162,39,.3); }
+
+/* UPGRADE 6 — Auto-save indicator badge */
+#autoSaveBadge {
+  font-family: 'Cinzel', serif; font-size: 6.5px; letter-spacing: 1.5px;
+  color: rgba(61,214,219,.6); text-align: center;
+  padding: 3px 0 0; opacity: 0; transition: opacity .4s;
+  pointer-events: none; user-select: none;
+}
+#autoSaveBadge.show { opacity: 1; }
+
+/* UPGRADE 9 — RP sparkle particle */
+.rp-sparkle {
+  position: fixed; pointer-events: none; z-index: 9500;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--res); box-shadow: 0 0 8px rgba(61,214,219,.9);
+  animation: sparkleFloat .9s ease-out forwards;
+}
+@keyframes sparkleFloat {
+  0%   { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-38px) scale(.2); }
+}
+</style>
+
+<script>
+(function(){
+'use strict';
+
+/* ── UPGRADE 2: Dynamic browser tab title ─────────────────── */
+function updateDocTitle(){
+  var n = (document.getElementById('charName')||{}).value||'';
+  document.title = n ? n + ' — ALAS' : 'ALAS — Character Creator';
+}
+var _nameEl = document.getElementById('charName');
+if(_nameEl) _nameEl.addEventListener('input', updateDocTitle);
+updateDocTitle();
+
+/* ── UPGRADE 3: Keyboard shortcuts ───────────────────────── */
+document.addEventListener('keydown', function(e){
+  // Ctrl+S — save .alas file
+  if(e.ctrlKey && e.key === 's'){
+    e.preventDefault();
+    if(typeof saveCharacterFile === 'function') saveCharacterFile();
+    return;
+  }
+  // Escape — close any visible overlay/modal
+  if(e.key === 'Escape'){
+    ['sigilDetailOverlay','abilityDetailOverlay','invDetailOverlay','gemCombineModal',
+     'rollHistoryModal','settingsModal','unitsModal','sessionRitualOverlay'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && (el.style.display === 'flex' || el.classList.contains('show'))){
+        el.style.display = 'none';
+        el.classList.remove('show');
+      }
+    });
+    return;
+  }
+  // Alt+1–9,0 — switch tabs by index
+  if(e.altKey && /^[0-9]$/.test(e.key)){
+    var btn = document.querySelector('.tab-btn[data-tab-index="'+e.key+'"]');
+    if(btn){ e.preventDefault(); btn.click(); btn.scrollIntoView({behavior:'smooth',inline:'nearest'}); }
+  }
+}, false);
+
+/* ── UPGRADE 5: Sidebar collapse/expand ──────────────────── */
+window.toggleSidebar = function(){
+  var app = document.querySelector('.app');
+  if(!app) return;
+  var btn = document.getElementById('sidebarCollapseBtn');
+  app.classList.toggle('sidebar-collapsed');
+  if(btn) btn.title = app.classList.contains('sidebar-collapsed') ? 'Expand sidebar' : 'Collapse sidebar';
+};
+
+/* ── UPGRADE 6: Auto-save indicator ─────────────────────── */
+(function(){
+  var saveBar = document.querySelector('.rest-sec .save-bar');
+  if(!saveBar) return;
+  var badge = document.createElement('div');
+  badge.id = 'autoSaveBadge';
+  badge.textContent = '✓  auto-saved to browser';
+  saveBar.parentElement.insertBefore(badge, saveBar.nextSibling);
+  // Intercept _debouncedSave
+  var _orig = window._debouncedSave;
+  if(typeof _orig === 'function'){
+    window._debouncedSave = function(){
+      _orig.apply(this, arguments);
+      setTimeout(function(){
+        badge.classList.add('show');
+        setTimeout(function(){ badge.classList.remove('show'); }, 2200);
+      }, 320);
+    };
+  }
+})();
+
+/* ── UPGRADE 7 handled by CSS ambientBreath ──────────────── */
+
+/* ── UPGRADE 8: Scroll-to-top button ────────────────────── */
+(function(){
+  var btn = document.createElement('button');
+  btn.id = 'scrollTopBtn';
+  btn.title = 'Back to top';
+  btn.textContent = '▲';
+  document.body.appendChild(btn);
+  var tc = document.querySelector('.tab-content');
+  if(tc){
+    tc.addEventListener('scroll', function(){
+      if(tc.scrollTop > 180) btn.classList.add('visible');
+      else btn.classList.remove('visible');
+    });
+  }
+  btn.addEventListener('click', function(){
+    var tc2 = document.querySelector('.tab-content');
+    if(tc2) tc2.scrollTo({top:0, behavior:'smooth'});
+  });
+})();
+
+/* ── UPGRADE 9: RP spend sparkle ────────────────────────── */
+(function(){
+  var rpInput = document.getElementById('rpCur');
+  if(!rpInput) return;
+  var _lastRP = parseInt(rpInput.value)||0;
+  function spawnSparkles(){
+    var rect = rpInput.getBoundingClientRect();
+    for(var i=0;i<5;i++){
+      (function(idx){
+        setTimeout(function(){
+          var p = document.createElement('div');
+          p.className = 'rp-sparkle';
+          var ox = (Math.random()-0.5)*44;
+          var oy = (Math.random()-0.5)*10;
+          p.style.left = (rect.left + rect.width/2 + ox) + 'px';
+          p.style.top  = (rect.top + rect.height/2 + oy) + 'px';
+          document.body.appendChild(p);
+          setTimeout(function(){ if(p.parentNode) p.remove(); }, 1050);
+        }, idx*55);
+      })(i);
+    }
+  }
+  rpInput.addEventListener('input', function(){
+    var cur = parseInt(rpInput.value)||0;
+    if(cur < _lastRP) spawnSparkles();
+    _lastRP = cur;
+  });
+})();
+
+/* ── UPGRADE 10: Unsaved changes warning ─────────────────── */
+(function(){
+  var _dirty = false;
+  document.addEventListener('input', function(){ _dirty = true; }, true);
+  var _origSave = window.saveCharacterFile;
+  if(typeof _origSave === 'function'){
+    window.saveCharacterFile = function(){
+      _origSave.apply(this, arguments);
+      _dirty = false;
+    };
+  }
+  window.addEventListener('beforeunload', function(e){
+    var charName = (document.getElementById('charName')||{}).value||'';
+    if(_dirty && charName){
+      e.preventDefault();
+      e.returnValue = 'You have unsaved changes — download your .alas file before leaving.';
+      return e.returnValue;
+    }
+  });
+})();
+
+})();
+</script>
 </body>
 </html>
