@@ -10000,6 +10000,13 @@
                     <div class="card-list" id="activeEffectsList"></div>
                     <button class="add-btn" onclick="addActiveEffect()" style="border-color:rgba(160,96,224,.5);color:#a060e0;">+ Add Effect</button>
 
+                    <!-- ─── SIGIL AFFINITY STAGE REFERENCE ─── -->
+                    <div class="sec-hdr" style="margin-top:28px;">Sigil Affinity Stages</div>
+                    <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:14px;">
+                        Affinity is not gained through levelling — it is earned through casting, emotional synchronisation, and narrative choices. The Keeper confirms every Stage advancement beyond Stage I. Stages III–V are major campaign events. Physical mutations at Stage III+ are permanent.
+                    </div>
+                    <div id="sigilAffinityStagesPanel"></div>
+
                     <!-- ─── SPELL LIST (completed/locked spells) ─── -->
                     <div class="sec-hdr" style="margin-top:28px;" id="spellListHdr">Spell List</div>
                     <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:14px;">
@@ -10242,6 +10249,9 @@
                     <div id="lorePanelContent">
                         <div class="lore-empty">Select a Race and Class in the sidebar to load lore.</div>
                     </div>
+
+                    <!-- ─── SYSTEM REFERENCE (always visible) ─── -->
+                    <div id="systemReferencePanel" style="margin-top:28px;border-top:1px solid var(--bdr-g);padding-top:20px;"></div>
                 </div>
 
                 <!-- ─── COMPANIONS ─── -->
@@ -10754,9 +10764,9 @@ const ABILITIES = ['STR','DEX','CON','INT','WIS','CHA'];
 const AB_NAMES = {STR:'Strength',DEX:'Dexterity',CON:'Constitution',INT:'Intelligence',WIS:'Wisdom',CHA:'Charisma'};
 
 const RACES = {
-  'Human':          {stats:{STR:10,DEX:10,CON:10,INT:10,WIS:10,CHA:10},hitDie:'d8',baseHP:8,heavyBaseHP:85,speed:30,asi:'+2 to one, +1 to another. 6 Distinction Points (max +3 any single).',traits:['Adaptive Resonance (cantrip-tier Sigil −1 RC)','Distinction Points (6 pts, max +3 any)','Resilient Ambition (reroll 1 check/LR)','Biome Familiarity'],langs:['Alasian Standard','+ 1 of choice','+ 1 Biome language']},
+  'Human':          {stats:{STR:10,DEX:10,CON:10,INT:10,WIS:10,CHA:10},hitDie:'d8',baseHP:8,heavyBaseHP:85,speed:30,asi:'+2 to one, +1 to another. 6 Distinction Points (max +3 any single).',traits:['Adaptive Resonance (cantrip-tier Sigil −1 RC; off-Sigil cast Instability −1 min 1)','Distinction Points (6 pts, max +3 any)','Resilient Ambition (reroll 1 failed d20/Deep Rest; take higher result)','Biome Familiarity (ADV Survival+Nature in home biome; forage for 6 without check; cannot be lost non-magically)','Learned Resilience ★ (bonus skill proficiency; 1 Expertise context — specific, Keeper-approved)','Network ★ (1 named NPC contact at campaign start; they hold information and have a want — negotiated in play)'],langs:['Alasian Standard','+ 1 of choice','+ 1 Biome language']},
   'High Elf':       {stats:{STR:8,DEX:12,CON:10,INT:14,WIS:12,CHA:11},hitDie:'d6',baseHP:7,heavyBaseHP:85,speed:35,asi:'+2 INT, +1 WIS',traits:['Trance (4hr = 8hr sleep; partial awareness)','Keen Senses (Perception prof; adv. vs. Charmed)','Light Sigil Sensitivity (cantrip Light −1 RC)','Aelorian Archive Mind (perfect factual recall)'],langs:['Alasian Standard','Aelorian','+ 1 of choice','+ 1 Biome language']},
-  'Dunesong Elf':   {stats:{STR:9,DEX:14,CON:11,INT:10,WIS:13,CHA:10},hitDie:'d6',baseHP:7,heavyBaseHP:85,speed:35,asi:'+2 DEX, +1 WIS',traits:['Desert Stride (no cost in arid terrain; heat immune)','Geraki Bond (Desert Falcon companion; Rite of First Descent)','Resonance Navigator (sense Vein within 5 mi)','Trance'],langs:['Alasian Standard','Na\'Shira (incl. Cry-Language subsystem)']},
+  'Dunesong Elf':   {stats:{STR:9,DEX:14,CON:11,INT:10,WIS:13,CHA:10},hitDie:'d6',baseHP:7,heavyBaseHP:85,speed:35,asi:'+2 DEX, +1 WIS',traits:['Desert Stride (+2 Stealth arid terrain; no difficult-terrain cost in sand; immune to extreme natural heat; no tracks in sand)','Dunesong Agility ★ (Dash: ignore opportunity attacks until end of turn; move through same-or-larger creature\'s space 1/turn; cannot end turn in occupied space)','Geraki Bond (Desert Falcon companion; Rite of First Descent required; acts independently; 1-year bond cooldown on death)','Resonance Navigator (sense Vein within 5 mi — direction only; fails in Corruption Tier III+)','Trance (4 hr = 8 hr sleep; partial awareness maintained)'],langs:['Alasian Standard','Na\'Shira (incl. Cry-Language subsystem)']},
   'Drow':           {stats:{STR:9,DEX:14,CON:10,INT:12,WIS:11,CHA:12},hitDie:'d6',baseHP:7,heavyBaseHP:85,speed:30,asi:'+2 DEX, +1 CHA',traits:['Superior Darkvision 120 ft. (incl. magical darkness)','Sunlight Sensitivity (disadv. in direct sunlight)','Drow Magic (Dancing Lights + Faerie Fire L3 + Darkness L5)','Web Thinking (adv. Investigation; adv. vs. Charmed)','Trance'],langs:['Alasian Standard','Drow Shadespeak','+ 1 of choice']},
   'Wood Elf':       {stats:{STR:10,DEX:14,CON:11,INT:10,WIS:13,CHA:9},hitDie:'d6',baseHP:7,heavyBaseHP:85,speed:35,asi:'+2 DEX, +1 WIS',traits:['Fleet of Foot (35 ft.; no cost in forest terrain)','Mask of the Wild (hide in natural obscurement)','Nature Sigil Sensitivity (cantrip Nature −1 RC)','Sylvari Speaker (communicate with unintelligent plants)','Trance'],langs:['Alasian Standard','Sylvari','+ 1 of choice']},
   'Ember Forge Dwarf':{stats:{STR:13,DEX:9,CON:14,INT:12,WIS:10,CHA:9},hitDie:'d10',baseHP:10,heavyBaseHP:110,speed:25,asi:'+2 CON, +1 INT',traits:['Dwarven Resilience (adv. vs. poison; poison resistance)','Forge Mastery (smith\'s/jeweler\'s/tinker\'s tools proficiency)','Ember Resonance (fire resistance; ignite/extinguish flames)','Vein-Sight (identify gem quality by touch)'],langs:['Alasian Standard','Dur\'Khan','+ 1 of choice']},
@@ -31711,6 +31721,515 @@ function kpInjectConditionsIntoCards(){
 })();
 
 })(); /* end V4.7 IIFE */
+</script>
+
+<!-- ══════════════════════════════════════════════════════════
+     ALAS V4 — PHB MISSING CONTENT
+     ══════════════════════════════════════════════════════════ -->
+<style>
+/* ── Sigil Affinity Stage Panel ── */
+.sas-sigil-block { margin-bottom:18px; border:1px solid var(--bdr); border-radius:6px; overflow:hidden; }
+.sas-sigil-hdr {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 12px; cursor:pointer;
+  font-family:'Cinzel',serif; font-size:10px; letter-spacing:2px; text-transform:uppercase;
+  background:rgba(0,0,0,.25); user-select:none;
+  transition:background .15s;
+}
+.sas-sigil-hdr:hover { background:rgba(255,255,255,.04); }
+.sas-sigil-hdr-name { display:flex; align-items:center; gap:8px; }
+.sas-sigil-gem { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.sas-caret { font-size:10px; color:var(--txt-dim); transition:transform .2s; }
+.sas-sigil-block.open .sas-caret { transform:rotate(90deg); }
+.sas-stages { display:none; }
+.sas-sigil-block.open .sas-stages { display:block; }
+.sas-stage-row {
+  display:grid; grid-template-columns:22px 80px 1fr;
+  gap:0; padding:8px 12px; border-top:1px solid rgba(255,255,255,.05);
+  align-items:start;
+}
+.sas-stage-row:hover { background:rgba(255,255,255,.02); }
+.sas-stage-num {
+  font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px;
+  color:var(--txt-dim); padding-top:1px;
+}
+.sas-stage-name {
+  font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px;
+  padding-top:1px; padding-right:8px;
+}
+.sas-stage-body { font-family:'EB Garamond',serif; font-size:12px; color:var(--txt-lbl); line-height:1.45; }
+.sas-stage-thresh {
+  font-family:'Cinzel',serif; font-size:7.5px; letter-spacing:1px;
+  color:var(--gold-d); margin-bottom:3px;
+}
+.sas-stage-key { color:var(--txt-dim); font-style:italic; }
+.sas-mutation-pill {
+  display:inline-block; font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:1px;
+  border:1px solid; border-radius:2px; padding:1px 5px; margin-bottom:3px;
+}
+
+/* ── System Reference Panel ── */
+.sysref-section { margin-bottom:20px; }
+.sysref-hdr {
+  font-family:'Cinzel',serif; font-size:9px; letter-spacing:2.5px; color:var(--gold-d);
+  text-transform:uppercase; margin-bottom:8px; padding-bottom:4px;
+  border-bottom:1px solid rgba(201,162,39,.18);
+}
+.sysref-table { width:100%; border-collapse:collapse; margin-bottom:0; }
+.sysref-table th {
+  font-family:'Cinzel',serif; font-size:7px; letter-spacing:1.5px; color:var(--gold-d);
+  padding:4px 8px; border-bottom:1px solid var(--bdr); text-align:left;
+  background:rgba(201,162,39,.05);
+}
+.sysref-table td {
+  padding:4px 8px; border-bottom:1px solid rgba(255,255,255,.04);
+  font-family:'EB Garamond',serif; font-size:12px; color:var(--txt-lbl); vertical-align:top;
+  line-height:1.4;
+}
+.sysref-table tr:last-child td { border-bottom:none; }
+.sysref-table td:first-child { font-family:'Cinzel',serif; font-size:8px; letter-spacing:.5px; color:var(--txt); white-space:nowrap; }
+.sysref-note {
+  font-family:'EB Garamond',serif; font-size:11px; font-style:italic;
+  color:var(--txt-dim); margin-top:4px; padding:5px 8px;
+  background:rgba(61,214,219,.05); border-left:2px solid rgba(61,214,219,.3); border-radius:2px;
+}
+.sysref-warn {
+  font-family:'EB Garamond',serif; font-size:11px; font-style:italic;
+  color:var(--ins); margin-top:4px; padding:5px 8px;
+  background:rgba(232,160,32,.05); border-left:2px solid rgba(232,160,32,.35); border-radius:2px;
+}
+.cond-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:6px; }
+.cond-card {
+  background:rgba(0,0,0,.2); border:1px solid var(--bdr); border-radius:4px; padding:7px 9px;
+}
+.cond-name { font-family:'Cinzel',serif; font-size:8px; letter-spacing:1.5px; color:var(--txt); margin-bottom:3px; }
+.cond-alas-tag {
+  display:inline-block; font-family:'Cinzel',serif; font-size:6px; letter-spacing:1px;
+  background:rgba(201,162,39,.12); border:1px solid rgba(201,162,39,.3); color:var(--gold-d);
+  border-radius:2px; padding:0 4px; margin-left:4px; vertical-align:middle;
+}
+.cond-effect { font-family:'EB Garamond',serif; font-size:11px; color:var(--txt-lbl); line-height:1.4; }
+</style>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   SIGIL AFFINITY STAGES — PHB Part V-B
+   ════════════════════════════════════════════════════════════ */
+const SIGIL_AFFINITY_DATA = [
+  {
+    name:'Fire', gem:'Ruby', color:'#c82030', gemColor:'#c82030',
+    theme:'Passion. Destruction. Ambition. Momentum. Hunger.',
+    stages:[
+      {num:'I',   name:'Emberwake',         thresh:'8 Fire Sigil casts (or 1 emotionally intense moment while Resonance > 6)',
+       keyGain:'Physical synchronisation, minor environmental signature.',
+       passives:'Body temperature +2–4°. Eyes reflect orange under emotion. Heat exhaustion immunity. Fire spells propagate to adjacent ignitable surfaces.',
+       resonantTrait:'Cinder Pulse — When angered or determined: flames flicker at fingertips, candles within 10 ft. ignite, ash drifts from skin. Cannot be suppressed by willpower.',
+       drift:'Impatience with slow process. Emotional volatility — feelings arrive faster and more intensely.',
+       mutation:'None yet.',physical:'none'},
+      {num:'II',  name:'Infernal Harmony',  thresh:'25 Fire Sigil casts + survive magical fire exposure without damage (not via protection spell)',
+       keyGain:'Stable affinity, environmental influence, Resonant Trait evolves.',
+       passives:'Immune to natural heat and non-magical fire. See through smoke as dim light (30 ft.). Fire spells ignite wooden structures/dry grass from adjacency. Burning lasts +1 round.',
+       resonantTrait:'Ashen Momentum — Consecutive Fire Sigil turns deal +1d4 bonus fire each (max +3d4). Resets on miss turn, non-Fire Sigil, or incapacitation.',
+       drift:'Waiting feels physically uncomfortable. Decision-making accelerates, not always wisely.',
+       mutation:'None yet. Env: Air noticeably warmer within 10 ft. during Resonance expenditure. Footsteps leave faint scorch marks on soft surfaces at Resonance 6+.',physical:'none'},
+      {num:'III', name:'Flame Convergence',  thresh:'60 Fire Sigil casts + survive near-death (0 HP) while Instability ≥ 4',
+       keyGain:'Body begins to change. Resonant Trait becomes dangerous.',
+       passives:'Resistance to fire damage (all sources). Blood luminescent through skin in darkness (5 ft.). Unarmed/natural weapon critical hits: Burning (1d4 fire/round, DEX DC 14 ends). Consume ambient heat (bonus action): regain 1d6 RC 1/SR in fire-adjacent env.',
+       resonantTrait:'Living Blaze — When reduced below ½ HP: 10-ft. radius fire eruption. DEX Save DC 14 or 2d8 fire + Frightened until end of next turn. Automatic — no choice, no RC cost.',
+       drift:'Passion blurs with compulsion. Sigil has preferences now. They usually align with yours.',
+       mutation:'PERMANENT: Hair ember-glow at tips during Resonance expenditure. Veins visible at Instability 3+ (molten crack appearance). Heartbeat sounds like distant forge strikes to anyone listening.',physical:'visible'},
+      {num:'IV',  name:'Solar Ascendance',   thresh:'120 Fire Sigil casts + willingly accept a Tier III+ Scar from Fire Sigil Instability overload (do not stop)',
+       keyGain:'Reality responds. Mutations visible. Sigil shapes the battlefield.',
+       passives:'Fire spells partially bypass resistance (resistant targets take ¾ damage). Alter non-magical fire within 60 ft. as bonus action. Thermal propulsion: launch 30 ft. vertical / 20 ft. horizontal (2 RC). Aura of Heat: creatures within 5 ft. take 1d4 fire at start of your turns.',
+       resonantTrait:'Cataclysm Engine — Each round of combat past round 3: Fire Sigil damage +1d6 (max +4d6). Resets 1 min after combat ends. The Sigil measures your commitment.',
+       drift:'You have lost the concept of waiting entirely. That others operate differently is faintly offensive.',
+       mutation:'PERMANENT: Ember-glow hair constant. Vein-crack visible at rest. Eye colour permanently amber-red. Env: Storms within 1 mile distort from thermal pressure. Natural precipitation slows near you.',physical:'full'},
+      {num:'V',   name:'Embodied Flame',     thresh:'250 Fire Sigil casts + stand in a Tier IV+ magical conflagration for 1 full minute without retreating',
+       keyGain:'Embodied Sigil. The caster IS the force.',
+       passives:'Immune to all fire damage. Combustion Rebirth: 0 HP → choose to combust (4d10 to self, cannot die from it) → rise with CON mod×5 HP next turn. 1/LR. Fire spells track targets (−10 ft./turn), turn corners, avoid allies automatically. Immune to all mundane combustion.',
+       resonantTrait:'Final Mutation. Soul appears as a burning silhouette within the body. In darkness, outline is visible. In extreme emotion, silhouette moves independently for a half-second.',
+       drift:'The fire does not consume you because you have become it. Everything non-essential has burned away.',
+       mutation:'IRREVERSIBLE: Burning soul silhouette. Presence Effect: Creatures WIS ≤ 10 instinctively retreat. Trained animals will not approach within 30 ft. voluntarily.',physical:'embodied'},
+    ]
+  },
+  {
+    name:'Water', gem:'Sapphire', color:'#3080c0', gemColor:'#2870b0',
+    theme:'Adaptation. Memory. Patience. Pressure. Emotion.',
+    stages:[
+      {num:'I',   name:'Ripplebound',         thresh:'8 Water Sigil casts (or 4 continuous hours adjacent to natural water while Resonance > 5)',
+       keyGain:'Physical synchronisation, minor environmental signature.',
+       passives:'Half normal water intake needed. Swim speed 20 ft.; no disadvantage on Athletics (Swim) in turbulent water. Advantage on saves vs. Frightened and magical fear. Ranged Water Sigil attacks ignore disadvantage from moving targets.',
+       resonantTrait:'Echo Current — Casting the same Water Sigil twice in the same combat: second cast costs 1 fewer RC (min 0). Identical sigil names only.',
+       drift:'Introspection deepens. Empathy increases — you notice emotional states others have not expressed.',
+       mutation:'None yet.',physical:'none'},
+      {num:'II',  name:'Tidal Bond',           thresh:'25 Water Sigil casts + resist forced emotional manipulation (charm/fear/compulsion) — save must succeed by 5 or more',
+       keyGain:'Stable affinity, environmental influence, Resonant Trait evolves.',
+       passives:'Breathe underwater for CON mod × 5 minutes. Detect movement through connected liquids within 30 ft. Advantage on CON saves vs. blood loss/poison/physical exhaustion. Healing spells +1 HP per die rolled.',
+       resonantTrait:'Flowstep — Opportunity attacks against you have disadvantage. Move through water-effect difficult terrain (ice, flooding) at no extra cost.',
+       drift:'Empathy becomes precision — near-certain identification of emotional states in others, even when concealed.',
+       mutation:'None yet. Env: Condensation gathers on surfaces when Resonance > 4. Water in open containers subtly orients toward you.',physical:'none'},
+      {num:'III', name:'Abyssal Convergence', thresh:'60 Water Sigil casts + survive submersion that would kill an unprotected creature',
+       keyGain:'Body begins to change. Resonant Trait becomes dangerous.',
+       passives:'Indefinite underwater breathing. Water spells adapt shape to terrain (ice follows surfaces, floods route around allies). Resistance to pressure and cold damage. Advantage on all saves vs. charm/fear/compulsion.',
+       resonantTrait:'Undertow — Target hit by 3+ Water Sigil effects in one encounter gains Undertow: Slowed (speed halved), disadvantage on STR checks, CON saves at disadvantage. Clears 1 min without Water Sigil hit.',
+       drift:'Observation dominates. Others interpret the stillness as coldness. It is depth.',
+       mutation:'PERMANENT: Eyes develop a reflective quality (still water in light). Voice has audible echo in open spaces. Skin unnaturally cool to the touch always.',physical:'visible'},
+      {num:'IV',  name:'Oceanic Ascendance',   thresh:'120 Water Sigil casts + navigate a natural water catastrophe without magical assistance, protect/save at least one other creature',
+       keyGain:'Reality responds. Mutations visible. Sigil shapes the battlefield.',
+       passives:'Localized rainfall: 60-ft. radius for 10 min (1/LR, Action). Water constructs persist 1 hr after concentration ends. Healing propagates: heal 1 → adjacent allies within 10 ft. regain WIS mod HP. Creatures affected by Water Sigils who fail CON save: +1d4 internal pressure damage the next round.',
+       resonantTrait:'Crushing Depth — Water Sigil hits deal escalating damage: hit 1 normal, hit 2 +1d6, hit 3+ +2d6. The water does not forget what it has already found.',
+       drift:'Understanding is not the same as being moved by. Emotional distance is a survival mechanism. You are aware of this.',
+       mutation:'PERMANENT: Reflective eyes constant. Voice echo constant. Skin temperature ~4° below normal. Env: Tides within 1 mile react to your emotional state during Resonance expenditure.',physical:'full'},
+      {num:'V',   name:'Embodied Tide',         thresh:'250 Water Sigil casts + enter total emotional stillness during a moment of maximum external crisis — Keeper must witness',
+       keyGain:'Embodied Sigil. The caster IS the force.',
+       passives:'Partial liquefaction as bonus action: resistance to non-magical physical damage for 1 round (cannot attack while liquefied). Move through openings as small as 2 inches while liquefied. Near-impossible to physically restrain. Water within 30 ft. develops semi-sentience: flows toward enemies, shields allies.',
+       resonantTrait:'Presence Effect: Others feel emotionally exposed near you. Secrets become harder to maintain. Truths surface. People do not understand why.',
+       drift:'The ocean does not feel. It exerts pressure. It shapes coastlines. You are closer to this than you were.',
+       mutation:'IRREVERSIBLE: Internal organs are semi-fluid Resonance structures. Skilled healer detects pressurised water beneath skin.',physical:'embodied'},
+    ]
+  },
+  {
+    name:'Air', gem:'Celestite', color:'#4db8ff', gemColor:'#4098d8',
+    theme:'Freedom. Motion. Thought. Precision. Instinct.',
+    stages:[
+      {num:'I',   name:'Whisperwake',          thresh:'8 Air Sigil casts (or 6 continuous hours outdoors in wind > 20 mph while Resonance > 4)',
+       keyGain:'Physical synchronisation, minor environmental signature.',
+       passives:'+2 to Initiative rolls. Fall damage: treat falls as 20 ft. shorter. Advantage on Perception (sound) within 60 ft. Ranged attacks ignore disadvantage from light wind.',
+       resonantTrait:'Static Whisper — Cannot be surprised outdoors or in spaces with active airflow. Sense direction of any creature moving within 30 ft. (even invisible) as faint pressure change.',
+       drift:'Restlessness emerges. Staying in one place feels physically uncomfortable. Curiosity intensifies.',
+       mutation:'None yet.',physical:'none'},
+      {num:'II',  name:'Skybound Harmony',     thresh:'25 Air Sigil casts + successfully act while falling (action must succeed)',
+       keyGain:'Stable affinity, environmental influence, Resonant Trait evolves.',
+       passives:'Base speed +10 ft. Redirect midair trajectory once per round (up to 90°, no speed loss). Advantage on saves vs. suffocation, airborne toxins, inhaled effects. May take reactions at any point in a round, even before your turn.',
+       resonantTrait:'Velocity Casting — Move ≥ 20 ft. before casting an Air Sigil on the same turn: range +50%, Instability −1 (min 0).',
+       drift:'Preference for trajectory — always going somewhere specific, preferably quickly. Patience with process erodes further.',
+       mutation:'None yet. Env: Clothing/hair shift subtly without apparent wind when Resonance > 4. Small air currents spiral around hands during concentration.',physical:'none'},
+      {num:'III', name:'Storm Convergence',    thresh:'60 Air Sigil casts + survive a natural lightning strike or equivalent electrical event (cannot be artificially arranged)',
+       keyGain:'Body begins to change. Resonant Trait becomes dangerous.',
+       passives:'Hover in place up to 1 min (free action, 2 ft. off ground — bypasses ground-level effects). Lightning and thunder damage resistance. Air blades (bonus action 1/turn): melee attack 1d8 slashing, DEX, no weapon needed. Sound manipulation: whisper to any creature within 60 ft., audible only to target.',
+       resonantTrait:'Pressure Shift — Moving through/adjacent to enemy space: DEX Save (DC 12+DEX mod) or disadvantage on their next attack and −10 ft. movement next turn. Automatic with normal movement.',
+       drift:'Certainty replaces independence. You are faster than most things. These facts feel relevant to most situations.',
+       mutation:'PERMANENT: Eyes flicker silver-blue during spellcasting. Voice carries 2× further in open spaces. Body weight feels half its actual mass when lifted or grappled.',physical:'visible'},
+      {num:'IV',  name:'Tempest Ascendance',   thresh:'120 Air Sigil casts + navigate a Legendary weather event and redirect or significantly alter its course through sustained casting (≥ 1 hr)',
+       keyGain:'Reality responds. Mutations visible. Sigil shapes the battlefield.',
+       passives:'True flight: fly speed = base movement speed, hover. Vacuum zone (1/SR, Action): 10-ft. radius, 1 round — cannot breathe, no sound passes, fire extinguished. All Air Sigil damage now also deals half slashing. Sound barrier: creatures failing saves vs. sound-based Air Sigils take +1d6 thunder.',
+       resonantTrait:'Living Stormfront — Every Air Sigil cast: one creature of choice within 60 ft. pushed 5 ft. (no save). After 3 consecutive casts: compulsory repositioning for all creatures in 30-ft. radius (STR Save DC 15 per instance).',
+       drift:'You do not feel restless. You feel like the thing that makes other things restless. The world has not caught up with you.',
+       mutation:'PERMANENT: Eye flicker constant. Voice distance doubling constant. No footprints on soft surfaces at rest. Env: Storms within 2 miles intensify at Resonance > 5.',physical:'full'},
+      {num:'V',   name:'Embodied Sky',          thresh:'250 Air Sigil casts + spend 1 uninterrupted hour as wind — no form, no actions, simply atmospheric current — Keeper must witness',
+       keyGain:'Embodied Sigil. The caster IS the force.',
+       passives:'Partially disperse as wind (1/SR): immune to non-magical physical damage; move through any non-airtight space; 60 ft./round. Arrows and thrown weapons have disadvantage against you always and deal minimum damage. Immune to suffocation; no longer need to breathe.',
+       resonantTrait:'Presence Effect: Creatures WIS ≤ 12 feel instinctive unease under open skies near you. The awareness that they are not the apex thing in the air above them.',
+       drift:'You cannot be contained by any given moment for very long. The sky has no centre. You understand what that means.',
+       mutation:'IRREVERSIBLE: Heartbeat detectable only as subtle air pressure change against the chest — no audible pulse.',physical:'embodied'},
+    ]
+  },
+  {
+    name:'Nature', gem:'Emerald', color:'#40c060', gemColor:'#30a050',
+    theme:'Life. Growth. Decay. Instinct. Cycles.',
+    stages:[
+      {num:'I',   name:'Rootmarked',            thresh:'8 Nature Sigil casts (or 8 continuous hours in old-growth forest/jungle with Resonance > 4 — must be genuinely wild, not cultivated)',
+       keyGain:'Physical synchronisation, minor environmental signature.',
+       passives:'+1 additional HP per HD rolled during any rest. Proficiency in Survival (or half-proficiency added if already proficient). Plants orient toward you; growth near rest points measurably faster. Advantage on saves vs. natural poisons.',
+       resonantTrait:'Wildsense — Sense presence and rough direction of living creatures through natural terrain within 30 ft. (roots, soil, grass, standing water). Does not function on stone, metal, or worked surfaces.',
+       drift:'Protectiveness intensifies. Territorial instinct surfaces. Emotional ties deepen and persist longer.',
+       mutation:'None yet.',physical:'none'},
+      {num:'II',  name:'Verdant Bond',           thresh:'25 Nature Sigil casts + cause a dead/dying plant ecosystem to recover through sustained effort over ≥ 1 week (not a single spell)',
+       keyGain:'Stable affinity, environmental influence, Resonant Trait evolves.',
+       passives:'Stamina recovery doubles during rest in natural environments. Advantage on Stealth in forests, grasslands, and wetlands. Wild creatures CR ≤ 1 are non-aggressive by default; others need DC 12 WIS to become hostile. Opportunity attacks against you in natural terrain have disadvantage.',
+       resonantTrait:'Adaptive Bloom — Nature Sigil effects adapt to terrain: forests (+1d4 damage or +10 ft. range), wetlands (Slowed on failure), corrupted terrain (purge 1 Corruption point from environment per cast).',
+       drift:'Destruction of natural spaces produces visceral emotional response that surprises you in its intensity.',
+       mutation:'None yet. Env: Flowers bloom along path in fertile terrain. Grass visibly grows beneath feet during extended rest on natural surfaces.',physical:'none'},
+      {num:'III', name:'Primordial Convergence', thresh:'60 Nature Sigil casts + survive a lethal encounter with a CR 10+ natural creature and choose not to kill it',
+       keyGain:'Body begins to change. Resonant Trait becomes dangerous.',
+       passives:'Regeneration: +2 HP at start of each turn above 0 HP (not in Corrupted zones). Terrain merge: step into natural growth your size or larger, emerge from connected growth within 30 ft. (2 RC). Nature Sigils near living plant life +1d6 bonus damage or +1 duration. Immunity to natural diseases; magical diseases: save at advantage.',
+       resonantTrait:'Cycle of Predation — Reduce a target to 0 HP or make them flee: regain 2d8+WIS mod HP and 2 RC immediately. Once per combat, resets on new target.',
+       drift:'Death is not an ending. Things die and become other things. Loss is processed cyclically, not finally.',
+       mutation:'PERMANENT: Bark-like texture forms on forearms, shoulders, jaw at Resonance 4+. Eyes develop animalistic iris patterns. Hair entwines naturally with living plant material.',physical:'visible'},
+      {num:'IV',  name:'Worldroot Ascendance',   thresh:'120 Nature Sigil casts + protect a natural sacred site from desecration while at Instability 4 or higher',
+       keyGain:'Reality responds. Mutations visible. Sigil shapes the battlefield.',
+       passives:'Speak with the land: spend 10 min in contact with natural terrain → ask 3 yes/no questions about the area\'s history. 1/LR. Restore a dying environment: sustained effort → Corruption level drops 1 tier over 1 week. Root network control: bonus action, encase one creature in roots (STR Save DC = 8+WIS+Prof or Restrained 1 min). Nature Sigils in natural terrain deal +2d6.',
+       resonantTrait:'Pulse of the World — Once per combat when an ally within 60 ft. falls to 0 HP: the land itself acts — thorns erupt at the attacker (2d10 piercing, DEX half), and your ally regains HP equal to your WIS modifier immediately.',
+       drift:'You do not merely protect nature. You are beginning to feel like part of its infrastructure.',
+       mutation:'PERMANENT: Full visible bark and flora growth. Eyes fully animalistic. Environmental Influence: plants in your vicinity grow measurably faster. Corrupted terrain within 30 ft. during sustained presence loses 1 Corruption tier per day.',physical:'full'},
+      {num:'V',   name:'Embodied Wild',           thresh:'250 Nature Sigil casts + allow a natural place to choose you — spend 1 week in old-growth wilderness without spell, weapon, or shelter, surviving by connection alone — Keeper witnesses',
+       keyGain:'Embodied Sigil. The caster IS the force.',
+       passives:'Wild shape (bonus action): assume the form of any Beast CR ≤ half your level. Retain mind, RC pool, and Sigil access. Max 1 hr/day. All nature effects at Embodied tier are alive: spells react to battlefield state, route around allies, track retreating targets. Corrupted terrain within 30 ft. cannot advance beyond Tier II while you are present.',
+       resonantTrait:'Presence Effect: Animals and plants become unnaturally still in your presence. Corrupted creatures make WIS saves (DC 16) or are unable to attack you as their first action in combat — they hesitate, aware of what they are facing.',
+       drift:'You belong to the cycle now. The cycle belongs to you. What this means practically is still being discovered.',
+       mutation:'IRREVERSIBLE: Small plants grow and die in your shadow throughout each day. Bark texture permanent. Presence felt in natural terrain without sight.',physical:'embodied'},
+    ]
+  },
+  {
+    name:'Light', gem:'Amethyst', color:'#b478ff', gemColor:'#9050d8',
+    theme:'Truth. Clarity. Memory. Revelation. Purification.',
+    stages:[
+      {num:'I',   name:'Luminant Wake',          thresh:'8 Light Sigil casts (or spend 4 continuous hours in direct sunlight while Resonance > 4)',
+       keyGain:'Physical synchronisation, minor environmental signature.',
+       passives:'Darkvision 30 ft. (or +30 ft. if already possessed). Advantage on saves vs. Frightened and Blinded conditions. Light Sigil cantrips cost 0 RC instead of standard rates. Torches you hold shed bright light 10 ft. further than normal.',
+       resonantTrait:'Revealing Aura — Invisible creatures within 15 ft. of you emit a faint luminescence perceptible to you even if not visible to others. You cannot be deceived by illusions that produce visual effects.',
+       drift:'Truth-seeking intensifies. Deception — in others, and eventually in yourself — produces an increasing sense of friction.',
+       mutation:'None yet.',physical:'none'},
+      {num:'II',  name:'Radiant Bond',            thresh:'25 Light Sigil casts + expose a meaningful deception that caused real harm and ensure it does not continue',
+       keyGain:'Stable affinity, environmental influence, Resonant Trait evolves.',
+       passives:'Darkvision 60 ft. Cannot be blinded by non-magical means. Detect alignment of creatures within 30 ft. (good/evil/neutral) as passive. Healing spells restore +1d4 additional HP to undead-adjacent damage recipients (light fills where dark was).',
+       resonantTrait:'Clarity Pulse — Once per turn when you cast a Light Sigil: dispel one illusion or invisibility effect within the spell\'s area (no additional action required). The light finds what is hiding.',
+       drift:'You begin to read rooms at the intention level, not the surface level. Others may find your perceptions uncomfortable.',
+       mutation:'None yet. Env: Shadows around you are slightly less dark than they should be. Minor luminescence is visible at your fingertips in complete darkness.',physical:'none'},
+      {num:'III', name:'Radiant Convergence',    thresh:'60 Light Sigil casts + remain truthful during a situation where deception would have caused no harm and truth causes significant personal cost',
+       keyGain:'Body begins to change. Resonant Trait becomes dangerous.',
+       passives:'Immune to magical darkness and blindness. True seeing at will: see through illusions, polymorph, and invisibility within 30 ft. Undead and Corrupted creatures take +1d6 radiant from your attacks. Blessing of Clarity: 1/rest, touch a creature and remove one curse, charm effect, or mental compulsion.',
+       resonantTrait:'Blaze of Truth — When you are attacked by a creature that has lied to you within the last 24 hours: your next Light Sigil against that creature automatically maximises its damage and cannot be blocked by magical darkness. The light remembers.',
+       drift:'Your perceptions have become very accurate and very unrelenting. You are working on what to do with that.',
+       mutation:'PERMANENT: Eyes develop faint luminescence in darkness (visible to others within 5 ft.). In direct sunlight, a subtle halo effect is visible around your head to those with Perception 14+.',physical:'visible'},
+      {num:'IV',  name:'Ascendant Radiance',     thresh:'120 Light Sigil casts + restore a creature or place that has been corrupted, broken, or violated — not through power alone but through sustained presence over time',
+       keyGain:'Reality responds. Mutations visible. Sigil shapes the battlefield.',
+       passives:'Sunbeam at will (no RC cost, 1/round — not the spell, but a concentrated light beam dealing 2d8 radiant in a 30-ft. line). Undead and Corrupted creatures cannot willingly enter a 10-ft. radius around you. Healing spells extend range by 30 ft. Blindness condition immunity extended: also immune to magical compulsion that relies on sensory deprivation.',
+       resonantTrait:'Pillar of Light — Once per encounter, create a 60-ft. column of light at a point within 120 ft. (Action). All creatures in a 10-ft. radius: CON Save DC (8+Prof+CHA mod) or Blinded until end of next turn + 4d8 radiant damage. Undead: double damage, no save. Area becomes difficult terrain for Corrupted creatures for 1 minute.',
+       drift:'You see a great deal clearly and have learned to carry what you see. This is a different skill from seeing clearly.',
+       mutation:'PERMANENT: Luminescent eyes visible in darkness. Halo in sunlight visible to all. Environmental Influence: unattended candles in your presence ignite spontaneously; Corrupted objects within 5 ft. develop visible surface cracks.',physical:'full'},
+      {num:'V',   name:'Embodied Light',          thresh:'250 Light Sigil casts + accept the full weight of something you have known and refused to acknowledge — the Keeper determines what this is and must witness the acknowledgement',
+       keyGain:'Embodied Sigil. The caster IS the force.',
+       passives:'Immune to all radiant damage. Emit bright light in a 30-ft. radius as passive (can be suppressed). Permanently immune to all forms of magical blindness, charm, and compulsion. Once per long rest: cast Heal at no RC cost and no Instability.',
+       resonantTrait:'Presence Effect: Creatures with active deceptions, hidden guilt, or concealed intent feel physiological discomfort within 30 ft. of you. They do not know why. They know it stops when you leave.',
+       drift:'You are clear now. The cost of clarity was significant. You carry it without self-deception, which is the only way to carry it.',
+       mutation:'IRREVERSIBLE: Your shadow no longer moves independently of light sources — it is always oriented away from you, toward shadow, as if pulled. In darkness, your form emits enough ambient luminescence to read by.',physical:'embodied'},
+    ]
+  },
+  {
+    name:'Chaos', gem:'Obsidian', color:'#9040d0', gemColor:'#7030b0',
+    theme:'Disruption. Unpredictability. Entropy. Power Without Pattern.',
+    stages:[
+      {num:'I',   name:'Fracture Point',          thresh:'8 Chaos Sigil casts (or experience a reality-altering failure while Resonance > 5 — something you were certain of turns out to be completely wrong)',
+       keyGain:'Physical synchronisation, minor environmental signature.',
+       passives:'Chaos Sigil cantrips generate 1 less Instability (min 1). Sense when a creature within 30 ft. is using a sustained magical effect — not what it is, only that it exists. Immune to one magical charm or compulsion per day (automatic, no action).',
+       resonantTrait:'Glitch Step — Once per turn as bonus action, teleport up to 15 ft. to an unoccupied space you can see. No opportunity attacks triggered by this movement. The world did not expect you to be there.',
+       drift:'Patterns that once seemed stable begin to reveal their fragility. You find this interesting rather than alarming.',
+       mutation:'None yet.',physical:'none'},
+      {num:'II',  name:'Chaotic Attunement',      thresh:'25 Chaos Sigil casts + survive an encounter entirely through improvisation — no prepared tactics, no pre-planned spells, success only through in-the-moment adaptation',
+       keyGain:'Stable affinity, environmental influence, Resonant Trait evolves.',
+       passives:'Chaos Sigils deal +1d4 bonus force damage on any roll of 15+ on the attack/save dice. Counterspell reaction: once per SR, when a Sigil is cast within 30 ft., attempt to disrupt it (INT vs caster\'s spell mod — winner\'s effect proceeds). Immune to magical prediction effects (Divination cannot reliably show your future).',
+       resonantTrait:'Resonance Shatter — When you cast a Chaos Sigil, choose one ongoing magical effect within the spell\'s range: it must make a concentration check (DC 12+your INT mod) or end immediately.',
+       drift:'Certainty in others has become visible to you in a way it did not used to be. You find their confidence in predictable outcomes quietly fascinating.',
+       mutation:'None yet. Env: Small objects near you occasionally shift position slightly when you are not watching them. Mirrors reflect you with a 1-second delay.',physical:'none'},
+      {num:'III', name:'Entropy Convergence',     thresh:'60 Chaos Sigil casts + deliberately cast into Corruption (not Instability — Corruption) while casting a Chaos Sigil and survive without treatment',
+       keyGain:'Body begins to change. Resonant Trait becomes dangerous.',
+       passives:'Partial probability manipulation: once per SR, before a d20 roll that directly affects you, declare it a "Chaos Roll" — roll twice, use whichever result you prefer. Advantage on saves vs. any magical effect that creates order, binds, or compels pattern (oaths, binding contracts, compulsions). Your attacks may treat immunities as resistances (Chaos bypasses certainty).',
+       resonantTrait:'Unravel — Bonus action: one ongoing magical effect within 60 ft. must succeed on a DC (8+INT+Prof) check using its creator\'s casting modifier or end immediately. If it ends: the caster gains 1d6 psychic damage and 1 Instability from the whiplash.',
+       drift:'The question of whether things happen in the order you observe them in has become genuinely interesting. You are not distressed by this. You are curious.',
+       mutation:'PERMANENT: Your reflection occasionally shows an expression you are not making — visible to observers, 0.5 second delay. Minor objects within 5 ft. of you during Resonance expenditure have a 10% chance per turn of shifting 1d6 inches in a random direction.',physical:'visible'},
+      {num:'IV',  name:'Void Ascendance',          thresh:'120 Chaos Sigil casts + willingly enter a Zone of Instability 7+ and operate within it for at least 10 minutes (not protected, not cured — present)',
+       keyGain:'Reality responds. Mutations visible. Sigil shapes the battlefield.',
+       passives:'Once per LR: cast Void Collapse (RC 12) at 0 additional Instability. Immunities can be treated as resistances (as Stage III, now reliable). Reality anchor: once per encounter, when you would be affected by a Zone effect, negate it completely. Chaos Sigil misfires produce beneficial side effects instead of harmful ones (Keeper determines).',
+       resonantTrait:'Probability Cascade — When any creature within 60 ft. rolls a natural 1 or natural 20: you may immediately make an additional Chaos Sigil attack or move up to your speed as a free action. The universe cracked and you stepped through.',
+       drift:'Cause and effect have a looser relationship in your experience than they do for others. You have stopped finding this disorienting.',
+       mutation:'PERMANENT: Your body has visible micro-fractures of darkness at the joints and knuckle lines, as if barely held together with shadow. This is cosmetic. The actual damage to your structural integrity is zero — but it does not look like zero.',physical:'full'},
+      {num:'V',   name:'Embodied Chaos',           thresh:'250 Chaos Sigil casts + allow the Sigil to cast through you without intent — release all control over a Chaos Sigil cast and allow the Vein to determine the effect — Keeper witnesses and records the outcome',
+       keyGain:'Embodied Sigil. The caster IS the force.',
+       passives:'Immune to all Instability and Corruption generated by your own Chaos Sigil casting. Probability sight: see all possible immediate outcomes of any action before committing (Keeper provides brief summary once per SR). Once per encounter, cause any attack against you to critically miss (before the roll is made — you were not there in the probability that the attack assumed).',
+       resonantTrait:'Presence Effect: Probability itself becomes unstable near you. All natural 1s and natural 20s within 30 ft. produce secondary effects at Keeper discretion. Creatures do not roll critical fails against you normally — the possibility collapses before it resolves.',
+       drift:'You have not lost yourself to Chaos. You have become its most stable point — the eye of a storm that no longer surprises you.',
+       mutation:'IRREVERSIBLE: Your body exists in a state of controlled entropy. The fracture lines are now luminous with a deep-void purple. In complete darkness, your form is outlined in negative light.',physical:'embodied'},
+    ]
+  },
+];
+
+const PHYSICAL_LABELS = {none:'Internal — no visible change', visible:'⚠ Visible Mutation (Permanent)', full:'⚠⚠ Full Mutation (Permanent, Always Visible)', embodied:'⚠⚠⚠ Embodied — Irreversible Transformation'};
+const PHYSICAL_COLORS = {none:'var(--txt-dim)', visible:'var(--ins)', full:'var(--cor)', embodied:'#9040d0'};
+
+function buildSigilAffinityPanel(){
+  const panel = document.getElementById('sigilAffinityStagesPanel');
+  if(!panel) return;
+  let html = '';
+  SIGIL_AFFINITY_DATA.forEach((sigil, si) => {
+    const col = sigil.color;
+    html += `<div class="sas-sigil-block" id="sas_${si}" style="border-color:${col}30">`;
+    html += `<div class="sas-sigil-hdr" style="border-bottom:1px solid ${col}20" onclick="toggleSasBlock(${si})">`;
+    html += `<div class="sas-sigil-hdr-name">`;
+    html += `<div class="sas-sigil-gem" style="background:${col};box-shadow:0 0 8px ${col}60"></div>`;
+    html += `<span style="color:${col}">${sigil.name} Sigil</span>`;
+    html += `<span style="font-family:'EB Garamond',serif;font-size:11px;font-style:italic;color:var(--txt-dim);margin-left:6px;">${sigil.gem} · ${sigil.theme}</span>`;
+    html += `</div><span class="sas-caret">▶</span></div>`;
+    html += `<div class="sas-stages">`;
+    sigil.stages.forEach(st => {
+      const mutCol = PHYSICAL_COLORS[st.physical] || 'var(--txt-dim)';
+      const mutLbl = PHYSICAL_LABELS[st.physical] || '';
+      html += `<div class="sas-stage-row">`;
+      html += `<div class="sas-stage-num" style="color:${col}">§${st.num}</div>`;
+      html += `<div class="sas-stage-name" style="color:${col}">${st.name}</div>`;
+      html += `<div class="sas-stage-body">`;
+      html += `<div class="sas-stage-thresh">Threshold: ${st.thresh}</div>`;
+      html += `<div style="margin-bottom:2px"><span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--gold-d)">KEY GAIN — </span><span class="sas-stage-key">${st.keyGain}</span></div>`;
+      html += `<div style="margin-bottom:3px"><span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--res)">PASSIVES — </span>${st.passives}</div>`;
+      html += `<div style="margin-bottom:3px"><span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:${col}">RESONANT TRAIT — </span>${st.resonantTrait}</div>`;
+      html += `<div style="margin-bottom:3px"><span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--txt-dim)">EMOTIONAL DRIFT — </span>${st.drift}</div>`;
+      if(st.physical !== 'none') html += `<div class="sas-mutation-pill" style="border-color:${mutCol};color:${mutCol}">${mutLbl}</div>`;
+      html += `<div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:.5px;color:var(--txt-dim);margin-top:1px">MUTATION — ${st.mutation}</div>`;
+      html += `</div></div>`;
+    });
+    html += `</div></div>`;
+  });
+  panel.innerHTML = html;
+}
+
+function toggleSasBlock(idx){
+  const el = document.getElementById('sas_'+idx);
+  if(el) el.classList.toggle('open');
+}
+
+// Build when Sigils tab is opened
+(function(){
+  var _origShow = window.showTab;
+  if(typeof _origShow === 'function'){
+    window.showTab = function(id, btn){
+      _origShow.apply(this, arguments);
+      if(id === 'sigils') setTimeout(buildSigilAffinityPanel, 80);
+    };
+  }
+  // Also build on DOMContentLoaded in case Sigils tab is default
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(buildSigilAffinityPanel, 500); });
+  } else {
+    setTimeout(buildSigilAffinityPanel, 500);
+  }
+})();
+
+/* ════════════════════════════════════════════════════════════
+   SYSTEM REFERENCE PANEL — PHB Appendices
+   ════════════════════════════════════════════════════════════ */
+(function buildSystemReference(){
+  var panel = document.getElementById('systemReferencePanel');
+  if(!panel) return;
+
+  var html = '<div style="font-family:\'Cinzel\',serif;font-size:9px;letter-spacing:2.5px;color:var(--gold);text-transform:uppercase;margin-bottom:18px">System Reference</div>';
+
+  // ── DC Reference ──
+  html += '<div class="sysref-section"><div class="sysref-hdr">Difficulty Class Reference</div>';
+  html += '<table class="sysref-table"><thead><tr><th>DC</th><th>Tier</th><th>Description</th></tr></thead><tbody>';
+  [['5','Trivial','Something anyone should manage under normal conditions.'],
+   ['10','Easy','A trained or capable person succeeds most of the time.'],
+   ['15','Standard','Requires effort and competence. The default challenge.'],
+   ['20','Hard','Demands expertise. Most people will fail.'],
+   ['25','Legendary','The limit of mortal capability under ordinary conditions.'],
+   ['30','Impossible','World-altering. Only accessible at Ascendant+ tier.'],
+  ].forEach(function(r){ html += '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td></tr>'; });
+  html += '</tbody></table>';
+  html += '<div class="sysref-note">Resonance Interference: Corrupted zones +3 to all DCs · Instability 5+ adds +2 to casting DCs · Corruption 3+ adds +4 to all focus checks · Healthy Vein nearby −2 to Sigil-aligned checks</div>';
+  html += '</div>';
+
+  // ── RC Tiers ──
+  html += '<div class="sysref-section"><div class="sysref-hdr">Resonance Cost Tiers</div>';
+  html += '<table class="sysref-table"><thead><tr><th>Tier</th><th>RC</th><th>Description</th></tr></thead><tbody>';
+  [['Cantrip','0','At will. No pool drain. May generate environmental saturation over time.'],
+   ['Standard','2','Core combat and utility sigils. Most commonly cast tier.'],
+   ['Elevated','4','Area effects, concentration required, significant Instability risk.'],
+   ['Major','6','Scene-altering effects. Long casting time often required.'],
+   ['Critical','10+','World-affecting. Always require Instability check on cast.'],
+  ].forEach(function(r){ html += '<tr><td>'+r[0]+'</td><td style="color:var(--res);font-weight:700">'+r[1]+'</td><td>'+r[2]+'</td></tr>'; });
+  html += '</tbody></table>';
+  html += '<div class="sysref-warn">Fire Sigils generate minimum +1 Instability on all tiers, including cantrip. Chaos Sigils generate Corruption risk in addition to Instability. Any Chaos Sigil cast at Instability 5+ automatically generates 1 Corruption.</div>';
+  html += '</div>';
+
+  // ── Misfire by Zone ──
+  html += '<div class="sysref-section"><div class="sysref-hdr">Sigil Misfire — Zone Conditions</div>';
+  html += '<table class="sysref-table"><thead><tr><th>Zone</th><th>Instability</th><th>Misfire Range</th><th>Deviation Result</th></tr></thead><tbody>';
+  [['Stable','0–2','No misfire risk','—'],
+   ['Turbulent','3–4','Natural 1','Minor: reduce effect 50% or shift target'],
+   ['Surge','5–6','1–3','Moderate: affects wrong target or doubles in intensity'],
+   ['Critical','7+','1–5','Severe: sigil inverts effect or caster gains 1 Corruption'],
+  ].forEach(function(r){ html += '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td style="color:var(--cor)">'+r[2]+'</td><td>'+r[3]+'</td></tr>'; });
+  html += '</tbody></table></div>';
+
+  // ── Extended Exhaustion Effects ──
+  html += '<div class="sysref-section"><div class="sysref-hdr">Exhaustion Points — Extended Effects</div>';
+  html += '<table class="sysref-table"><thead><tr><th>EP</th><th>Effect</th></tr></thead><tbody>';
+  [['1','Fatigued — Disadvantage on ability checks.'],
+   ['2','Taxed — Speed halved. Disadvantage on attack rolls.'],
+   ['3','Debilitated — Fall unconscious at end of turn. Must Deep Rest to recover.'],
+   ['4','Critical Strain — Forced 12-hour Deep Rest. Physical damage: 2d6.'],
+   ['5+','Fatal Overreach — Immediate Deep Rest required or suffer 4d6 damage per EP above 5.'],
+  ].forEach(function(r){ html += '<tr><td style="color:var(--ins)">'+r[0]+'</td><td>'+r[1]+'</td></tr>'; });
+  html += '</tbody></table>';
+  html += '<div class="sysref-note">Recovery: A Recovery Rest (4 hours) removes 1 Exhaustion Point. Exhaustion 3–4 prevents further Resonance casting until a 12-hour Deep Rest is completed.</div>';
+  html += '</div>';
+
+  // ── Combat Quick Reference ──
+  html += '<div class="sysref-section"><div class="sysref-hdr">Combat Quick Reference</div>';
+  html += '<table class="sysref-table"><thead><tr><th>Roll Type</th><th>Formula</th></tr></thead><tbody>';
+  [['Melee Attack','d20 + STR mod + Prof Bonus'],
+   ['Ranged Attack','d20 + DEX mod + Prof Bonus'],
+   ['Sigil Attack','d20 + Spellcasting Ability mod + Prof Bonus'],
+   ['Spell Save DC','8 + Prof Bonus + Spellcasting Ability mod'],
+   ['Initiative','d20 + DEX mod (Beastkin & Goliath: advantage)'],
+   ['Critical Hit','Natural 20 — roll all damage dice twice, add modifiers once'],
+   ['Critical Miss','Natural 1 — attack misses automatically'],
+   ['Death Save Pass','Roll 10+ → 1 success (3 successes = stable)'],
+   ['Death Save Fail','Roll 9 or lower → 1 failure; Natural 1 = 2 failures (3 failures = death)'],
+   ['Death Save Nat 20','Regain 1 HP immediately, dying state ends'],
+  ].forEach(function(r){ html += '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td></tr>'; });
+  html += '</tbody></table>';
+  html += '<div class="sysref-note">Turn Actions: 1 Action · 1 Bonus Action · Full Movement (split before/after) · 1 Reaction. Difficult terrain costs 2 ft. per 1 ft. moved.</div>';
+  html += '</div>';
+
+  // ── Encounter Weight ──
+  html += '<div class="sysref-section"><div class="sysref-hdr">Encounter Weight</div>';
+  html += '<table class="sysref-table"><thead><tr><th>Tier</th><th>Rounds</th><th>RC Drain</th><th>Nature</th></tr></thead><tbody>';
+  [['Skirmish','2–3','0–2 pts','Quick, focused, single objective.'],
+   ['Standard','3–5','2–5 pts','Core encounter type. Clear stakes.'],
+   ['Crucible','5–8','5–10 pts','Multi-phase or high-consequence. Narrative weight.'],
+   ['Crisis','8–12','10–20 pts','No clean resolution. Campaign-altering.'],
+   ['Worldscar','12+','Overflow risk','The world is different after this.'],
+  ].forEach(function(r){ html += '<tr><td>'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td>'+r[3]+'</td></tr>'; });
+  html += '</tbody></table></div>';
+
+  // ── Conditions Reference ──
+  html += '<div class="sysref-section"><div class="sysref-hdr">Conditions Reference</div>';
+  html += '<div class="cond-grid">';
+  var CONDITIONS = [
+    {n:'Blinded',alas:false,e:'Cannot see. Attacks against you: advantage. Your attacks: disadvantage. Auto-fail sight-based checks.'},
+    {n:'Burning',alas:true, e:'1d6 fire damage at start of turn (DC 12 DEX save as Action to extinguish). Spreading: DC 15 to stop spread.'},
+    {n:'Charmed',alas:false,e:'Cannot attack the charmer. Charmer has advantage on social checks against you.'},
+    {n:'Concentrating',alas:false,e:'Maintaining a concentration spell. Taking damage: CON save (DC 10 or half damage) or lose the spell.'},
+    {n:'Deafened',alas:false,e:'Cannot hear. Auto-fail hearing-based checks. Verbal spell components fail.'},
+    {n:'Exhausted',alas:false,e:'Cumulative levels. See Exhaustion Points table above for full effects.'},
+    {n:'Frightened',alas:false,e:'Cannot willingly move closer to fear source. Disadvantage on checks/attacks while source is in sight.'},
+    {n:'Frozen',alas:true, e:'Speed 0. Disadvantage on DEX saves. Considered incapacitated until thawed.'},
+    {n:'Grappled',alas:false,e:'Speed 0. Ends if grappler is incapacitated or moves beyond reach.'},
+    {n:'Incapacitated',alas:false,e:'Cannot take actions or reactions.'},
+    {n:'Invisible',alas:false,e:'Cannot be seen without special senses. Attacks against you: disadvantage. Your attacks: advantage.'},
+    {n:'Paralyzed',alas:false,e:'Incapacitated. Auto-fail STR and DEX saves. Attacks: advantage. Melee hits within 5 ft. are critical.'},
+    {n:'Petrified',alas:false,e:'Transformed to solid substance. Incapacitated. Immune to poison/disease (not cured). Resistance all damage.'},
+    {n:'Poisoned',alas:false,e:'Disadvantage on attack rolls and ability checks.'},
+    {n:'Prone',alas:false,e:'Disadvantage on attacks. Melee attacks: advantage. Ranged attacks: disadvantage. Stand: half movement.'},
+    {n:'Restrained',alas:false,e:'Speed 0. Attacks against you: advantage. Your attacks: disadvantage. Disadvantage on DEX saves.'},
+    {n:'Silenced',alas:true, e:'Cannot speak or produce verbal components. Verbal spell components fail automatically.'},
+    {n:'Slowed',alas:false,e:'Speed halved. Only one action or one bonus action per turn (not both). Disadvantage on DEX saves.'},
+    {n:'Stunned',alas:false,e:'Incapacitated. Cannot move. Auto-fail STR/DEX saves. Attacks against you: advantage.'},
+    {n:'Unconscious',alas:false,e:'Incapacitated. Drop items. Fall prone. Auto-fail STR/DEX saves. Attacks advantage; crits within 5 ft.'},
+  ];
+  CONDITIONS.forEach(function(c){
+    html += '<div class="cond-card"><div class="cond-name">'+c.n+(c.alas?'<span class="cond-alas-tag">ALAS</span>':'')+'</div><div class="cond-effect">'+c.e+'</div></div>';
+  });
+  html += '</div></div>';
+
+  // ── Starting Wealth by Class ──
+  html += '<div class="sysref-section"><div class="sysref-hdr">Starting Wealth by Class</div>';
+  html += '<table class="sysref-table"><thead><tr><th>Class</th><th>Starting Gold</th><th>Starting Equipment Package</th></tr></thead><tbody>';
+  [['Legionnaire Ascendant','5d4×10 GP','Chain mail, shield, longsword, 2 handaxes, explorer\'s pack'],
+   ['Flow Disciple','5d4 GP','No armor, 2 shortswords, dungeoneer\'s pack, 10 darts'],
+   ['Sigil-Touched Adept','3d4×10 GP','Light crossbow + 20 bolts, 2 daggers, explorer\'s pack, arcane focus'],
+   ['Pactbound Broker','4d4×10 GP','Light armor, simple weapon, arcane focus, scholar\'s pack'],
+   ['Circlewarden','2d4×10 GP','Wooden shield, scimitar, leather armor, explorer\'s pack, Sigil focus'],
+   ['Oathbearer of the Broken Light','5d4×10 GP','Chain mail, holy symbol, 2 martial weapons, priest\'s pack'],
+   ['Reliquary Priest','5d4×10 GP','Scale mail, holy symbol, simple weapon, priest\'s pack'],
+   ['Veilrunner','4d4×10 GP','Leather armor, 2 daggers, short bow + 20 arrows, burglar\'s pack'],
+   ['Lorecantor','5d4×10 GP','Leather armor, rapier, hand crossbow, entertainer\'s pack, instrument'],
+   ['Worldscar Ravager','2d4×10 GP','Explorer\'s pack, 4 handaxes, or greataxe + 2 handaxes'],
+  ].forEach(function(r){ html += '<tr><td>'+r[0]+'</td><td style="color:var(--gold)">'+r[1]+'</td><td>'+r[2]+'</td></tr>'; });
+  html += '</tbody></table></div>';
+
+  panel.innerHTML = html;
+})();
 </script>
 
 <!-- ══════════════════════════════════════════════════════════
