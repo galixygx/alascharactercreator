@@ -12789,6 +12789,8 @@ function onXpChange(){
     showToast('Level updated to ' + lvl + ' based on XP.');
   }
   saveAll();
+  // BUGFIX — update XP bar immediately; don't wait for the 300ms _debouncedSave chain
+  if(typeof _updateXpBar === 'function') _updateXpBar();
 }
 
 function getProfBonus(lvl){
@@ -13509,6 +13511,9 @@ function updateBar(type){
   const _bar=document.getElementById(type+'Bar'); if(_bar) _bar.style.width=pct+'%';
   // UPGRADE 1 — HP critical pulse at ≤25% (wires existing @keyframes hpCriticalPulse)
   if(type==='hp'&&_bar){ if(pct<=25&&pct>0) _bar.classList.add('hp-critical'); else _bar.classList.remove('hp-critical'); }
+  // BUGFIX — auto-save HP/RP changes (inputs only call updateBar, never saveAll)
+  if(type==='hp'){ state.hpCur=cur; state.hpMax=max; _debouncedSave(); }
+  if(type==='rp'){ state.rpCur=cur; state.rpMax=max; _debouncedSave(); }
 }
 
 function updateRpState(){
@@ -31538,7 +31543,8 @@ function kpInjectConditionsIntoCards(){
   background: linear-gradient(180deg, rgba(201,162,39,.32), rgba(201,162,39,.16));
   box-shadow: 2px 0 14px rgba(201,162,39,.25);
 }
-.app.sidebar-collapsed #sidebarExpandHandle { display: flex; }
+/* Handle visibility is toggled directly by toggleSidebar() — NOT by CSS descendant selector,
+   because the element lives in <body>, outside .app */
 .app.sidebar-collapsed #sidebarCollapseBtn { transform: scaleX(-1); }
 
 /* UPGRADE 7 — Ambient background breathing animation */
@@ -31640,11 +31646,16 @@ window.toggleSidebar = function(){
   if(!app) return;
   app.classList.toggle('sidebar-collapsed');
   var collapsed = app.classList.contains('sidebar-collapsed');
+  // Collapse button arrow
   var btn = document.getElementById('sidebarCollapseBtn');
   if(btn){
-    btn.innerHTML = collapsed ? '&#9654;' : '&#9664;'; // ▶ when collapsed, ◀ when open
+    btn.innerHTML = collapsed ? '&#9654;' : '&#9664;';
     btn.title = collapsed ? 'Expand sidebar' : 'Collapse sidebar';
   }
+  // Re-expand handle lives in <body> (not inside .app) so CSS descendant
+  // selectors can't reach it — toggle display directly here instead.
+  var handle = document.getElementById('sidebarExpandHandle');
+  if(handle) handle.style.display = collapsed ? 'flex' : 'none';
 };
 
 /* ── UPGRADE 6: Auto-save indicator ─────────────────────── */
