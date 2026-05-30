@@ -16541,20 +16541,42 @@ function buildShapeAddBox(type, unlocked, level){
 }
 
 // ── Shape Action Entry helpers ──────────────────────────────────────────────
-function _shapeAERow(listId, key, name, desc) {
-  const sv = v => (v||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
-  return '<div class="sae-row" style="display:flex;gap:5px;align-items:flex-start;margin-bottom:5px;">'
-    + '<input class="c-inp sae-name" placeholder="Name…" value="' + sv(name) + '" style="flex:0 0 105px;min-width:0;font-size:11px;">'
-    + '<textarea class="c-ta sae-desc" placeholder="Effect, roll, condition, damage…" style="flex:1;min-height:34px;resize:vertical;font-size:11px;">' + sv(desc) + '</textarea>'
-    + '<button onclick="this.closest(\'.sae-row\').remove()" style="flex-shrink:0;padding:2px 7px;background:rgba(200,70,70,.1);border:1px solid rgba(200,70,70,.2);border-radius:3px;color:rgba(220,100,80,.8);cursor:pointer;font-size:12px;line-height:1;margin-top:1px;" title="Remove">×</button>'
-    + '</div>';
+const _SAE_ACTION_TYPES = ['—','Melee Attack','Ranged Attack','Melee / Ranged','Saving Throw','Special Ability','Multiattack','Move Ability','Utility'];
+const _SAE_DIE_TYPES    = ['—','d4','d6','d8','d10','d12','d20'];
+const _SAE_DMG_TYPES    = ['—','Physical','Fire','Cold','Lightning','Poison','Acid','Necrotic','Radiant','Force','Thunder','Psychic','Shadow','Nature','Arcane'];
+const _SAE_CONDITIONS   = ['None','Grappled','Prone','Poisoned','Blinded','Frightened','Restrained','Stunned','Incapacitated','Paralyzed','Charmed','Burning','Silenced','Slowed','Weakened'];
+
+function _shapeAERow(listId, key, e) {
+  e = e || {};
+  const sv   = v => (v||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  const opts = (arr, val) => arr.map(o => `<option${o===(val||arr[0])?' selected':''}>${o}</option>`).join('');
+  const lbl  = t => `<div style="font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.8px;color:var(--txt-dim);margin-bottom:2px;text-transform:uppercase;">${t}</div>`;
+  return `<div class="sae-row" style="background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.07);border-radius:4px;padding:8px;margin-bottom:6px;">
+    <div style="display:flex;gap:5px;align-items:center;margin-bottom:7px;">
+      <input class="c-inp sae-name" placeholder="Ability name…" value="${sv(e.name)}" style="flex:1;min-width:0;font-size:11px;">
+      <select class="c-sel sae-actionType" style="flex:0 0 128px;font-size:10px;">${opts(_SAE_ACTION_TYPES, e.actionType)}</select>
+      <button onclick="this.closest('.sae-row').remove()" style="flex-shrink:0;padding:2px 7px;background:rgba(200,70,70,.1);border:1px solid rgba(200,70,70,.2);border-radius:3px;color:rgba(220,100,80,.8);cursor:pointer;font-size:12px;line-height:1;" title="Remove">×</button>
+    </div>
+    <div style="display:flex;gap:5px;align-items:flex-end;margin-bottom:6px;flex-wrap:wrap;">
+      <div style="flex:0 0 auto;">${lbl('Hit Bonus / DC')}<input class="c-inp sae-hitDC" placeholder="+4  /  DC 13" value="${sv(e.hitDC)}" style="width:90px;font-size:10px;"></div>
+      <div style="flex:0 0 auto;">${lbl('# Dice')}<input class="c-inp sae-diceNum" type="number" min="1" max="20" placeholder="1" value="${sv(e.diceNum)}" style="width:42px;font-size:10px;"></div>
+      <div style="flex:0 0 auto;">${lbl('Die Type')}<select class="c-sel sae-dieType" style="width:58px;font-size:10px;">${opts(_SAE_DIE_TYPES, e.dieType)}</select></div>
+      <div style="flex:0 0 auto;">${lbl('+ Mod')}<input class="c-inp sae-dmgMod" placeholder="+2" value="${sv(e.dmgMod)}" style="width:42px;font-size:10px;"></div>
+      <div style="flex:1;min-width:90px;">${lbl('Damage Type')}<select class="c-sel sae-dmgType" style="width:100%;font-size:10px;">${opts(_SAE_DMG_TYPES, e.dmgType)}</select></div>
+    </div>
+    <div style="display:flex;gap:5px;align-items:flex-end;margin-bottom:6px;flex-wrap:wrap;">
+      <div style="flex:0 0 auto;">${lbl('Condition on Hit')}<select class="c-sel sae-condition" style="width:130px;font-size:10px;">${opts(_SAE_CONDITIONS, e.condition||'None')}</select></div>
+      <div style="flex:1;min-width:80px;">${lbl('Range / Reach')}<input class="c-inp sae-range" placeholder="5 ft. / 30 ft." value="${sv(e.range)}" style="width:100%;font-size:10px;"></div>
+    </div>
+    <div>${lbl('Effect / Notes')}<textarea class="c-ta sae-desc" placeholder="Additional details, trigger condition, flavor…" style="width:100%;min-height:30px;resize:vertical;font-size:10.5px;box-sizing:border-box;">${sv(e.desc)}</textarea></div>
+  </div>`;
 }
 
 function addShapeAE(listId) {
   const list = document.getElementById(listId);
   if(!list) return;
   const tmp = document.createElement('div');
-  tmp.innerHTML = _shapeAERow(listId, Date.now(), '', '');
+  tmp.innerHTML = _shapeAERow(listId, Date.now(), {});
   list.appendChild(tmp.firstElementChild);
   list.lastElementChild?.querySelector('.sae-name')?.focus();
 }
@@ -16563,13 +16585,21 @@ function collectShapeAEs(listId) {
   const list = document.getElementById(listId);
   if(!list) return [];
   return [...list.querySelectorAll('.sae-row')].map(row => ({
-    name: row.querySelector('.sae-name')?.value.trim()||'',
-    desc: row.querySelector('.sae-desc')?.value.trim()||''
-  })).filter(e => e.name||e.desc);
+    name:       row.querySelector('.sae-name')?.value.trim()||'',
+    actionType: row.querySelector('.sae-actionType')?.value||'—',
+    hitDC:      row.querySelector('.sae-hitDC')?.value.trim()||'',
+    diceNum:    row.querySelector('.sae-diceNum')?.value.trim()||'',
+    dieType:    row.querySelector('.sae-dieType')?.value||'—',
+    dmgMod:     row.querySelector('.sae-dmgMod')?.value.trim()||'',
+    dmgType:    row.querySelector('.sae-dmgType')?.value||'—',
+    condition:  row.querySelector('.sae-condition')?.value||'None',
+    range:      row.querySelector('.sae-range')?.value.trim()||'',
+    desc:       row.querySelector('.sae-desc')?.value.trim()||'',
+  })).filter(e => e.name||e.desc||e.hitDC||e.diceNum);
 }
 
 function _shapeAESection(listId, icon, label, borderClr, textClr, entries) {
-  const rows = (entries||[]).map((e,i) => _shapeAERow(listId, i, e.name||'', e.desc||'')).join('');
+  const rows = (entries||[]).map((e,i) => _shapeAERow(listId, i, e)).join('');
   const empty = !rows ? '<div style="font-size:10px;color:var(--txt-dim);font-style:italic;padding:2px 0 4px 2px;">No entries — click + Add.</div>' : '';
   return '<div style="margin-bottom:9px;">'
     + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;border-left:2px solid ' + borderClr + ';padding-left:6px;">'
@@ -16778,15 +16808,31 @@ function _renderAEBlock(entries, borderClr, textClr, icon, label) {
   const list = _normalizeAEs(entries);
   if(!list.length) return '';
   const rows = list.map(e => {
+    const dmgParts = [];
+    if(e.diceNum && e.dieType && e.dieType!=='—') {
+      let d = e.diceNum + e.dieType;
+      if(e.dmgMod) d += (e.dmgMod.startsWith('-')?'':'+') + e.dmgMod;
+      dmgParts.push(d);
+    }
+    if(e.dmgType && e.dmgType!=='—') dmgParts.push(e.dmgType);
+    const dmgStr = dmgParts.join(' ');
+    const dot = '<span style="color:var(--txt-dim);opacity:.35;font-size:9px;"> · </span>';
+    const chips = [];
+    if(e.actionType && e.actionType!=='—') chips.push('<em style="color:var(--txt-dim);font-size:10px;opacity:.75;">' + e.actionType + '</em>');
+    if(e.hitDC)  chips.push('<span style="color:var(--txt);font-size:10.5px;">' + e.hitDC + '</span>');
+    if(dmgStr)   chips.push('<span style="color:var(--txt);font-size:10.5px;">' + dmgStr + '</span>');
+    if(e.range)  chips.push('<span style="color:var(--txt-dim);font-size:10px;">' + e.range + '</span>');
+    if(e.condition && e.condition!=='None') chips.push('<span style="color:rgba(220,162,39,.85);font-size:10px;">[' + e.condition + ']</span>');
     const nameH = e.name ? '<strong style="color:var(--txt);font-family:\'Cinzel\',serif;font-size:8.5px;">' + e.name + '</strong>' : '';
-    const sep   = (e.name && e.desc) ? '<span style="color:var(--txt-dim);opacity:.5;"> — </span>' : '';
-    const descH = e.desc ? '<span style="color:var(--txt-dim);font-size:11.5px;">' + e.desc + '</span>' : '';
-    return '<div style="padding:3px 0 3px 8px;border-left:1px solid ' + borderClr + ';margin-bottom:3px;">' + nameH + sep + descH + '</div>';
+    const metaH = chips.length ? (nameH ? dot : '') + chips.join(dot) : '';
+    const descH = e.desc ? '<div style="font-size:11px;color:var(--txt-dim);margin-top:2px;">' + e.desc + '</div>' : '';
+    return '<div style="padding:3px 0 4px 8px;border-left:1px solid ' + borderClr + ';margin-bottom:4px;">'
+      + '<div style="line-height:1.7;">' + nameH + metaH + '</div>'
+      + descH + '</div>';
   }).join('');
   return '<div style="margin-bottom:6px;">'
     + '<div style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:1.2px;color:' + textClr + ';text-transform:uppercase;margin-bottom:3px;">' + icon + ' ' + label + '</div>'
-    + rows
-    + '</div>';
+    + rows + '</div>';
 }
 
 function renderShapeList(type){
