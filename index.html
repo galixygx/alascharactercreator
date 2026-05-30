@@ -31939,16 +31939,6 @@ function kpInjectConditionsIntoCards(){
 }
 .kb-close-btn:hover { border-color: var(--gold); color: var(--gold); }
 
-/* U23 — Gold total display */
-.gold-total-row {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-top: 6px; padding: 4px 8px;
-  background: rgba(201,162,39,.06); border: 1px solid rgba(201,162,39,.2);
-  border-radius: 4px;
-}
-.gold-total-lbl { font-family: 'Cinzel', serif; font-size: 7px; letter-spacing: 1.5px; color: var(--gold-d); }
-.gold-total-val { font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 700; color: var(--gold); }
-
 /* U25 — Copy stats button */
 .copy-stats-btn {
   display: flex; align-items: center; gap: 5px;
@@ -32301,40 +32291,6 @@ function _autoFocusNewCard(listId){
 (function(){
   var sel = document.getElementById('attunedSigil');
   if(sel && !sel.title) sel.title = 'Attuned Sigil — your chosen gemstone alignment. Grants bonus scaling when matched to your Sigil school. Drakonian: must match bloodline affinity for +3 Resonance Pool bonus.';
-})();
-
-/* ── U22: Gold GP + SP + CP → total GP display ──────────────── */
-(function(){
-  function updateGoldTotal(){
-    var gp = parseFloat((document.getElementById('goldGP')||{}).value)||0;
-    var sp = parseFloat((document.getElementById('goldSP')||{}).value)||0;
-    var cp = parseFloat((document.getElementById('goldCP')||{}).value)||0;
-    var total = gp + sp/10 + cp/100;
-    var el = document.getElementById('goldTotalDisplay');
-    if(el) el.textContent = total.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2}) + ' GP total';
-  }
-  // Inject the display row after the gold inputs
-  var goldGP = document.getElementById('goldGP');
-  if(goldGP){
-    var wrap = goldGP.closest('.s-card') || goldGP.parentElement;
-    // Walk up to find a reasonable parent
-    var parent = goldGP;
-    for(var i=0;i<6;i++){ if(parent.parentElement) parent = parent.parentElement; }
-    var row = document.createElement('div');
-    row.className = 'gold-total-row';
-    row.innerHTML = '<span class="gold-total-lbl">TOTAL VALUE</span><span class="gold-total-val" id="goldTotalDisplay">0 GP total</span>';
-    // Find the gold section
-    var gemsEl = document.getElementById('gemsHeld');
-    if(gemsEl && gemsEl.parentElement && gemsEl.parentElement.parentElement){
-      gemsEl.parentElement.parentElement.parentElement.appendChild(row);
-    }
-    // Listen
-    ['goldGP','goldSP','goldCP'].forEach(function(id){
-      var el = document.getElementById(id);
-      if(el) el.addEventListener('input', updateGoldTotal);
-    });
-    updateGoldTotal();
-  }
 })();
 
 /* ── U23: Copy character stats to clipboard ─────────────────── */

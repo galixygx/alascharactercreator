@@ -10,7 +10,7 @@
 #   4. Deploys directly to Netlify (live in ~30 seconds)
 # ────────────────────────────────────────────────────────────────
 
-Set-Location "C:\Users\r2d2r\OneDrive\Desktop\Alas\alascharactercreator-site"
+Set-Location "C:\Users\r2d2r\OneDrive\Desktop\alascharactercreator-site"
 
 # Step 1 — Copy latest HTML
 Write-Host "`n[1/4] Copying latest HTML..." -ForegroundColor Cyan
