@@ -16587,6 +16587,16 @@ function openAddShapeForm(type){
       <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">Traits &amp; Abilities</span>
         <textarea class="c-ta" id="sf_traits" placeholder="Describe special traits, passive abilities, or combat behaviors…" style="min-height:60px;"></textarea>
       </div>
+      <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:${accentColor};opacity:.7;margin-bottom:6px;margin-top:4px;text-transform:uppercase;">Combat Actions</div>
+      <div class="c-fld" style="margin-bottom:8px;"><span class="c-fld-lbl">⚔ Actions</span>
+        <textarea class="c-ta" id="sf_actions" placeholder="Main attacks and action abilities (e.g. Claw +4 to hit, 1d6+2 — on hit: target is grappled)…" style="min-height:58px;"></textarea>
+      </div>
+      <div class="c-fld" style="margin-bottom:8px;"><span class="c-fld-lbl">◈ Bonus Actions</span>
+        <textarea class="c-ta" id="sf_bonusActions" placeholder="Bonus action abilities (e.g. Pounce: move up to 15 ft. as a bonus action after attacking)…" style="min-height:48px;"></textarea>
+      </div>
+      <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">↺ Reactions</span>
+        <textarea class="c-ta" id="sf_reactions" placeholder="Reaction abilities (e.g. Redirect — when hit, reduce damage by CON mod)…" style="min-height:48px;"></textarea>
+      </div>
       <div class="c-fld" style="margin-bottom:14px;"><span class="c-fld-lbl">Notes</span>
         <textarea class="c-ta" id="sf_notes" placeholder="Flavor, narrative, when/how this form was observed…" style="min-height:50px;"></textarea>
       </div>
@@ -16610,10 +16620,13 @@ function saveShapeForm(type){
     ac:       parseInt(document.getElementById('sf_ac')?.value)||12,
     hp:       parseInt(document.getElementById('sf_hp')?.value)||24,
     speed:    document.getElementById('sf_speed')?.value.trim()||'30 ft.',
-    strike:   document.getElementById('sf_strike')?.value.trim()||'',
-    location: document.getElementById('sf_location')?.value.trim()||'',
-    traits:   document.getElementById('sf_traits')?.value.trim()||'',
-    notes:    document.getElementById('sf_notes')?.value.trim()||'',
+    strike:       document.getElementById('sf_strike')?.value.trim()||'',
+    location:     document.getElementById('sf_location')?.value.trim()||'',
+    traits:       document.getElementById('sf_traits')?.value.trim()||'',
+    actions:      document.getElementById('sf_actions')?.value.trim()||'',
+    bonusActions: document.getElementById('sf_bonusActions')?.value.trim()||'',
+    reactions:    document.getElementById('sf_reactions')?.value.trim()||'',
+    notes:        document.getElementById('sf_notes')?.value.trim()||'',
   };
   state.customShapes[type].push(entry);
   _debouncedSave();
@@ -16683,6 +16696,16 @@ function openEditShapeForm(type, id){
       <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">Traits &amp; Abilities</span>
         <textarea class="c-ta" id="sef_traits" style="min-height:60px;">${ea(entry.traits)}</textarea>
       </div>
+      <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:${accentColor};opacity:.7;margin-bottom:6px;margin-top:4px;text-transform:uppercase;">Combat Actions</div>
+      <div class="c-fld" style="margin-bottom:8px;"><span class="c-fld-lbl">⚔ Actions</span>
+        <textarea class="c-ta" id="sef_actions" style="min-height:58px;">${ea(entry.actions||'')}</textarea>
+      </div>
+      <div class="c-fld" style="margin-bottom:8px;"><span class="c-fld-lbl">◈ Bonus Actions</span>
+        <textarea class="c-ta" id="sef_bonusActions" style="min-height:48px;">${ea(entry.bonusActions||'')}</textarea>
+      </div>
+      <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">↺ Reactions</span>
+        <textarea class="c-ta" id="sef_reactions" style="min-height:48px;">${ea(entry.reactions||'')}</textarea>
+      </div>
       <div class="c-fld" style="margin-bottom:14px;"><span class="c-fld-lbl">Notes</span>
         <textarea class="c-ta" id="sef_notes" style="min-height:50px;">${ea(entry.notes)}</textarea>
       </div>
@@ -16708,10 +16731,13 @@ function saveEditShapeForm(type, id){
     ac:       parseInt(document.getElementById('sef_ac')?.value)||12,
     hp:       parseInt(document.getElementById('sef_hp')?.value)||24,
     speed:    document.getElementById('sef_speed')?.value.trim()||'30 ft.',
-    strike:   document.getElementById('sef_strike')?.value.trim()||'',
-    location: document.getElementById('sef_location')?.value.trim()||'',
-    traits:   document.getElementById('sef_traits')?.value.trim()||'',
-    notes:    document.getElementById('sef_notes')?.value.trim()||'',
+    strike:       document.getElementById('sef_strike')?.value.trim()||'',
+    location:     document.getElementById('sef_location')?.value.trim()||'',
+    traits:       document.getElementById('sef_traits')?.value.trim()||'',
+    actions:      document.getElementById('sef_actions')?.value.trim()||'',
+    bonusActions: document.getElementById('sef_bonusActions')?.value.trim()||'',
+    reactions:    document.getElementById('sef_reactions')?.value.trim()||'',
+    notes:        document.getElementById('sef_notes')?.value.trim()||'',
   };
   _debouncedSave();
   document.getElementById('shapeEditOverlay')?.remove();
@@ -16750,7 +16776,22 @@ function renderShapeList(type){
         ${s.location?`<span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--txt-dim);">📍 <em style="color:var(--txt)">${s.location}</em></span>`:''}
       </div>
       ${s.strike?`<div style="font-family:'Cinzel',serif;font-size:8px;color:var(--txt-lbl);margin-bottom:5px;">⚔ ${s.strike}</div>`:''}
-      ${s.traits?`<div style="font-size:12px;color:var(--txt-dim);margin-bottom:4px;">${s.traits}</div>`:''}
+      ${s.traits?`<div style="font-size:12px;color:var(--txt-dim);margin-bottom:6px;">${s.traits}</div>`:''}
+      ${(s.actions||s.bonusActions||s.reactions)?`
+        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">
+          ${s.actions?`<div style="background:rgba(0,0,0,.15);border-left:2px solid ${accentColor};border-radius:0 3px 3px 0;padding:5px 8px;">
+            <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.2px;color:${accentColor};margin-bottom:3px;text-transform:uppercase;">⚔ Actions</div>
+            <div style="font-size:11.5px;color:var(--txt-dim);white-space:pre-wrap;">${s.actions}</div>
+          </div>`:''}
+          ${s.bonusActions?`<div style="background:rgba(0,0,0,.15);border-left:2px solid rgba(201,162,39,.6);border-radius:0 3px 3px 0;padding:5px 8px;">
+            <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.2px;color:rgba(201,162,39,.85);margin-bottom:3px;text-transform:uppercase;">◈ Bonus Actions</div>
+            <div style="font-size:11.5px;color:var(--txt-dim);white-space:pre-wrap;">${s.bonusActions}</div>
+          </div>`:''}
+          ${s.reactions?`<div style="background:rgba(0,0,0,.15);border-left:2px solid rgba(220,100,100,.6);border-radius:0 3px 3px 0;padding:5px 8px;">
+            <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.2px;color:rgba(220,120,100,.85);margin-bottom:3px;text-transform:uppercase;">↺ Reactions</div>
+            <div style="font-size:11.5px;color:var(--txt-dim);white-space:pre-wrap;">${s.reactions}</div>
+          </div>`:''}
+        </div>`:''}
       ${s.notes?`<div style="font-family:'EB Garamond',serif;font-size:11.5px;color:var(--txt-dim);font-style:italic;">${s.notes}</div>`:''}
     </div>`).join('');
 }
