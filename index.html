@@ -10008,16 +10008,20 @@
                     <div id="sigilAffinityStagesPanel"></div>
 
                     <!-- ─── SPELL LIST (completed/locked spells) ─── -->
-                    <div class="sec-hdr" style="margin-top:28px;" id="spellListHdr">Spell List</div>
+                    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:28px;margin-bottom:6px;">
+                        <div class="sec-hdr" id="spellListHdr" style="margin:0;border:none;padding:0;flex:1;min-width:0;">Spell List</div>
+                        <select id="slSortSelect" onchange="sortSpellList(this.value)"
+                                style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;padding:4px 24px 4px 10px;background:var(--surf2);border:1px solid var(--bdr-g);color:var(--gold-d);border-radius:4px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%23c9a227%22 opacity=%22.6%22/></svg>');background-repeat:no-repeat;background-position:right 7px center;">
+                            <option value="level">Sort: Level ↑</option>
+                            <option value="name">Sort: Name A–Z</option>
+                            <option value="aff">Sort: Affinity</option>
+                            <option value="rc">Sort: RC Cost ↑</option>
+                            <option value="ct">Sort: Cast Time</option>
+                        </select>
+                        <button onclick="restoreAllSpells()" class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;border-color:rgba(61,214,219,.4);color:rgba(61,214,219,.85);white-space:nowrap;">◉ Restore All</button>
+                    </div>
                     <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:14px;">
                         Completed spells locked in from your Custom &amp; Additional Sigils above. Press <em>Complete</em> on any spell card to add it here as a permanent reference.
-                    </div>
-                    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px;">
-                        <span style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;">Sort by:</span>
-                        <button onclick="sortSpellList('level')" id="slSortLevel" class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;border-color:rgba(201,162,39,.4);color:var(--gold-d);">Level ▲</button>
-                        <button onclick="sortSpellList('name')"  id="slSortName"  class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;">Name A–Z</button>
-                        <button onclick="sortSpellList('aff')"   id="slSortAff"   class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;">Affinity</button>
-                        <button onclick="restoreAllSpells()" class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;border-color:rgba(61,214,219,.4);color:rgba(61,214,219,.85);margin-left:auto;">◉ Restore All</button>
                     </div>
                     <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;">
                         <input id="slSearchInput" type="text" placeholder="🔍 Search spells…"
@@ -27965,12 +27969,9 @@ function editCompletedSpell(id){
 
 function sortSpellList(key){
   _slSortKey = key;
-  // Update button highlight
-  ['level','name','aff'].forEach(k => {
-    const btn = document.getElementById('slSort' + k.charAt(0).toUpperCase() + k.slice(1));
-    if(btn) btn.style.borderColor = k === key ? 'rgba(201,162,39,.8)' : '';
-    if(btn) btn.style.color       = k === key ? 'var(--gold)'         : '';
-  });
+  // Sync dropdown
+  const sel = document.getElementById('slSortSelect');
+  if(sel && sel.value !== key) sel.value = key;
   renderSpellList();
 }
 
@@ -27992,6 +27993,8 @@ function renderSpellList(){
     if(_slSortKey === 'level') return (parseInt(a.spellLevel)||0) - (parseInt(b.spellLevel)||0);
     if(_slSortKey === 'name')  return (a.name||'').localeCompare(b.name||'');
     if(_slSortKey === 'aff')   return (a.aff||'').localeCompare(b.aff||'');
+    if(_slSortKey === 'rc')    return (parseInt(a.rc)||0) - (parseInt(b.rc)||0);
+    if(_slSortKey === 'ct')    return (a.ct||'Action').localeCompare(b.ct||'Action');
     return 0;
   });
 
