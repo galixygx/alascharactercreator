@@ -16540,6 +16540,52 @@ function buildShapeAddBox(type, unlocked, level){
   return html;
 }
 
+// ── Shape Action Entry helpers ──────────────────────────────────────────────
+function _shapeAERow(listId, key, name, desc) {
+  const sv = v => (v||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+  return '<div class="sae-row" style="display:flex;gap:5px;align-items:flex-start;margin-bottom:5px;">'
+    + '<input class="c-inp sae-name" placeholder="Name…" value="' + sv(name) + '" style="flex:0 0 105px;min-width:0;font-size:11px;">'
+    + '<textarea class="c-ta sae-desc" placeholder="Effect, roll, condition, damage…" style="flex:1;min-height:34px;resize:vertical;font-size:11px;">' + sv(desc) + '</textarea>'
+    + '<button onclick="this.closest(\'.sae-row\').remove()" style="flex-shrink:0;padding:2px 7px;background:rgba(200,70,70,.1);border:1px solid rgba(200,70,70,.2);border-radius:3px;color:rgba(220,100,80,.8);cursor:pointer;font-size:12px;line-height:1;margin-top:1px;" title="Remove">×</button>'
+    + '</div>';
+}
+
+function addShapeAE(listId) {
+  const list = document.getElementById(listId);
+  if(!list) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = _shapeAERow(listId, Date.now(), '', '');
+  list.appendChild(tmp.firstElementChild);
+  list.lastElementChild?.querySelector('.sae-name')?.focus();
+}
+
+function collectShapeAEs(listId) {
+  const list = document.getElementById(listId);
+  if(!list) return [];
+  return [...list.querySelectorAll('.sae-row')].map(row => ({
+    name: row.querySelector('.sae-name')?.value.trim()||'',
+    desc: row.querySelector('.sae-desc')?.value.trim()||''
+  })).filter(e => e.name||e.desc);
+}
+
+function _shapeAESection(listId, icon, label, borderClr, textClr, entries) {
+  const rows = (entries||[]).map((e,i) => _shapeAERow(listId, i, e.name||'', e.desc||'')).join('');
+  const empty = !rows ? '<div style="font-size:10px;color:var(--txt-dim);font-style:italic;padding:2px 0 4px 2px;">No entries — click + Add.</div>' : '';
+  return '<div style="margin-bottom:9px;">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;border-left:2px solid ' + borderClr + ';padding-left:6px;">'
+    + '<span style="font-family:\'Cinzel\',serif;font-size:7.5px;letter-spacing:1.2px;color:' + textClr + ';text-transform:uppercase;">' + icon + ' ' + label + '</span>'
+    + '<button onclick="addShapeAE(\'' + listId + '\')" style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:.8px;padding:2px 8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12);border-radius:3px;color:var(--txt-dim);cursor:pointer;flex-shrink:0;">+ Add</button>'
+    + '</div>'
+    + '<div id="' + listId + '" style="display:flex;flex-direction:column;">' + (rows||empty) + '</div>'
+    + '</div>';
+}
+
+function _normalizeAEs(v) {
+  if(!v) return [];
+  if(Array.isArray(v)) return v;
+  return [{name:'', desc: String(v)}];
+}
+
 function openAddShapeForm(type){
   ensureCustomShapes();
   const isWild = type==='wildshape';
@@ -16554,19 +16600,14 @@ function openAddShapeForm(type){
   overlay.onclick = e=>{ if(e.target===overlay) overlay.remove(); };
 
   overlay.innerHTML = `
-    <div class="sr-box" style="max-width:520px;width:94%;padding:20px;">
-      <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:${accentColor};margin-bottom:14px;">${title}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-        <div class="c-fld"><span class="c-fld-lbl">Creature Name</span>
-          <input class="c-inp" id="sf_name" placeholder="e.g. Glintfox, Thornbound Hare…">
-        </div>
+    <div class="sr-box" style="max-width:540px;width:94%;padding:20px;max-height:88vh;overflow-y:auto;">
+      <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:${accentColor};margin-bottom:12px;">${title}</div>
+      <div class="c-fld" style="margin-bottom:8px;"><span class="c-fld-lbl">Creature Name</span>
+        <input class="c-inp" id="sf_name" placeholder="e.g. Glintfox, Thornbound Hare…">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
         <div class="c-fld"><span class="c-fld-lbl">Size</span>
-          <select class="c-sel" id="sf_size">
-            ${sizesAllowed.map(s=>`<option>${s}</option>`).join('')}
-          </select>
-        </div>
-        <div class="c-fld"><span class="c-fld-lbl">Element / Type</span>
-          <input class="c-inp" id="sf_element" placeholder="e.g. Fire, Nature, Physical…">
+          <select class="c-sel" id="sf_size">${sizesAllowed.map(s=>`<option>${s}</option>`).join('')}</select>
         </div>
         <div class="c-fld"><span class="c-fld-lbl">AC</span>
           <input class="c-inp" type="number" id="sf_ac" value="12">
@@ -16577,28 +16618,24 @@ function openAddShapeForm(type){
         <div class="c-fld"><span class="c-fld-lbl">Speed</span>
           <input class="c-inp" id="sf_speed" placeholder="30 ft.">
         </div>
-        <div class="c-fld"><span class="c-fld-lbl">Primary Strike</span>
-          <input class="c-inp" id="sf_strike" placeholder="+4 to hit, 1d6+2 physical">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div class="c-fld"><span class="c-fld-lbl">Element / Type</span>
+          <input class="c-inp" id="sf_element" placeholder="e.g. Fire, Nature, Physical…">
         </div>
         <div class="c-fld"><span class="c-fld-lbl">Where Observed / Found</span>
           <input class="c-inp" id="sf_location" placeholder="e.g. Elderglades, Dunesong…">
         </div>
       </div>
-      <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">Traits &amp; Abilities</span>
-        <textarea class="c-ta" id="sf_traits" placeholder="Describe special traits, passive abilities, or combat behaviors…" style="min-height:60px;"></textarea>
+      <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">Traits &amp; Passives</span>
+        <textarea class="c-ta" id="sf_traits" placeholder="Always-on traits, resistances, special senses, passive abilities…" style="min-height:50px;"></textarea>
       </div>
-      <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:${accentColor};opacity:.7;margin-bottom:6px;margin-top:4px;text-transform:uppercase;">Combat Actions</div>
-      <div class="c-fld" style="margin-bottom:8px;"><span class="c-fld-lbl">⚔ Actions</span>
-        <textarea class="c-ta" id="sf_actions" placeholder="Main attacks and action abilities (e.g. Claw +4 to hit, 1d6+2 — on hit: target is grappled)…" style="min-height:58px;"></textarea>
-      </div>
-      <div class="c-fld" style="margin-bottom:8px;"><span class="c-fld-lbl">◈ Bonus Actions</span>
-        <textarea class="c-ta" id="sf_bonusActions" placeholder="Bonus action abilities (e.g. Pounce: move up to 15 ft. as a bonus action after attacking)…" style="min-height:48px;"></textarea>
-      </div>
-      <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">↺ Reactions</span>
-        <textarea class="c-ta" id="sf_reactions" placeholder="Reaction abilities (e.g. Redirect — when hit, reduce damage by CON mod)…" style="min-height:48px;"></textarea>
-      </div>
-      <div class="c-fld" style="margin-bottom:14px;"><span class="c-fld-lbl">Notes</span>
-        <textarea class="c-ta" id="sf_notes" placeholder="Flavor, narrative, when/how this form was observed…" style="min-height:50px;"></textarea>
+      <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:var(--txt-dim);opacity:.55;margin-bottom:8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:5px;">Combat — one entry per ability</div>
+      ${_shapeAESection('sf_actions_list',   '⚔', 'Actions',       accentColor,              accentColor,              [])}
+      ${_shapeAESection('sf_bonus_list',     '◈', 'Bonus Actions', 'rgba(201,162,39,.65)',   'rgba(201,162,39,.85)',   [])}
+      ${_shapeAESection('sf_reactions_list', '↺', 'Reactions',     'rgba(220,100,75,.55)',   'rgba(220,110,85,.85)',   [])}
+      <div class="c-fld" style="margin-bottom:14px;margin-top:6px;"><span class="c-fld-lbl">Notes</span>
+        <textarea class="c-ta" id="sf_notes" placeholder="Flavor, narrative, when/how this form was observed…" style="min-height:46px;"></textarea>
       </div>
       <div style="display:flex;gap:8px;">
         <button class="add-btn" style="flex:1;" onclick="saveShapeForm('${type}')">✦ Save Form</button>
@@ -16610,31 +16647,28 @@ function openAddShapeForm(type){
 
 function saveShapeForm(type){
   ensureCustomShapes();
-  const name     = document.getElementById('sf_name')?.value.trim()||'';
+  const name = document.getElementById('sf_name')?.value.trim()||'';
   if(!name){ showToast('Enter a creature name.'); return; }
   const entry = {
     id: Date.now()+'_'+Math.random().toString(36).slice(2,6),
     name,
-    size:     document.getElementById('sf_size')?.value||'Small',
-    element:  document.getElementById('sf_element')?.value.trim()||'Physical',
-    ac:       parseInt(document.getElementById('sf_ac')?.value)||12,
-    hp:       parseInt(document.getElementById('sf_hp')?.value)||24,
-    speed:    document.getElementById('sf_speed')?.value.trim()||'30 ft.',
-    strike:       document.getElementById('sf_strike')?.value.trim()||'',
+    size:         document.getElementById('sf_size')?.value||'Small',
+    element:      document.getElementById('sf_element')?.value.trim()||'Physical',
+    ac:           parseInt(document.getElementById('sf_ac')?.value)||12,
+    hp:           parseInt(document.getElementById('sf_hp')?.value)||24,
+    speed:        document.getElementById('sf_speed')?.value.trim()||'30 ft.',
     location:     document.getElementById('sf_location')?.value.trim()||'',
     traits:       document.getElementById('sf_traits')?.value.trim()||'',
-    actions:      document.getElementById('sf_actions')?.value.trim()||'',
-    bonusActions: document.getElementById('sf_bonusActions')?.value.trim()||'',
-    reactions:    document.getElementById('sf_reactions')?.value.trim()||'',
+    actions:      collectShapeAEs('sf_actions_list'),
+    bonusActions: collectShapeAEs('sf_bonus_list'),
+    reactions:    collectShapeAEs('sf_reactions_list'),
     notes:        document.getElementById('sf_notes')?.value.trim()||'',
   };
   state.customShapes[type].push(entry);
   _debouncedSave();
   document.getElementById('shapeFormOverlay')?.remove();
   showToast(`${entry.name} added to ${type==='wildshape'?'Wild Shapes':'Beast Shapes'}.`);
-  // Re-render the progression display to show the new entry
   buildClassProgressionDisplay();
-  // Render the list
   renderShapeList(type);
 }
 
@@ -16654,6 +16688,10 @@ function openEditShapeForm(type, id){
   const entry = state.customShapes[type].find(s => s.id === id);
   if(!entry){ showToast('Entry not found.'); return; }
 
+  const actEntries   = _normalizeAEs(entry.actions);
+  const bonusEntries = _normalizeAEs(entry.bonusActions);
+  const reactEntries = _normalizeAEs(entry.reactions);
+
   document.getElementById('shapeEditOverlay')?.remove();
   const overlay = document.createElement('div');
   overlay.className = 'sr-overlay';
@@ -16661,21 +16699,16 @@ function openEditShapeForm(type, id){
   overlay.id = 'shapeEditOverlay';
   overlay.onclick = e=>{ if(e.target===overlay) overlay.remove(); };
 
-  const ea = v => (v||'').toString().replace(/"/g,'&quot;');
+  const ea = v => (v||'').toString().replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
   overlay.innerHTML = `
-    <div class="sr-box" style="max-width:520px;width:94%;padding:20px;">
-      <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:${accentColor};margin-bottom:14px;">${title}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
-        <div class="c-fld"><span class="c-fld-lbl">Creature Name</span>
-          <input class="c-inp" id="sef_name" value="${ea(entry.name)}">
-        </div>
+    <div class="sr-box" style="max-width:540px;width:94%;padding:20px;max-height:88vh;overflow-y:auto;">
+      <div style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:2px;color:${accentColor};margin-bottom:12px;">${title}</div>
+      <div class="c-fld" style="margin-bottom:8px;"><span class="c-fld-lbl">Creature Name</span>
+        <input class="c-inp" id="sef_name" value="${ea(entry.name)}">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:8px;">
         <div class="c-fld"><span class="c-fld-lbl">Size</span>
-          <select class="c-sel" id="sef_size">
-            ${sizesAllowed.map(s=>`<option${s===entry.size?' selected':''}>${s}</option>`).join('')}
-          </select>
-        </div>
-        <div class="c-fld"><span class="c-fld-lbl">Element / Type</span>
-          <input class="c-inp" id="sef_element" value="${ea(entry.element)}">
+          <select class="c-sel" id="sef_size">${sizesAllowed.map(s=>`<option${s===entry.size?' selected':''}>${s}</option>`).join('')}</select>
         </div>
         <div class="c-fld"><span class="c-fld-lbl">AC</span>
           <input class="c-inp" type="number" id="sef_ac" value="${entry.ac||12}">
@@ -16686,28 +16719,24 @@ function openEditShapeForm(type, id){
         <div class="c-fld"><span class="c-fld-lbl">Speed</span>
           <input class="c-inp" id="sef_speed" value="${ea(entry.speed)}">
         </div>
-        <div class="c-fld"><span class="c-fld-lbl">Primary Strike</span>
-          <input class="c-inp" id="sef_strike" value="${ea(entry.strike)}">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+        <div class="c-fld"><span class="c-fld-lbl">Element / Type</span>
+          <input class="c-inp" id="sef_element" value="${ea(entry.element)}">
         </div>
         <div class="c-fld"><span class="c-fld-lbl">Where Observed / Found</span>
           <input class="c-inp" id="sef_location" value="${ea(entry.location)}">
         </div>
       </div>
-      <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">Traits &amp; Abilities</span>
-        <textarea class="c-ta" id="sef_traits" style="min-height:60px;">${ea(entry.traits)}</textarea>
+      <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">Traits &amp; Passives</span>
+        <textarea class="c-ta" id="sef_traits" style="min-height:50px;">${ea(entry.traits)}</textarea>
       </div>
-      <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:${accentColor};opacity:.7;margin-bottom:6px;margin-top:4px;text-transform:uppercase;">Combat Actions</div>
-      <div class="c-fld" style="margin-bottom:8px;"><span class="c-fld-lbl">⚔ Actions</span>
-        <textarea class="c-ta" id="sef_actions" style="min-height:58px;">${ea(entry.actions||'')}</textarea>
-      </div>
-      <div class="c-fld" style="margin-bottom:8px;"><span class="c-fld-lbl">◈ Bonus Actions</span>
-        <textarea class="c-ta" id="sef_bonusActions" style="min-height:48px;">${ea(entry.bonusActions||'')}</textarea>
-      </div>
-      <div class="c-fld" style="margin-bottom:10px;"><span class="c-fld-lbl">↺ Reactions</span>
-        <textarea class="c-ta" id="sef_reactions" style="min-height:48px;">${ea(entry.reactions||'')}</textarea>
-      </div>
-      <div class="c-fld" style="margin-bottom:14px;"><span class="c-fld-lbl">Notes</span>
-        <textarea class="c-ta" id="sef_notes" style="min-height:50px;">${ea(entry.notes)}</textarea>
+      <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:var(--txt-dim);opacity:.55;margin-bottom:8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:5px;">Combat — one entry per ability</div>
+      ${_shapeAESection('sef_actions_list',   '⚔', 'Actions',       accentColor,              accentColor,              actEntries)}
+      ${_shapeAESection('sef_bonus_list',     '◈', 'Bonus Actions', 'rgba(201,162,39,.65)',   'rgba(201,162,39,.85)',   bonusEntries)}
+      ${_shapeAESection('sef_reactions_list', '↺', 'Reactions',     'rgba(220,100,75,.55)',   'rgba(220,110,85,.85)',   reactEntries)}
+      <div class="c-fld" style="margin-bottom:14px;margin-top:6px;"><span class="c-fld-lbl">Notes</span>
+        <textarea class="c-ta" id="sef_notes" style="min-height:46px;">${ea(entry.notes)}</textarea>
       </div>
       <div style="display:flex;gap:8px;">
         <button class="add-btn" style="flex:1;" onclick="saveEditShapeForm('${type}','${id}')">✦ Save Changes</button>
@@ -16726,17 +16755,16 @@ function saveEditShapeForm(type, id){
   state.customShapes[type][idx] = {
     ...state.customShapes[type][idx],
     name,
-    size:     document.getElementById('sef_size')?.value||'Small',
-    element:  document.getElementById('sef_element')?.value.trim()||'Physical',
-    ac:       parseInt(document.getElementById('sef_ac')?.value)||12,
-    hp:       parseInt(document.getElementById('sef_hp')?.value)||24,
-    speed:    document.getElementById('sef_speed')?.value.trim()||'30 ft.',
-    strike:       document.getElementById('sef_strike')?.value.trim()||'',
+    size:         document.getElementById('sef_size')?.value||'Small',
+    element:      document.getElementById('sef_element')?.value.trim()||'Physical',
+    ac:           parseInt(document.getElementById('sef_ac')?.value)||12,
+    hp:           parseInt(document.getElementById('sef_hp')?.value)||24,
+    speed:        document.getElementById('sef_speed')?.value.trim()||'30 ft.',
     location:     document.getElementById('sef_location')?.value.trim()||'',
     traits:       document.getElementById('sef_traits')?.value.trim()||'',
-    actions:      document.getElementById('sef_actions')?.value.trim()||'',
-    bonusActions: document.getElementById('sef_bonusActions')?.value.trim()||'',
-    reactions:    document.getElementById('sef_reactions')?.value.trim()||'',
+    actions:      collectShapeAEs('sef_actions_list'),
+    bonusActions: collectShapeAEs('sef_bonus_list'),
+    reactions:    collectShapeAEs('sef_reactions_list'),
     notes:        document.getElementById('sef_notes')?.value.trim()||'',
   };
   _debouncedSave();
@@ -16744,6 +16772,21 @@ function saveEditShapeForm(type, id){
   showToast(`${name} updated.`);
   buildClassProgressionDisplay();
   renderShapeList(type);
+}
+
+function _renderAEBlock(entries, borderClr, textClr, icon, label) {
+  const list = _normalizeAEs(entries);
+  if(!list.length) return '';
+  const rows = list.map(e => {
+    const nameH = e.name ? '<strong style="color:var(--txt);font-family:\'Cinzel\',serif;font-size:8.5px;">' + e.name + '</strong>' : '';
+    const sep   = (e.name && e.desc) ? '<span style="color:var(--txt-dim);opacity:.5;"> — </span>' : '';
+    const descH = e.desc ? '<span style="color:var(--txt-dim);font-size:11.5px;">' + e.desc + '</span>' : '';
+    return '<div style="padding:3px 0 3px 8px;border-left:1px solid ' + borderClr + ';margin-bottom:3px;">' + nameH + sep + descH + '</div>';
+  }).join('');
+  return '<div style="margin-bottom:6px;">'
+    + '<div style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:1.2px;color:' + textClr + ';text-transform:uppercase;margin-bottom:3px;">' + icon + ' ' + label + '</div>'
+    + rows
+    + '</div>';
 }
 
 function renderShapeList(type){
@@ -16777,22 +16820,10 @@ function renderShapeList(type){
       </div>
       ${s.strike?`<div style="font-family:'Cinzel',serif;font-size:8px;color:var(--txt-lbl);margin-bottom:5px;">⚔ ${s.strike}</div>`:''}
       ${s.traits?`<div style="font-size:12px;color:var(--txt-dim);margin-bottom:6px;">${s.traits}</div>`:''}
-      ${(s.actions||s.bonusActions||s.reactions)?`
-        <div style="display:flex;flex-direction:column;gap:5px;margin-bottom:6px;">
-          ${s.actions?`<div style="background:rgba(0,0,0,.15);border-left:2px solid ${accentColor};border-radius:0 3px 3px 0;padding:5px 8px;">
-            <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.2px;color:${accentColor};margin-bottom:3px;text-transform:uppercase;">⚔ Actions</div>
-            <div style="font-size:11.5px;color:var(--txt-dim);white-space:pre-wrap;">${s.actions}</div>
-          </div>`:''}
-          ${s.bonusActions?`<div style="background:rgba(0,0,0,.15);border-left:2px solid rgba(201,162,39,.6);border-radius:0 3px 3px 0;padding:5px 8px;">
-            <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.2px;color:rgba(201,162,39,.85);margin-bottom:3px;text-transform:uppercase;">◈ Bonus Actions</div>
-            <div style="font-size:11.5px;color:var(--txt-dim);white-space:pre-wrap;">${s.bonusActions}</div>
-          </div>`:''}
-          ${s.reactions?`<div style="background:rgba(0,0,0,.15);border-left:2px solid rgba(220,100,100,.6);border-radius:0 3px 3px 0;padding:5px 8px;">
-            <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.2px;color:rgba(220,120,100,.85);margin-bottom:3px;text-transform:uppercase;">↺ Reactions</div>
-            <div style="font-size:11.5px;color:var(--txt-dim);white-space:pre-wrap;">${s.reactions}</div>
-          </div>`:''}
-        </div>`:''}
-      ${s.notes?`<div style="font-family:'EB Garamond',serif;font-size:11.5px;color:var(--txt-dim);font-style:italic;">${s.notes}</div>`:''}
+      ${_renderAEBlock(s.actions,      accentColor,            accentColor,            '⚔','Actions')}
+      ${_renderAEBlock(s.bonusActions, 'rgba(201,162,39,.5)',  'rgba(201,162,39,.85)', '◈','Bonus Actions')}
+      ${_renderAEBlock(s.reactions,    'rgba(220,100,75,.45)', 'rgba(220,110,85,.85)', '↺','Reactions')}
+      ${s.notes?`<div style="font-family:'EB Garamond',serif;font-size:11.5px;color:var(--txt-dim);font-style:italic;margin-top:4px;">${s.notes}</div>`:''}
     </div>`).join('');
 }
 
