@@ -10019,11 +10019,11 @@
                         <button onclick="sortSpellList('aff')"   id="slSortAff"   class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;">Affinity</button>
                         <button onclick="restoreAllSpells()" class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;border-color:rgba(61,214,219,.4);color:rgba(61,214,219,.85);margin-left:auto;">◉ Restore All</button>
                     </div>
-                    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px;">
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;">
                         <input id="slSearchInput" type="text" placeholder="🔍 Search spells…"
                                style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.5px;padding:5px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:4px;color:var(--txt-main);width:170px;"
                                oninput="_slSearch=this.value.toLowerCase();renderSpellList()">
-                        <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;">Filter:</span>
+                        <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;">Affinity:</span>
                         <button type="button" class="sl-aff-btn add-btn" data-aff="All"    onclick="_slSetAff('All')"    style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:1;">All</button>
                         <button type="button" class="sl-aff-btn add-btn" data-aff="Light"  onclick="_slSetAff('Light')"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#e8d070;border-color:rgba(232,208,112,.35);">Light</button>
                         <button type="button" class="sl-aff-btn add-btn" data-aff="Nature" onclick="_slSetAff('Nature')" style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#7cd46a;border-color:rgba(124,212,106,.35);">Nature</button>
@@ -10032,6 +10032,26 @@
                         <button type="button" class="sl-aff-btn add-btn" data-aff="Fire"   onclick="_slSetAff('Fire')"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#e07040;border-color:rgba(224,112,64,.35);">Fire</button>
                         <button type="button" class="sl-aff-btn add-btn" data-aff="Chaos"  onclick="_slSetAff('Chaos')"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#e050a0;border-color:rgba(224,80,160,.35);">Chaos</button>
                         <button type="button" class="sl-aff-btn add-btn" data-aff="Common" onclick="_slSetAff('Common')" style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#a0a0b8;border-color:rgba(160,160,184,.35);">Common</button>
+                    </div>
+                    <!-- ── RC Cost filter ── -->
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;">
+                        <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;">RC Cost:</span>
+                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="all" onclick="_slSetRC(null)"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:1;color:var(--res);border-color:rgba(61,214,219,.8);">All</button>
+                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="0"   onclick="_slSetRC(0)"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">0 (Free)</button>
+                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="2"   onclick="_slSetRC(2)"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">≤ 2</button>
+                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="4"   onclick="_slSetRC(4)"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">≤ 4</button>
+                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="6"   onclick="_slSetRC(6)"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">≤ 6</button>
+                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="8"   onclick="_slSetRC(8)"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">≤ 8</button>
+                    </div>
+                    <!-- ── Cast Time (Action type) filter ── -->
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px;">
+                        <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;">Action:</span>
+                        <button type="button" class="sl-ct-btn add-btn" data-ct="All"          onclick="_slSetCT('All')"          style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:1;color:var(--res);border-color:rgba(61,214,219,.8);">All</button>
+                        <button type="button" class="sl-ct-btn add-btn" data-ct="Action"        onclick="_slSetCT('Action')"        style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">Action</button>
+                        <button type="button" class="sl-ct-btn add-btn" data-ct="Bonus Action"  onclick="_slSetCT('Bonus Action')"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">Bonus</button>
+                        <button type="button" class="sl-ct-btn add-btn" data-ct="Reaction"      onclick="_slSetCT('Reaction')"      style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">Reaction</button>
+                        <button type="button" class="sl-ct-btn add-btn" data-ct="Free Action"   onclick="_slSetCT('Free Action')"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">Free</button>
+                        <button type="button" class="sl-ct-btn add-btn" data-ct="2 Actions"     onclick="_slSetCT('2 Actions')"     style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">2 Actions</button>
                     </div>
                     <div id="spellListGrid" style="display:flex;flex-direction:column;gap:8px;"></div>
                     <div id="spellListEmpty" style="font-family:'EB Garamond',serif;font-size:13px;color:var(--txt-dim);font-style:italic;padding:10px 0;">No completed spells yet — press <strong style="color:var(--gold-d)">Complete</strong> on a spell card above to add it to your list.</div>
@@ -14546,9 +14566,20 @@ function addSpell(data){
         </select>
         ${durSubHTML}
       </div>
-      <div class="c-fld"><span class="c-fld-lbl">Range</span><select class="c-sel sp-range-sel" onchange="saveCards('sigilsList','sigils')">
-        ${['Self','Touch','5 ft.','10 ft.','15 ft.','20 ft.','30 ft.','60 ft.','90 ft.','120 ft.','300 ft.','500 ft.','1 mile','Sight','Unlimited','Special'].map(v=>`<option${(data.range||'60 ft.')===v?' selected':''}>${v}</option>`).join('')}
-      </select></div>
+      <div class="c-fld"><span class="c-fld-lbl">Range</span>
+        ${(()=>{
+          const PRESET_RANGES = ['Self','Touch','5 ft.','10 ft.','15 ft.','20 ft.','30 ft.','60 ft.','90 ft.','120 ft.','300 ft.','500 ft.','1 mile','Sight','Unlimited','Special'];
+          const isCustom = data.range && !PRESET_RANGES.includes(data.range);
+          const selVal   = isCustom ? 'Custom' : (data.range || '60 ft.');
+          const opts     = PRESET_RANGES.map(v=>`<option${selVal===v?' selected':''}>${v}</option>`).join('')
+                         + `<option${isCustom?' selected':''}>Custom</option>`;
+          return `<select class="c-sel sp-range-sel" onchange="spellRangeChanged(this)">${opts}</select>`
+               + `<input type="text" class="c-inp sp-range-custom" placeholder="e.g. 45 ft., Line 60 ft., Touch or Sight…"
+                         style="display:${isCustom?'block':'none'};margin-top:4px;"
+                         value="${isCustom?(data.range||'').replace(/"/g,'&quot;'):''}"
+                         oninput="saveCards('sigilsList','sigils')">`;
+        })()}
+      </div>
     </div>
 
     <!-- Section: Attack & Save -->
@@ -18678,9 +18709,12 @@ function saveCards(listId, stateKey){
       d.concUnit     = card.dataset.concUnit         || 'minutes';
       d.concAmt      = card.dataset.concAmt          || '1';
       d.spellLevel   = card.dataset.spellLevel       || '1';
-      d.ct    = (card.querySelector('.sp-ct-sel')    ||{}).value || 'Action';
-      d.dur   = (card.querySelector('.sp-dur-sel')   ||{}).value || 'Instant';
-      d.range = (card.querySelector('.sp-range-sel') ||{}).value || '60 ft.';
+      d.ct  = (card.querySelector('.sp-ct-sel')  ||{}).value || 'Action';
+      d.dur = (card.querySelector('.sp-dur-sel') ||{}).value || 'Instant';
+      { const rSel = card.querySelector('.sp-range-sel');
+        d.range = rSel && rSel.value === 'Custom'
+          ? ((card.querySelector('.sp-range-custom')||{}).value || 'Custom')
+          : ((rSel||{}).value || '60 ft.'); }
       const sb = card.querySelector('.sig-avail-btn');
       d.dailySpent = sb && sb.getAttribute('data-spent')==='1';
       // Unstable Magic — persist toggle + 6 result boxes
@@ -27687,6 +27721,8 @@ function castingScaleRoll(tier){
 let _slSortKey       = 'level';
 let _slSearch        = '';
 let _slFilterAff     = 'All';
+let _slFilterCT      = 'All';   // Cast-Time filter
+let _slFilterRCMax   = null;    // null = no RC cap
 let _slExpandedNotes = new Set();
 
 // ── Spell List helpers ────────────────────────────────────────────
@@ -27715,6 +27751,41 @@ function _slSetAff(aff){
     b.style.opacity     = on ? '1' : '.5';
   });
   renderSpellList();
+}
+
+function _slSetCT(ct){
+  _slFilterCT = ct;
+  document.querySelectorAll('.sl-ct-btn').forEach(function(b){
+    const on = b.dataset.ct === ct;
+    b.style.borderColor = on ? 'rgba(61,214,219,.8)' : '';
+    b.style.color       = on ? 'var(--res)' : '';
+    b.style.opacity     = on ? '1' : '.5';
+  });
+  renderSpellList();
+}
+
+function _slSetRC(max){
+  _slFilterRCMax = max;
+  document.querySelectorAll('.sl-rc-btn').forEach(function(b){
+    const bMax = b.dataset.rcmax;
+    const on   = (bMax === 'all' && max === null) || (bMax !== 'all' && parseInt(bMax) === max);
+    b.style.borderColor = on ? 'rgba(61,214,219,.8)' : '';
+    b.style.color       = on ? 'var(--res)' : '';
+    b.style.opacity     = on ? '1' : '.5';
+  });
+  renderSpellList();
+}
+
+/* ── Custom Range toggle for + Add Spell cards ── */
+function spellRangeChanged(sel){
+  const card      = sel.closest('.item-card');
+  const customInp = card ? card.querySelector('.sp-range-custom') : null;
+  if(customInp){
+    const isCustom = sel.value === 'Custom';
+    customInp.style.display = isCustom ? 'block' : 'none';
+    if(isCustom) customInp.focus();
+  }
+  saveCards('sigilsList','sigils');
 }
 
 function restoreAllSpells(){
@@ -27804,12 +27875,15 @@ function completeSpell(card){
     }
   }
 
-  const ctEl     = card.querySelector('.sp-ct-sel');
-  const durEl    = card.querySelector('.sp-dur-sel');
-  const rangeEl  = card.querySelector('.sp-range-sel');
+  const ctEl        = card.querySelector('.sp-ct-sel');
+  const durEl       = card.querySelector('.sp-dur-sel');
+  const rangeEl     = card.querySelector('.sp-range-sel');
+  const customRangeEl = card.querySelector('.sp-range-custom');
   const ctVal    = (ctEl    ||{}).value || 'Action';
   const durVal   = (durEl   ||{}).value || 'Instant';
-  const rangeVal = (rangeEl ||{}).value || '—';
+  const rangeVal = rangeEl && rangeEl.value === 'Custom'
+    ? ((customRangeEl ? customRangeEl.value : '') || 'Custom')
+    : ((rangeEl||{}).value || '—');
 
   const aePanel = card.querySelector('.sp-ae-panel .eff-stat-panel');
   const hasAE   = card.dataset.hasActiveEffect === '1';
@@ -27924,6 +27998,8 @@ function renderSpellList(){
   // Filter
   let spells = allSpells;
   if(_slFilterAff && _slFilterAff !== 'All') spells = spells.filter(s => s.aff === _slFilterAff);
+  if(_slFilterCT  && _slFilterCT  !== 'All') spells = spells.filter(s => (s.ct||'Action') === _slFilterCT);
+  if(_slFilterRCMax !== null) spells = spells.filter(s => parseInt(s.rc||0) <= _slFilterRCMax);
   if(_slSearch) spells = spells.filter(s =>
     (s.name||'').toLowerCase().includes(_slSearch) || (s.notes||'').toLowerCase().includes(_slSearch));
 
