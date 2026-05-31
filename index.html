@@ -10014,9 +10014,9 @@
                                 style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;padding:4px 24px 4px 10px;background:var(--surf2);border:1px solid var(--bdr-g);color:var(--gold-d);border-radius:4px;cursor:pointer;outline:none;appearance:none;-webkit-appearance:none;background-image:url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2210%22 height=%226%22><path d=%22M0 0l5 6 5-6z%22 fill=%22%23c9a227%22 opacity=%22.6%22/></svg>');background-repeat:no-repeat;background-position:right 7px center;">
                             <option value="level">Sort: Level ↑</option>
                             <option value="name">Sort: Name A–Z</option>
-                            <option value="aff">Sort: Affinity</option>
-                            <option value="rc">Sort: RC Cost ↑</option>
-                            <option value="ct">Sort: Cast Time</option>
+                            <option value="aff">Sort: Affinity ▾</option>
+                            <option value="rc">Sort: RC Cost ▾</option>
+                            <option value="ct">Sort: Action Type ▾</option>
                         </select>
                         <button onclick="restoreAllSpells()" class="add-btn" style="padding:4px 12px;font-size:7px;letter-spacing:1.5px;border-color:rgba(61,214,219,.4);color:rgba(61,214,219,.85);white-space:nowrap;">◉ Restore All</button>
                     </div>
@@ -10027,36 +10027,9 @@
                         <input id="slSearchInput" type="text" placeholder="🔍 Search spells…"
                                style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:.5px;padding:5px 10px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.15);border-radius:4px;color:var(--txt-main);width:170px;"
                                oninput="_slSearch=this.value.toLowerCase();renderSpellList()">
-                        <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;">Affinity:</span>
-                        <button type="button" class="sl-aff-btn add-btn" data-aff="All"    onclick="_slSetAff('All')"    style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:1;">All</button>
-                        <button type="button" class="sl-aff-btn add-btn" data-aff="Light"  onclick="_slSetAff('Light')"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#e8d070;border-color:rgba(232,208,112,.35);">Light</button>
-                        <button type="button" class="sl-aff-btn add-btn" data-aff="Nature" onclick="_slSetAff('Nature')" style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#7cd46a;border-color:rgba(124,212,106,.35);">Nature</button>
-                        <button type="button" class="sl-aff-btn add-btn" data-aff="Water"  onclick="_slSetAff('Water')"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#50b8e0;border-color:rgba(80,184,224,.35);">Water</button>
-                        <button type="button" class="sl-aff-btn add-btn" data-aff="Air"    onclick="_slSetAff('Air')"    style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#b0d8f0;border-color:rgba(176,216,240,.35);">Air</button>
-                        <button type="button" class="sl-aff-btn add-btn" data-aff="Fire"   onclick="_slSetAff('Fire')"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#e07040;border-color:rgba(224,112,64,.35);">Fire</button>
-                        <button type="button" class="sl-aff-btn add-btn" data-aff="Chaos"  onclick="_slSetAff('Chaos')"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#e050a0;border-color:rgba(224,80,160,.35);">Chaos</button>
-                        <button type="button" class="sl-aff-btn add-btn" data-aff="Common" onclick="_slSetAff('Common')" style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;color:#a0a0b8;border-color:rgba(160,160,184,.35);">Common</button>
                     </div>
-                    <!-- ── RC Cost filter ── -->
-                    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px;">
-                        <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;">RC Cost:</span>
-                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="all" onclick="_slSetRC(null)"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:1;color:var(--res);border-color:rgba(61,214,219,.8);">All</button>
-                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="0"   onclick="_slSetRC(0)"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">0 (Free)</button>
-                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="2"   onclick="_slSetRC(2)"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">≤ 2</button>
-                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="4"   onclick="_slSetRC(4)"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">≤ 4</button>
-                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="6"   onclick="_slSetRC(6)"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">≤ 6</button>
-                        <button type="button" class="sl-rc-btn add-btn" data-rcmax="8"   onclick="_slSetRC(8)"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">≤ 8</button>
-                    </div>
-                    <!-- ── Cast Time (Action type) filter ── -->
-                    <div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px;">
-                        <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;">Action:</span>
-                        <button type="button" class="sl-ct-btn add-btn" data-ct="All"          onclick="_slSetCT('All')"          style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:1;color:var(--res);border-color:rgba(61,214,219,.8);">All</button>
-                        <button type="button" class="sl-ct-btn add-btn" data-ct="Action"        onclick="_slSetCT('Action')"        style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">Action</button>
-                        <button type="button" class="sl-ct-btn add-btn" data-ct="Bonus Action"  onclick="_slSetCT('Bonus Action')"  style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">Bonus</button>
-                        <button type="button" class="sl-ct-btn add-btn" data-ct="Reaction"      onclick="_slSetCT('Reaction')"      style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">Reaction</button>
-                        <button type="button" class="sl-ct-btn add-btn" data-ct="Free Action"   onclick="_slSetCT('Free Action')"   style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">Free</button>
-                        <button type="button" class="sl-ct-btn add-btn" data-ct="2 Actions"     onclick="_slSetCT('2 Actions')"     style="padding:2px 8px;font-size:7px;letter-spacing:1px;opacity:.5;">2 Actions</button>
-                    </div>
+                    <!-- ── Dynamic sub-filter row (populated by sortSpellList) ── -->
+                    <div id="slSubFilter" style="display:none;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px;padding:6px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:4px;"></div>
                     <div id="spellListGrid" style="display:flex;flex-direction:column;gap:8px;"></div>
                     <div id="spellListEmpty" style="font-family:'EB Garamond',serif;font-size:13px;color:var(--txt-dim);font-style:italic;padding:10px 0;">No completed spells yet — press <strong style="color:var(--gold-d)">Complete</strong> on a spell card above to add it to your list.</div>
                 </div>
@@ -27969,10 +27942,80 @@ function editCompletedSpell(id){
 
 function sortSpellList(key){
   _slSortKey = key;
-  // Sync dropdown
+  // Reset all sub-filters so stale state from previous mode never leaks
+  _slFilterAff   = 'All';
+  _slFilterRCMax = null;
+  _slFilterCT    = 'All';
+  // Sync dropdown value
   const sel = document.getElementById('slSortSelect');
   if(sel && sel.value !== key) sel.value = key;
+  // Show the right chip row beneath the dropdown
+  _slRenderSubFilter(key);
   renderSpellList();
+}
+
+function _slRenderSubFilter(key){
+  const div = document.getElementById('slSubFilter');
+  if(!div) return;
+  if(key === 'level' || key === 'name'){
+    div.style.display = 'none';
+    div.innerHTML = '';
+    return;
+  }
+  div.style.display = 'flex';
+  const btnBase = 'padding:2px 8px;font-size:7px;letter-spacing:1px;';
+  if(key === 'aff'){
+    const affs = [
+      {v:'All',    lbl:'All',    col:'',        bdr:''},
+      {v:'Light',  lbl:'Light',  col:'#e8d070', bdr:'rgba(232,208,112,.35)'},
+      {v:'Nature', lbl:'Nature', col:'#7cd46a', bdr:'rgba(124,212,106,.35)'},
+      {v:'Water',  lbl:'Water',  col:'#50b8e0', bdr:'rgba(80,184,224,.35)'},
+      {v:'Air',    lbl:'Air',    col:'#b0d8f0', bdr:'rgba(176,216,240,.35)'},
+      {v:'Fire',   lbl:'Fire',   col:'#e07040', bdr:'rgba(224,112,64,.35)'},
+      {v:'Chaos',  lbl:'Chaos',  col:'#e050a0', bdr:'rgba(224,80,160,.35)'},
+      {v:'Common', lbl:'Common', col:'#a0a0b8', bdr:'rgba(160,160,184,.35)'},
+    ];
+    div.innerHTML = '<span style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;flex-shrink:0;">Affinity:</span>'
+      + affs.map(a =>
+          '<button type="button" class="sl-aff-btn add-btn" data-aff="'+a.v+'" onclick="_slSetAff(\''+a.v+'\')" style="'+btnBase
+          +(a.v==='All'?'opacity:1;':'opacity:.5;')
+          +(a.col?'color:'+a.col+';':'')
+          +(a.bdr?'border-color:'+a.bdr+';':'')+'">'
+          +a.lbl+'</button>'
+        ).join('');
+  } else if(key === 'rc'){
+    const rcs = [
+      {max:null, lbl:'All RC'},
+      {max:0,    lbl:'0 (Free)'},
+      {max:2,    lbl:'≤ 2'},
+      {max:4,    lbl:'≤ 4'},
+      {max:6,    lbl:'≤ 6'},
+      {max:8,    lbl:'≤ 8'},
+    ];
+    div.innerHTML = '<span style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;flex-shrink:0;">RC Cost:</span>'
+      + rcs.map(r =>
+          '<button type="button" class="sl-rc-btn add-btn" data-rcmax="'+(r.max===null?'all':r.max)+'" onclick="_slSetRC('+(r.max===null?'null':r.max)+')" style="'+btnBase
+          +(r.max===null?'opacity:1;color:var(--res);border-color:rgba(61,214,219,.8);':'opacity:.5;')+'">'
+          +r.lbl+'</button>'
+        ).join('');
+  } else if(key === 'ct'){
+    const cts = [
+      {v:'All',          lbl:'All'},
+      {v:'Action',       lbl:'Action'},
+      {v:'Bonus Action', lbl:'Bonus Action'},
+      {v:'Reaction',     lbl:'Reaction'},
+      {v:'Free Action',  lbl:'Free Action'},
+      {v:'2 Actions',    lbl:'2 Actions'},
+      {v:'1 Minute',     lbl:'1 Minute'},
+      {v:'1 Hour',       lbl:'1 Hour'},
+    ];
+    div.innerHTML = '<span style="font-family:\'Cinzel\',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;flex-shrink:0;">Action Type:</span>'
+      + cts.map(c =>
+          '<button type="button" class="sl-ct-btn add-btn" data-ct="'+c.v+'" onclick="_slSetCT(\''+c.v+'\')" style="'+btnBase
+          +(c.v==='All'?'opacity:1;color:var(--res);border-color:rgba(61,214,219,.8);':'opacity:.5;')+'">'
+          +c.lbl+'</button>'
+        ).join('');
+  }
 }
 
 function renderSpellList(){
