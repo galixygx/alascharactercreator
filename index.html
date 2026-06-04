@@ -13822,11 +13822,52 @@ function adjTracker(type,delta){
 }
 
 const EP_CONDITIONS = [
-  {min:0,max:0,label:'No Effect',desc:'No exhaustion. The body and resonance channels are operating normally.'},
-  {min:1,max:2,label:'Fatigued',desc:'Disadvantage on all ability checks. The body is straining but still functional.'},
-  {min:3,max:3,label:'Debilitated',desc:'Unconscious at end of turn — must be stabilized. Deep Rest required before continuing.'},
-  {min:4,max:4,label:'Critical Strain',desc:'Forced 12-hour Deep Rest before any Resonance casting. Take 2d6 physical damage.'},
-  {min:5,max:5,label:'Fatal Overreach',desc:'Immediate Deep Rest required. Each EP above 5: take 4d6 damage. Permanent damage risk without treatment.'},
+  {min:0,max:0,label:'No Effect',
+   desc:'No exhaustion. The body and resonance channels are operating normally.',
+   effects:[]},
+  {min:1,max:1,label:'Fatigued',
+   desc:'The body is straining but still functional.',
+   effects:[
+     'Disadvantage on all ability checks'
+   ]},
+  {min:2,max:2,label:'Taxed',
+   desc:'Fatigue is compounding. Movement and combat effectiveness are impaired.',
+   effects:[
+     'Disadvantage on all ability checks',
+     'Movement speed halved',
+     'Disadvantage on attack rolls'
+   ]},
+  {min:3,max:3,label:'Debilitated',
+   desc:'The body can no longer sustain itself. Collapse is imminent without Deep Rest.',
+   effects:[
+     'Disadvantage on all ability checks',
+     'Movement speed halved',
+     'Disadvantage on attack rolls',
+     'Fall unconscious at end of each turn — must be stabilized',
+     'Deep Rest required before continuing any activity'
+   ]},
+  {min:4,max:4,label:'Critical Strain',
+   desc:'The body is failing. Physical damage from strain is immediate.',
+   effects:[
+     'Disadvantage on all ability checks',
+     'Movement speed halved',
+     'Disadvantage on attack rolls',
+     'Fall unconscious at end of each turn',
+     'HP maximum halved',
+     'Take 2d6 physical damage — forced 12-hour Deep Rest required',
+     'No Resonance casting until Deep Rest is completed'
+   ]},
+  {min:5,max:5,label:'Fatal Overreach',
+   desc:'Death is imminent without immediate intervention.',
+   effects:[
+     'Disadvantage on all ability checks',
+     'Movement speed becomes 0',
+     'Disadvantage on attack rolls',
+     'Fall unconscious at end of each turn',
+     'HP maximum halved',
+     'Take 4d6 damage per EP above 5 — immediate Deep Rest required',
+     'Permanent injury risk without treatment'
+   ]},
 ];
 
 function getEpCondition(ep){
@@ -13886,10 +13927,22 @@ function updateEpDesc(){
   const ep=state.exhaustion||0;
   const panel=document.getElementById('epDesc');
   if(!panel)return;
-  if(ep===0){panel.classList.remove('ep-active');panel.textContent='';return;}
+  if(ep===0){panel.classList.remove('ep-active');panel.innerHTML='';return;}
   const cond=getEpCondition(ep);
   panel.classList.add('ep-active');
-  panel.innerHTML=`<strong style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;">${cond.label}</strong> — ${cond.desc}`;
+  const effectsHtml=cond.effects.length
+    ? '<ul style="margin:6px 0 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px;">'
+      + cond.effects.map((e,i)=>{
+          const isNew=(i===cond.effects.length-1&&ep>1)||ep===1;
+          return `<li style="display:flex;align-items:baseline;gap:6px;font-family:'EB Garamond',serif;font-size:11px;font-style:italic;color:${isNew?'var(--ins)':'var(--txt-dim)'};">
+            <span style="flex-shrink:0;font-size:8px;opacity:.6">${isNew?'▶':'·'}</span>${e}</li>`;
+        }).join('')
+      + '</ul>'
+    : '';
+  panel.innerHTML=`<div style="display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;">
+    <strong style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--ins);">EP ${ep} — ${cond.label}</strong>
+    <span style="font-family:'EB Garamond',serif;font-size:11px;font-style:italic;color:var(--txt-dim);">${cond.desc}</span>
+  </div>${effectsHtml}`;
 }
 
 function buildScarTiers(){
@@ -29478,12 +29531,11 @@ function copyReport(){
                                         <div style="font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:1.5px;color:rgba(184,115,51,.65);margin-bottom:5px;text-transform:uppercase">Exhaustion Levels</div>
                                         <table class="dms-tbl" style="margin-bottom:9px">
                                             <tbody>
-                                                <tr><td>1</td><td>Disadvantage on Ability Checks</td></tr>
-                                                <tr><td>2</td><td>Speed halved</td></tr>
-                                                <tr><td>3</td><td>Disadvantage on Attacks &amp; Saves</td></tr>
-                                                <tr><td>4</td><td>HP maximum halved</td></tr>
-                                                <tr><td>5</td><td>Speed becomes 0</td></tr>
-                                                <tr><td>6</td><td>Death</td></tr>
+                                                <tr><td>1</td><td>Fatigued — Disadvantage on all ability checks</td></tr>
+                                                <tr><td>2</td><td>Taxed — Speed halved · Disadvantage on attack rolls</td></tr>
+                                                <tr><td>3</td><td>Debilitated — Fall unconscious at end of turn · Deep Rest required</td></tr>
+                                                <tr><td>4</td><td>Critical Strain — HP max halved · 2d6 damage · No Resonance casting</td></tr>
+                                                <tr><td>5</td><td>Fatal Overreach — Speed 0 · 4d6 damage/EP above 5 · Permanent injury risk</td></tr>
                                             </tbody>
                                         </table>
                                         <div style="font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:1.5px;color:rgba(184,115,51,.65);margin-bottom:5px;text-transform:uppercase">Status Conditions</div>
