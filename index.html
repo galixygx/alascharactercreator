@@ -1017,12 +1017,80 @@
 
         .skill-row {
             display: flex;
-            align-items: center;
-            gap: 7px;
+            flex-direction: column;
             background: var(--surf);
             border: 1px solid var(--bdr);
             border-radius: 4px;
-            padding: 5px 10px;
+            overflow: hidden;
+        }
+
+        .skill-row-top {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 8px 5px 10px;
+        }
+
+        .skill-info-btn {
+            margin-left: auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gold-d);
+            font-size: 11px;
+            line-height: 1;
+            padding: 2px 4px;
+            opacity: 0.55;
+            transition: opacity 0.15s, transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        .skill-info-btn:hover { opacity: 1; }
+        .skill-info-btn.open { transform: rotate(180deg); opacity: 0.9; }
+
+        .skill-info-panel {
+            display: none;
+            padding: 8px 12px 10px;
+            border-top: 1px solid var(--bdr-g);
+            background: rgba(0,0,0,0.18);
+        }
+
+        .skill-info-panel.open { display: block; }
+
+        .skill-info-what {
+            font-family: 'Cinzel', serif;
+            font-size: 8px;
+            letter-spacing: 1.5px;
+            color: var(--gold-d);
+            margin-bottom: 4px;
+            opacity: 0.8;
+        }
+
+        .skill-info-desc {
+            font-family: 'EB Garamond', serif;
+            font-size: 11.5px;
+            color: var(--txt-main);
+            line-height: 1.55;
+            margin-bottom: 6px;
+        }
+
+        .skill-info-when-lbl {
+            font-family: 'Cinzel', serif;
+            font-size: 8px;
+            letter-spacing: 1.5px;
+            color: rgba(61,214,219,0.7);
+            margin-bottom: 3px;
+        }
+
+        .skill-info-tip {
+            font-family: 'EB Garamond', serif;
+            font-size: 11px;
+            font-style: italic;
+            color: var(--txt-dim);
+            margin-top: 6px;
+            padding-top: 5px;
+            border-top: 1px solid var(--bdr-g);
+            line-height: 1.5;
         }
 
         .sk-chks {
@@ -10943,16 +11011,110 @@ const CLASSES = {
 };
 
 const SKILLS_DATA = [
-  {name:'Acrobatics',ab:'DEX'},{name:'Animal Handling',ab:'WIS'},{name:'Arcana',ab:'INT'},
-  {name:'Athletics',ab:'STR'},{name:'Deception',ab:'CHA'},{name:'History',ab:'INT'},
-  {name:'Insight',ab:'WIS'},{name:'Intimidation',ab:'CHA'},{name:'Investigation',ab:'INT'},
-  {name:'Medicine',ab:'WIS'},{name:'Nature',ab:'INT'},{name:'Perception',ab:'WIS'},
-  {name:'Performance',ab:'CHA'},{name:'Persuasion',ab:'CHA'},{name:'Religion',ab:'INT'},
-  {name:'Sleight of Hand',ab:'DEX'},{name:'Stealth',ab:'DEX'},{name:'Survival',ab:'WIS'},
-  {name:'Crafting (Non-Magical)',ab:'INT'},{name:'Crafting (Magical)',ab:'INT'},
-  {name:'Vehicle Handling',ab:'DEX'},
-  {name:'Navigation',ab:'WIS'},{name:'Lore of the Veins',ab:'INT'},
-  {name:'Trade & Appraisal',ab:'CHA'},{name:'Espionage',ab:'DEX'}
+  {name:'Acrobatics',ab:'DEX',
+   what:'Tumbling, balancing, and precise body control under pressure.',
+   when:'Ask for Acrobatics when you want to: flip over an obstacle, keep your footing on a slippery deck, land from a fall without injury, slip through a narrow gap, or maintain balance while someone tries to knock you down.',
+   tip:'If you\'re moving through difficult terrain or trying not to fall — Acrobatics. If you\'re lifting or forcing — Athletics.'},
+  {name:'Animal Handling',ab:'WIS',
+   what:'Calming, controlling, and communicating intent to animals and beasts.',
+   when:'Ask for Animal Handling when you want to: keep a spooked mount from bolting, calm a wounded creature, guide a beast through a crowd, or make a wild animal trust you.',
+   tip:'Works on mundane beasts. Magical or Vein-altered creatures may require Arcana or Lore of the Veins instead.'},
+  {name:'Arcana',ab:'INT',
+   what:'Knowledge of magical theory, sigil mechanics, enchantments, and ancient spellcraft.',
+   when:'Ask for Arcana when you want to: identify a spell being cast, recall facts about a magical creature, understand a runic inscription, detect the school of an enchantment, or analyze a magical trap.',
+   tip:'Arcana covers traditional magic. Vein-specific phenomena (Resonance Channels, RC mechanics, Corruption) fall under Lore of the Veins.'},
+  {name:'Athletics',ab:'STR',
+   what:'Raw physical power — climbing, swimming, jumping, grappling, and forcing things.',
+   when:'Ask for Athletics when you want to: scale a wall, swim against a current, jump a wide gap, break free of a grapple, hold a door shut, or wrestle an opponent to the ground.',
+   tip:'Strength-based movement and force. For agile movement and balance, use Acrobatics.'},
+  {name:'Deception',ab:'CHA',
+   what:'Misleading others through lies, misdirection, disguise, and false impressions.',
+   when:'Ask for Deception when you want to: convince someone a false story is true, bluff your way past a guard, pass off a forgery, hide your true intentions, or keep a straight face under pressure.',
+   tip:'Deception creates a false belief. Persuasion changes a genuine one. If you\'re lying — Deception.'},
+  {name:'History',ab:'INT',
+   what:'Recalling facts about past events, civilisations, wars, and notable figures.',
+   when:'Ask for History when you want to: remember who founded a city, recall the outcome of a battle, identify a historical artefact, or understand the cultural context behind a tradition.',
+   tip:'History covers the past of the wider world. For Karanthian Vein lore specifically, Lore of the Veins is more precise.'},
+  {name:'Insight',ab:'WIS',
+   what:'Reading people — detecting lies, sensing mood, and understanding true intent.',
+   when:'Ask for Insight when you want to: sense whether someone is lying, read the emotional state of a creature, anticipate someone\'s next move in negotiation, or notice when a deal feels wrong.',
+   tip:'Insight is passive reading of people. It\'s a good counter-check against Deception. The Keeper may call for it without you asking.'},
+  {name:'Intimidation',ab:'CHA',
+   what:'Using fear, dominance, or implied threat to influence behaviour.',
+   when:'Ask for Intimidation when you want to: frighten someone into compliance, extract information through menace, make a hostile creature back down, or assert authority through sheer presence.',
+   tip:'Intimidation works in the moment but can damage long-term relations. Persuasion is slower but builds trust.'},
+  {name:'Investigation',ab:'INT',
+   what:'Actively searching for clues, patterns, hidden objects, and logical deductions.',
+   when:'Ask for Investigation when you want to: search a room for hidden compartments, deduce what happened at a crime scene, find weaknesses in a structure, or analyse evidence to form conclusions.',
+   tip:'Perception notices things passively. Investigation is when you actively examine something with intent to understand it.'},
+  {name:'Medicine',ab:'WIS',
+   what:'Treating wounds, diagnosing illness, and stabilising the dying.',
+   when:'Ask for Medicine when you want to: stabilise a dying creature, diagnose a poison or disease, perform field surgery, or determine the cause of death from a body.',
+   tip:'Medicine keeps people alive — it doesn\'t restore HP by default. The Keeper may allow HP restoration for extended care during a Short Rest.'},
+  {name:'Nature',ab:'INT',
+   what:'Knowledge of the natural world — flora, fauna, weather, terrain, and ecosystems.',
+   when:'Ask for Nature when you want to: identify a plant or creature, predict weather patterns, understand a natural hazard, recall facts about a region\'s ecology, or navigate a wilderness environment.',
+   tip:'Nature is book-knowledge about the wild. For tracking creatures through it, use Survival. For Vein-altered wildlife, use Lore of the Veins.'},
+  {name:'Perception',ab:'WIS',
+   what:'Noticing things in the environment — sounds, movement, hidden figures, details.',
+   when:'Ask for Perception when you want to: spot an ambush, hear someone sneaking, notice a faint smell, see a figure in the fog, or detect that something is out of place. The Keeper may roll this for you secretly.',
+   tip:'Perception is always-on awareness. It counters Stealth. Your Passive Perception (10 + WIS mod + bonus) handles background vigilance automatically.'},
+  {name:'Performance',ab:'CHA',
+   what:'Entertaining an audience through music, acting, storytelling, or spectacle.',
+   when:'Ask for Performance when you want to: wow a crowd at a tavern, maintain a disguise through roleplay, deliver a convincing speech on a stage, or distract bystanders with a show.',
+   tip:'Performance is about the craft of the act. If you\'re trying to change minds through the content of a speech, that\'s Persuasion — even if it\'s delivered dramatically.'},
+  {name:'Persuasion',ab:'CHA',
+   what:'Influencing others through honest appeals, charm, diplomacy, and reasoned argument.',
+   when:'Ask for Persuasion when you want to: negotiate a deal, win someone to your cause, ask a favour from an NPC, smooth over an offence, or convince a guard to let you through on principle.',
+   tip:'Persuasion requires the target to at least consider your position. If they\'re hostile and you\'re using fear, Intimidation is the right call. If you\'re lying, use Deception.'},
+  {name:'Religion',ab:'INT',
+   what:'Knowledge of deities, religious rites, sacred symbols, cults, and divine magic.',
+   when:'Ask for Religion when you want to: identify a deity\'s symbol, recall doctrine of a faith, understand a ritual being performed, recognise signs of cult activity, or know how to properly conduct a rite.',
+   tip:'Religion covers organised faith and divine lore. For raw Vein phenomena and Resonance theology, Lore of the Veins may apply instead — the Keeper will indicate which.'},
+  {name:'Sleight of Hand',ab:'DEX',
+   what:'Fine manual dexterity — pickpocketing, palming objects, planting items, and quick hands.',
+   when:'Ask for Sleight of Hand when you want to: lift a coin purse without being noticed, slip a note into someone\'s pocket, palm a card, conceal an object on your person, or perform manual trickery.',
+   tip:'Usually contested by the target\'s Perception. If they\'re actively watching you, the DC rises significantly.'},
+  {name:'Stealth',ab:'DEX',
+   what:'Moving without being detected — hiding, moving silently, and staying unseen.',
+   when:'Ask for Stealth when you want to: sneak past a guard, hide in shadows, move through a building without alerting anyone, follow someone without being noticed, or set up for a surprise attack.',
+   tip:'Stealth is contested by Passive Perception or an active Perception check. You must have something to hide behind or be in low light — you can\'t Stealth in an open lit room with watchers.'},
+  {name:'Survival',ab:'WIS',
+   what:'Navigating wilderness, tracking creatures, foraging, and enduring harsh environments.',
+   when:'Ask for Survival when you want to: follow a trail through the woods, find drinkable water, predict a coming storm, navigate without a map, set a camp safely, or avoid natural hazards.',
+   tip:'Survival handles the wild through experience and instinct. For theoretical knowledge of nature, use Nature. For Vein-corrupted terrain, the Keeper may require Lore of the Veins alongside it.'},
+  {name:'Crafting (Non-Magical)',ab:'INT',
+   what:'Fabricating, repairing, or modifying physical objects using tools and materials.',
+   when:'Ask for Crafting (Non-Magical) when you want to: forge a weapon, repair armour, construct a device, build a shelter, brew a non-magical potion, or modify an item\'s function.',
+   tip:'The DC is set by item complexity and the quality of your materials. Having appropriate tools (Smith\'s Tools, Carpenter\'s Tools, etc.) is usually required. Without them, the Keeper may impose disadvantage or deny the check.'},
+  {name:'Crafting (Magical)',ab:'INT',
+   what:'Imbuing objects with Sigil energy, crafting enchanted items, and inscribing Vein-linked components.',
+   when:'Ask for Crafting (Magical) when you want to: inscribe a sigil onto a weapon or armour, enchant a focus item, create a Resonance conduit, or craft a magical consumable.',
+   tip:'Requires both knowledge of the relevant Sigil affinity and appropriate materials. A failed check may produce an unstable item or waste reagents — the Keeper determines consequences. High Arcana or Lore of the Veins checks may be required as prerequisites.'},
+  {name:'Vehicle Handling',ab:'DEX',
+   what:'Operating, controlling, and manoeuvring vehicles — from carts to skyships.',
+   when:'Ask for Vehicle Handling when you want to: drive a wagon at speed through a crowd, pilot a skiff through a storm, control a skyship during combat, execute a sharp turn to avoid a collision, or maintain control of a vehicle under duress.',
+   tip:'The vehicle type matters. Land vehicles (carts, wagons) are generally easier. Water and aerial vessels carry higher DCs. The Keeper may also call for Athletics or Strength checks when brute force is needed to control a large vessel.'},
+  {name:'Navigation',ab:'WIS',
+   what:'Plotting courses, reading maps and stars, and maintaining direction across land, sea, or sky.',
+   when:'Ask for Navigation when you want to: chart a safe route between islands, read an unfamiliar map, estimate travel time to a destination, avoid getting lost in open ocean, or find a landmark from memory.',
+   tip:'Navigation is about direction and route-finding. Survival handles the day-to-day hazards of the journey. Both are often used together on long expeditions — Navigation to stay on course, Survival to stay alive.'},
+  {name:'Lore of the Veins',ab:'INT',
+   what:'Deep knowledge of Karanthian Resonance Veins, Vein creatures, Instability, Corruption, and Sigil theory.',
+   when:'Ask for Lore of the Veins when you want to: identify a Vein channel, understand a Corruption effect, recall facts about a Vein-altered creature, analyse Resonance saturation in an area, or understand why a Sigil behaved unexpectedly.',
+   tip:'This is the Alas-specific knowledge skill. It bridges Arcana, Nature, and Religion for Vein-related phenomena. Characters with this proficiency are rare and valued — Sigil Cartographers, Lorekeepers, and senior Circlewardens typically possess it.'},
+  {name:'Trade & Appraisal',ab:'CHA',
+   what:'Assessing the value of goods, negotiating fair prices, and understanding commercial networks.',
+   when:'Ask for Trade & Appraisal when you want to: estimate the GP value of an item, spot a forgery in a deal, negotiate a discount, understand what a merchant really wants, or know the going market rate for rare materials.',
+   tip:'High Trade & Appraisal lets you avoid being cheated and find better deals. Combine with Insight to detect when a seller is hiding something about an item\'s true value or origin.'},
+  {name:'Espionage',ab:'DEX',
+   what:'Covert operations — surveillance, infiltration, coded communication, and information extraction.',
+   when:'Ask for Espionage when you want to: tail a target through a city without being noticed, pass a coded message undetected, break into a secure location without triggering alarms, maintain a cover identity under scrutiny, or identify surveillance on yourself.',
+   tip:'Espionage combines elements of Stealth, Deception, and Investigation into covert tradecraft. The Keeper may split complex infiltration tasks into multiple checks. Failing an Espionage check in hostile territory can escalate quickly.'},
+  {name:'Tracking',ab:'WIS',
+   what:'Following the signs left by creatures, people, or vehicles across any terrain.',
+   when:'Ask for Tracking when you want to: follow a creature\'s footprints through forest or city, determine how many people passed through an area and when, identify what creature made a set of marks, or pursue a target that is trying to lose you.',
+   tip:'Tracking is more specific than Survival — use it when you\'re actively pursuing a trail. The DC rises with time elapsed, adverse weather, and hard terrain (stone, water). Survival handles general wilderness navigation; Tracking handles the hunt.'}
 ];
 
 // ── SIGIL COMPENDIUM (PHB p.47–50) ──────────────────────────────────────
@@ -13913,23 +14075,42 @@ function buildSkillsGrid(){
     const tot=base+(isPr?prof:0)+(isEx?prof:0);
     const row=document.createElement('div');
     row.className='skill-row';
+    const hasInfo=sk.what||sk.when;
     row.innerHTML=`
-      <div class="sk-chks">
-        <div class="sk-chk-wrap">
-          <input type="checkbox" class="pchk" id="sp_${skId}" ${isPr?'checked':''} onchange="saveAll()">
-          <span class="sk-chk-lbl">PR</span>
+      <div class="skill-row-top">
+        <div class="sk-chks">
+          <div class="sk-chk-wrap">
+            <input type="checkbox" class="pchk" id="sp_${skId}" ${isPr?'checked':''} onchange="saveAll()">
+            <span class="sk-chk-lbl">PR</span>
+          </div>
+          <div class="sk-chk-wrap">
+            <input type="checkbox" class="pchk" id="se_${skId}" ${isEx?'checked':''} onchange="saveAll()">
+            <span class="sk-chk-lbl">EX</span>
+          </div>
         </div>
-        <div class="sk-chk-wrap">
-          <input type="checkbox" class="pchk" id="se_${skId}" ${isEx?'checked':''} onchange="saveAll()">
-          <span class="sk-chk-lbl">EX</span>
-        </div>
+        <span class="sk-name">${sk.name}</span>
+        <span class="sk-ab">${sk.ab}</span>
+        <span class="sk-tot" id="sktot_${skId}">${fmtMod(tot)}</span>
+        ${hasInfo?`<button class="skill-info-btn" id="skibtn_${skId}" onclick="toggleSkillInfo('${skId}')" title="What is this skill?">▼</button>`:''}
       </div>
-      <span class="sk-name">${sk.name}</span>
-      <span class="sk-ab">${sk.ab}</span>
-      <span class="sk-tot" id="sktot_${skId}">${fmtMod(tot)}</span>
+      ${hasInfo?`<div class="skill-info-panel" id="skipanel_${skId}">
+        <div class="skill-info-what">WHAT IT IS</div>
+        <div class="skill-info-desc">${sk.what||''}</div>
+        <div class="skill-info-when-lbl">WHEN TO USE IT</div>
+        <div class="skill-info-desc">${sk.when||''}</div>
+        ${sk.tip?`<div class="skill-info-tip">💡 ${sk.tip}</div>`:''}
+      </div>`:''}
     `;
     g.appendChild(row);
   });
+}
+
+function toggleSkillInfo(skId){
+  const panel=document.getElementById('skipanel_'+skId);
+  const btn=document.getElementById('skibtn_'+skId);
+  if(!panel)return;
+  const open=panel.classList.toggle('open');
+  btn.classList.toggle('open',open);
 }
 
 function buildFactionsGrid(){
