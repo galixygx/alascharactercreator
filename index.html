@@ -8385,21 +8385,28 @@
             color: rgba(200,160,255,.7); text-align: center; margin-top: 10px;
         }
 
-        /* ── Agent Alas floating button ── */
+        /* ── Agent Alas tab-bar toggle button ── */
         #agentAlasBtn {
-            display: none; position: fixed; bottom: 24px; right: 24px; z-index: 900;
-            width: 52px; height: 52px; border-radius: 50%;
-            background: linear-gradient(135deg,#1a0a30,#0e0818);
-            border: 1px solid rgba(160,96,224,.5);
-            box-shadow: 0 0 20px rgba(120,60,200,.3), 0 2px 12px rgba(0,0,0,.6);
-            cursor: pointer; font-size: 20px; transition: all .2s;
-            align-items: center; justify-content: center;
+            display: none; align-items: center; justify-content: center;
+            gap: 5px; margin-left: auto; flex-shrink: 0;
+            padding: 6px 13px; border-radius: 4px;
+            background: rgba(120,60,200,.12);
+            border: 1px solid rgba(160,96,224,.35);
+            color: rgba(200,160,255,.7);
+            font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 1.2px;
+            cursor: pointer; transition: background .15s, border-color .15s, color .15s;
+            white-space: nowrap;
         }
         #agentAlasBtn.visible { display: flex; }
         #agentAlasBtn:hover {
+            background: rgba(120,60,200,.22);
+            border-color: rgba(160,96,224,.75);
+            color: rgba(220,180,255,.95);
+        }
+        #agentAlasBtn.panel-open {
+            background: rgba(120,60,200,.28);
             border-color: rgba(160,96,224,.9);
-            box-shadow: 0 0 32px rgba(120,60,200,.5), 0 2px 16px rgba(0,0,0,.7);
-            transform: scale(1.06);
+            color: #d4b0ff;
         }
 
         /* ── Agent Alas side panel ── */
@@ -9903,6 +9910,7 @@
                 <button class="tab-btn" onclick="showTab('notes',this)" data-tab-index="0">📝 Notes</button>
                 <button class="tab-btn" onclick="showTab('vtt',this)">⚔ VTT</button>
                 <button class="tab-btn" onclick="showTab('report',this)">📋 Report</button>
+                <button id="agentAlasBtn" onclick="toggleAgentPanel()" title="Agent Alas">🔮 Agent Alas</button>
             </nav>
 
             <div class="tab-content">
@@ -29809,9 +29817,6 @@ function ucConvert(from, val){
 <!-- Fireworks canvas -->
 <canvas id="fireworksCanvas"></canvas>
 
-<!-- Agent Alas floating button (Galixy only) -->
-<button id="agentAlasBtn" onclick="toggleAgentPanel()" title="Agent Alas">🔮</button>
-
 <!-- Agent Alas side panel -->
 <div id="agentPanel">
   <div class="ap-header">
@@ -30587,13 +30592,16 @@ ${this.buildContext()}`;
 function toggleAgentPanel(){
   if(!AUTH.currentUser){ openAuthModal(); return; }
   const panel=document.getElementById('agentPanel');
+  const btn=document.getElementById('agentAlasBtn');
   panel.classList.toggle('open');
-  if(panel.classList.contains('open')) apRenderLog();
+  const isOpen=panel.classList.contains('open');
+  if(btn) btn.classList.toggle('panel-open',isOpen);
+  if(isOpen) apRenderLog();
 }
 function _agentPanelHide(){
   document.getElementById('agentPanel').classList.remove('open');
-  const fab=document.getElementById('agentAlasBtn');
-  if(fab) fab.classList.remove('visible');
+  const btn=document.getElementById('agentAlasBtn');
+  if(btn) btn.classList.remove('panel-open');
 }
 function apSwitchTab(name, btn){
   document.querySelectorAll('.ap-tab').forEach(t=>t.classList.remove('active'));
@@ -30962,24 +30970,7 @@ document.addEventListener('DOMContentLoaded',function(){
     });
   }
 
-  /* QoL 10 — Floating scroll-to-top button */
-  var tcEl=document.querySelector('.tab-content');
-  if(tcEl){
-    var topBtn=document.createElement('button');
-    topBtn.id='scrollTopBtn';
-    topBtn.innerHTML='▲';
-    topBtn.title='Scroll to top (Alt+Home)';
-    topBtn.style.cssText='position:fixed;bottom:60px;right:14px;width:28px;height:28px;background:var(--surf2);border:1px solid var(--bdr-g);color:var(--gold-d);font-size:11px;border-radius:3px;cursor:pointer;z-index:888;opacity:0;transition:opacity .3s,border-color .15s,color .15s;pointer-events:none;';
-    topBtn.addEventListener('mouseenter',function(){this.style.borderColor='var(--gold)';this.style.color='var(--gold)';});
-    topBtn.addEventListener('mouseleave',function(){this.style.borderColor='var(--bdr-g)';this.style.color='var(--gold-d)';});
-    topBtn.onclick=qkScrollTop;
-    document.body.appendChild(topBtn);
-    tcEl.addEventListener('scroll',function(){
-      var v=tcEl.scrollTop>90;
-      topBtn.style.opacity=v?'0.9':'0';
-      topBtn.style.pointerEvents=v?'auto':'none';
-    });
-  }
+  /* QoL 10 — Scroll-to-top: handled by UPGRADE 8 below; Alt+Home shortcut preserved above */
 
   /* QoL 7 — Hold-to-repeat on existing tracker +/− buttons */
   document.querySelectorAll('.trk-btn').forEach(function(btn){
