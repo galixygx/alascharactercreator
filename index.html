@@ -8378,6 +8378,36 @@
         }
         .auth-close:hover { color: rgba(255,255,255,.6); }
 
+        /* ── Auth views (forgot / change / set-password) ── */
+        .auth-view { display: none; }
+        .auth-view.active { display: block; }
+        .auth-forgot-link {
+            font-family: 'EB Garamond', serif; font-size: 11.5px;
+            color: rgba(200,160,255,.4); text-align: right; margin-top: -8px; margin-bottom: 12px;
+            cursor: pointer; transition: color .2s;
+        }
+        .auth-forgot-link:hover { color: rgba(200,160,255,.75); }
+        .auth-success {
+            font-family: 'EB Garamond', serif; font-size: 12px; font-style: italic;
+            color: #7cd46a; text-align: center; margin-top: 12px; min-height: 18px;
+        }
+        .auth-recovery-code {
+            font-family: monospace; font-size: 13px; letter-spacing: 2px;
+            background: rgba(255,255,255,.06); border: 1px solid rgba(201,162,39,.35);
+            border-radius: 5px; padding: 12px 16px; margin: 12px 0; text-align: center;
+            color: var(--gold-l); word-break: break-all; cursor: pointer; user-select: all;
+        }
+        .auth-recovery-code:hover { background: rgba(255,255,255,.1); }
+        /* ── Sidebar change-password button ── */
+        .sb-chpw-btn {
+            font-family: 'Cinzel', serif; font-size: 6.5px; letter-spacing: 1px;
+            padding: 4px 9px; background: transparent;
+            border: 1px solid rgba(100,180,200,.3); border-radius: 3px;
+            color: rgba(100,200,220,.65); cursor: pointer; white-space: nowrap;
+            transition: all .15s;
+        }
+        .sb-chpw-btn:hover { background: rgba(61,214,219,.1); border-color: rgba(61,214,219,.5); color: var(--res); }
+
         /* ── Logged-in badge on title screen ── */
         #tsUserBadge {
             display: none;
@@ -9600,6 +9630,7 @@
             <!-- User strip — shown when logged in -->
             <div id="sbUserStrip">
                 <span id="sbUserName">◈ —</span>
+                <button class="sb-chpw-btn" onclick="openChangePasswordModal()" title="Change your password">⚙ Password</button>
                 <button class="sb-logout-btn" onclick="authSignOut()">Sign Out</button>
             </div>
             <div class="sb-head sb-head-dice">
@@ -26376,7 +26407,7 @@ function keeperTab(id, btn){
   if(btn) btn.classList.add('active');
   const panel = document.getElementById('ktab-'+id);
   if(panel) panel.classList.add('active');
-  if(id==='command'){ renderAgentAlasReport(); renderDeviceAuthStatus(); keeperRenderPlayers(); }
+  if(id==='command'){ renderAgentAlasReport(); renderDeviceAuthStatus(); keeperRenderPlayers(); _renderSeededAccountList(); }
   if(id==='encounter') renderEncounterList();
   if(id==='session'){ loadKeeperState(); _renderTrafficLog(); }
   if(id==='dmscreen') renderDMScreen();
@@ -29169,15 +29200,78 @@ function keeperDeleteAccount(){
   if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
   const targetKey = (document.getElementById('kpAccountTarget')||{}).value;
   if(!targetKey){ showToast('Select a player first.'); return; }
-  if(targetKey==='galixy'){ showToast('Cannot delete the Owner account.'); return; }
   if(!confirm('Permanently delete account "'+targetKey+'"? All data will be lost.')){ return; }
-  const users = AUTH.getUsers();
-  delete users[targetKey];
-  AUTH.saveUsers(users);
-  localStorage.removeItem(AUTH.STATE_PRE+targetKey);
-  localStorage.removeItem(AUTH.LOG_PRE+targetKey);
+  const result = AUTH.keeperDeleteUser(targetKey);
+  if(!result.ok){ showToast('⚠ ' + result.msg); return; }
   showToast('Account "'+targetKey+'" deleted.');
   keeperRenderPlayers();
+}
+
+function keeperResetPassword(){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  const targetKey = (document.getElementById('kpAccountTarget')||{}).value;
+  if(!targetKey){ showToast('Select a player first.'); return; }
+  const users = AUTH.getUsers();
+  if(!users[targetKey]){ showToast('User not found.'); return; }
+  const newPw = prompt(`Set a new password for "${targetKey}":\n(Min 4 characters — share this with the player directly)`);
+  if(!newPw) return;
+  const result = AUTH.keeperSetPassword(targetKey, newPw);
+  if(!result.ok){ showToast('⚠ ' + result.msg); return; }
+  showToast(`✓ Password reset for "${targetKey}". Share the new password with them.`);
+  keeperRenderPlayers();
+}
+
+function keeperExportCredentialBackup(){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  AUTH.exportCredentialBackup();
+  showToast('Credential backup downloaded. Store this file safely.');
+}
+
+function keeperImportCredentialBackup(){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.json';
+  input.onchange=e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const result=AUTH.importCredentialBackup(ev.target.result);
+      if(result.ok){ showToast(`✓ Imported credentials for ${result.count} account(s). Existing accounts were not overwritten.`); keeperRenderPlayers(); }
+      else showToast('⚠ Import failed: '+result.msg);
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function _renderSeededAccountList(){
+  const el=document.getElementById('kpSeededAccountList');
+  if(!el) return;
+  const users=AUTH.getUsers();
+  const seeded=Object.entries(SEEDED_ACCOUNTS);
+  if(!seeded.length){ el.textContent='None defined.'; return; }
+  el.innerHTML=seeded.map(([key])=>{
+    const u=users[key];
+    const exists=!!u;
+    const hasPass=!!(u&&u.hash);
+    const col=exists?'#7cd46a':'rgba(200,100,100,.7)';
+    const status=!exists?'⚠ Missing — will restore on next load':(hasPass?'✓ Active · Password set':'⚠ Password not yet set — will prompt on first login');
+    return `<div style="display:flex;align-items:center;gap:10px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+      <span style="font-family:'Cinzel',serif;font-size:10px;color:${col};">${key}</span>
+      <span style="font-family:'EB Garamond',serif;font-size:11px;color:var(--txt-dim);flex:1;">${status}</span>
+      ${exists?`<button class="dm-tool-btn" style="padding:2px 8px;font-size:9px;" onclick="keeperResetPasswordFor('${key}')">Reset PW</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+function keeperResetPasswordFor(targetKey){
+  if(!AUTH.isGalixy()){ showToast('Access denied.'); return; }
+  const newPw=prompt(`Set new password for "${targetKey}":\n(Share this with the player via DM/message — min 4 characters)`);
+  if(!newPw) return;
+  const result=AUTH.keeperSetPassword(targetKey,newPw);
+  if(!result.ok){ showToast('⚠ '+result.msg); return; }
+  showToast(`✓ Password set for "${targetKey}". Share the new password with them.`);
+  _renderSeededAccountList();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -29821,9 +29915,37 @@ function copyReport(){
                                 <div style="display:flex;flex-direction:column;gap:5px;">
                                     <button class="dm-tool-btn" onclick="keeperViewCharacter()">🔍 View Character</button>
                                     <button class="dm-tool-btn" onclick="keeperResetPlayerState()">↺ Reset Character Data</button>
+                                    <button class="dm-tool-btn" style="border-color:rgba(61,214,219,.4);color:rgba(61,214,219,.8);" onclick="keeperResetPassword()">🔑 Reset Password</button>
                                     <button class="dm-tool-btn" style="border-color:rgba(200,32,48,.4);color:rgba(200,32,48,.8);" onclick="keeperDeleteAccount()">✕ Delete Account</button>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+
+                    <!-- Credential Security & Backup -->
+                    <div class="cmd-panel">
+                        <div class="cmd-hdr">🔐 Credential Security &amp; Backup</div>
+                        <div style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);font-style:italic;margin-bottom:12px;line-height:1.6;">
+                            Credentials are stored in <strong style="color:var(--gold-d)">localStorage</strong> — they persist across visits on the same browser but <strong style="color:rgba(200,100,100,.85)">will be lost if the browser clears storage</strong>.
+                            Export a backup regularly. The backup file contains hashed passwords only — it is safe to store.
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+                            <button class="dm-tool-btn" style="border-color:rgba(124,212,106,.4);color:rgba(124,212,106,.8);" onclick="keeperExportCredentialBackup()">⬇ Export Credential Backup (.json)</button>
+                            <button class="dm-tool-btn" onclick="keeperImportCredentialBackup()">⬆ Import Credential Backup</button>
+                        </div>
+                        <div style="padding:10px;background:rgba(61,214,219,.04);border:1px solid rgba(61,214,219,.15);border-radius:5px;">
+                            <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:rgba(61,214,219,.7);margin-bottom:6px;text-transform:uppercase;">Protected Accounts (Seeded — Never Deleted)</div>
+                            <div id="kpSeededAccountList" style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">Loading…</div>
+                        </div>
+                        <div style="margin-top:10px;padding:10px;background:rgba(201,162,39,.04);border:1px solid rgba(201,162,39,.18);border-radius:5px;">
+                            <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:rgba(201,162,39,.7);margin-bottom:6px;text-transform:uppercase;">Security Notes</div>
+                            <ul style="font-family:'EB Garamond',serif;font-size:11.5px;color:var(--txt-dim);padding-left:16px;line-height:1.75;margin:0;">
+                                <li>Passwords are hashed — never stored as plain text</li>
+                                <li>Recovery codes are generated at registration and hashed — even Keeper cannot see them</li>
+                                <li>Use "Reset Password" to give a player a new password if they forget it</li>
+                                <li>Seeded accounts (phokingturts) are recreated automatically if storage is cleared</li>
+                                <li>Export credential backups monthly and store them securely</li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -30284,26 +30406,114 @@ function ucConvert(from, val){
 <div id="authOverlay" onclick="if(event.target===this)closeAuthModal()">
   <div class="auth-modal">
     <button class="auth-close" onclick="closeAuthModal()">✕</button>
-    <div class="auth-modal-title" id="authModalTitle">Sign In</div>
-    <div class="auth-modal-sub" id="authModalSub">Access your character across sessions</div>
-    <div class="auth-field">
-      <label>Username</label>
-      <input type="text" id="authUsername" placeholder="Enter username…" autocomplete="username"
-             onkeydown="if(event.key==='Enter')authSubmit()">
+
+    <!-- ── VIEW: Sign In / Register ── -->
+    <div class="auth-view active" id="authViewMain">
+      <div class="auth-modal-title" id="authModalTitle">Sign In</div>
+      <div class="auth-modal-sub" id="authModalSub">Access your character across sessions</div>
+      <div class="auth-field">
+        <label>Username</label>
+        <input type="text" id="authUsername" placeholder="Enter username…" autocomplete="username"
+               onkeydown="if(event.key==='Enter')authSubmit()">
+      </div>
+      <div class="auth-field">
+        <label>Password</label>
+        <input type="password" id="authPassword" placeholder="Enter password…" autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')authSubmit()">
+      </div>
+      <div class="auth-forgot-link" id="authForgotLink" onclick="openForgotPasswordView()">Forgot password?</div>
+      <div class="auth-btns">
+        <button class="auth-btn auth-btn-primary" id="authSubmitBtn" onclick="authSubmit()">Sign In</button>
+        <button class="auth-btn auth-btn-secondary" onclick="closeAuthModal()">Cancel</button>
+      </div>
+      <div class="auth-toggle" id="authToggle" onclick="authToggleMode()">
+        No account? <span>Register here</span>
+      </div>
+      <div class="auth-error" id="authError"></div>
     </div>
-    <div class="auth-field">
-      <label>Password</label>
-      <input type="password" id="authPassword" placeholder="Enter password…" autocomplete="current-password"
-             onkeydown="if(event.key==='Enter')authSubmit()">
+
+    <!-- ── VIEW: Set Password (first login for seeded accounts) ── -->
+    <div class="auth-view" id="authViewSetPassword">
+      <div class="auth-modal-title">Welcome, <span id="setpwUsername"></span>!</div>
+      <div class="auth-modal-sub">Your account exists but has no password yet.<br>Set one now to secure your character.</div>
+      <div class="auth-field">
+        <label>New Password</label>
+        <input type="password" id="setpwNew" placeholder="Choose a password (min 4 chars)…" autocomplete="new-password"
+               onkeydown="if(event.key==='Enter')authSubmitSetPassword()">
+      </div>
+      <div class="auth-field">
+        <label>Confirm Password</label>
+        <input type="password" id="setpwConfirm" placeholder="Confirm password…" autocomplete="new-password"
+               onkeydown="if(event.key==='Enter')authSubmitSetPassword()">
+      </div>
+      <div class="auth-btns">
+        <button class="auth-btn auth-btn-primary" onclick="authSubmitSetPassword()">Set Password &amp; Sign In</button>
+      </div>
+      <div class="auth-error" id="setpwError"></div>
     </div>
-    <div class="auth-btns">
-      <button class="auth-btn auth-btn-primary" id="authSubmitBtn" onclick="authSubmit()">Sign In</button>
-      <button class="auth-btn auth-btn-secondary" onclick="closeAuthModal()">Cancel</button>
+
+    <!-- ── VIEW: Forgot Password (recovery code) ── -->
+    <div class="auth-view" id="authViewForgot">
+      <div class="auth-modal-title">Reset Password</div>
+      <div class="auth-modal-sub">Enter your username and recovery code,<br>then choose a new password.</div>
+      <div class="auth-field">
+        <label>Username</label>
+        <input type="text" id="forgotUsername" placeholder="Enter your username…" autocomplete="username">
+      </div>
+      <div class="auth-field">
+        <label>Recovery Code</label>
+        <input type="text" id="forgotCode" placeholder="Your recovery code (saved at registration)…" autocomplete="off"
+               style="font-family:monospace;font-size:12px;letter-spacing:1px">
+      </div>
+      <div class="auth-field">
+        <label>New Password</label>
+        <input type="password" id="forgotNewPw" placeholder="New password (min 4 chars)…" autocomplete="new-password"
+               onkeydown="if(event.key==='Enter')authSubmitForgotPassword()">
+      </div>
+      <div class="auth-btns">
+        <button class="auth-btn auth-btn-primary" onclick="authSubmitForgotPassword()">Reset Password</button>
+        <button class="auth-btn auth-btn-secondary" onclick="authSwitchView('main')">Back</button>
+      </div>
+      <div class="auth-error" id="forgotError"></div>
     </div>
-    <div class="auth-toggle" id="authToggle" onclick="authToggleMode()">
-      No account? <span>Register here</span>
+
+    <!-- ── VIEW: Change Password (while logged in) ── -->
+    <div class="auth-view" id="authViewChangePw">
+      <div class="auth-modal-title">Change Password</div>
+      <div class="auth-modal-sub" id="changepwSub">Update the password for your account.</div>
+      <div class="auth-field" id="changepwCurrentRow">
+        <label>Current Password</label>
+        <input type="password" id="changepwCurrent" placeholder="Enter current password…" autocomplete="current-password">
+      </div>
+      <div class="auth-field">
+        <label>New Password</label>
+        <input type="password" id="changepwNew" placeholder="New password (min 4 chars)…" autocomplete="new-password">
+      </div>
+      <div class="auth-field">
+        <label>Confirm New Password</label>
+        <input type="password" id="changepwConfirm" placeholder="Confirm new password…" autocomplete="new-password"
+               onkeydown="if(event.key==='Enter')authSubmitChangePassword()">
+      </div>
+      <div class="auth-btns">
+        <button class="auth-btn auth-btn-primary" onclick="authSubmitChangePassword()">Update Password</button>
+        <button class="auth-btn auth-btn-secondary" onclick="closeAuthModal()">Cancel</button>
+      </div>
+      <div class="auth-error" id="changepwError"></div>
+      <div class="auth-success" id="changepwSuccess"></div>
     </div>
-    <div class="auth-error" id="authError"></div>
+
+    <!-- ── VIEW: Recovery Code Display (after registration) ── -->
+    <div class="auth-view" id="authViewRecovery">
+      <div class="auth-modal-title" style="color:var(--res)">Save Your Recovery Code</div>
+      <div class="auth-modal-sub">This is the ONLY way to reset your password if you forget it.<br><strong style="color:var(--gold)">Write it down or screenshot it now.</strong></div>
+      <div class="auth-recovery-code" id="recoveryCodeDisplay" title="Click to copy" onclick="navigator.clipboard?.writeText(this.textContent).then(()=>showToast('Recovery code copied!'))"></div>
+      <div style="font-family:'EB Garamond',serif;font-size:11px;color:var(--txt-dim);font-style:italic;text-align:center;margin-bottom:14px;">
+        Tap/click the code to copy it. Store it safely. The Keeper cannot recover it for you.
+      </div>
+      <div class="auth-btns">
+        <button class="auth-btn auth-btn-primary" onclick="authRecoveryAcknowledged()">I've saved it — Continue</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -30399,6 +30609,39 @@ function _alasHash(str){
   return h.toString(36);
 }
 
+// ── Recovery code generator ───────────────────────────────────
+const _RECOVERY_WORDS = [
+  'amber','blade','crown','drake','ember','forge','ghost','honor',
+  'ivory','jewel','karma','lance','mirth','noble','onyx','pearl',
+  'quest','raven','stone','torch','umbra','valor','wraith','xenon',
+  'yield','zeal','arcane','blood','chaos','dusk','elder','flame',
+  'grave','haste','iron','jade','knight','lore','magic','north',
+  'oath','prime','quartz','realm','sigil','tide','umber','vein',
+  'ward','abyss','basalt','coal','dawn','echo','frost','glyph'
+];
+
+function _generateRecoveryCode(){
+  const words = [];
+  const pool = [..._RECOVERY_WORDS];
+  for(let i=0;i<6;i++){
+    const idx = Math.floor(Math.random()*pool.length);
+    words.push(pool.splice(idx,1)[0]);
+  }
+  return words.join('-');
+}
+
+// ── Seeded Accounts — permanently baked in usernames ──────────
+// These accounts are always re-created if localStorage is wiped.
+// Password is NOT stored here — users set it on first login.
+// phokingturts: player account, never deleted, can set own password.
+const SEEDED_ACCOUNTS = {
+  'phokingturts': {
+    display: 'phokingturts',
+    rank: 'user',
+    role: 'player',
+  }
+};
+
 // ════════════════════════════════════════════════════════════
 // FIREWORKS — celebration animation on login/register
 // ════════════════════════════════════════════════════════════
@@ -30443,16 +30686,89 @@ function launchFireworks(){
 // AUTH — per-user account + state system
 // ════════════════════════════════════════════════════════════
 const AUTH = {
-  USERS_KEY : 'alas_users_v1',
+  USERS_KEY  : 'alas_users_v1',
+  BACKUP_KEY1: 'alas_users_bk1',   // redundant backup copy 1
+  BACKUP_KEY2: 'alas_users_bk2',   // redundant backup copy 2
   STATE_PRE  : 'alas_ustate_',
   LOG_PRE    : 'alas_ulog_',
   SESS_KEY   : 'alas_session',
   APIKEY     : 'alas_agent_key',
+  RECOVERY_PRE: 'alas_rc_',
   currentUser: null,
   _authMode  : 'login',
 
-  getUsers(){ try{return JSON.parse(localStorage.getItem(this.USERS_KEY)||'{}')}catch{return{}} },
-  saveUsers(u){ localStorage.setItem(this.USERS_KEY,JSON.stringify(u)); },
+  // ── User storage — triple-saved for resilience ──────────────
+  getUsers(){
+    try{
+      // Primary key
+      const raw = localStorage.getItem(this.USERS_KEY);
+      if(raw) return JSON.parse(raw);
+    }catch{}
+    // Fallback: restore from backup 1
+    try{
+      const bk1 = localStorage.getItem(this.BACKUP_KEY1);
+      if(bk1){ const d=JSON.parse(bk1); this._saveToAll(d); return d; }
+    }catch{}
+    // Fallback: restore from backup 2
+    try{
+      const bk2 = localStorage.getItem(this.BACKUP_KEY2);
+      if(bk2){ const d=JSON.parse(bk2); this._saveToAll(d); return d; }
+    }catch{}
+    return {};
+  },
+
+  _saveToAll(u){
+    const s = JSON.stringify(u);
+    try{ localStorage.setItem(this.USERS_KEY,  s); }catch{}
+    try{ localStorage.setItem(this.BACKUP_KEY1, s); }catch{}
+    try{ localStorage.setItem(this.BACKUP_KEY2, s); }catch{}
+  },
+  saveUsers(u){ this._saveToAll(u); },
+
+  // ── Seeded accounts — permanently ensure these usernames exist ──
+  ensureSeededAccounts(){
+    const users = this.getUsers();
+    let changed = false;
+    Object.entries(SEEDED_ACCOUNTS).forEach(([key, defaults])=>{
+      if(!users[key]){
+        // Account was wiped — re-create without a password (hash=null)
+        users[key] = {
+          display: defaults.display,
+          hash: null,  // no password set — will prompt on first login
+          created: Date.now(),
+          lastLogin: 0,
+          lastActivity: 0,
+          rank: defaults.rank,
+          role: defaults.role,
+          seeded: true,
+        };
+        changed = true;
+        console.log(`[ALAS Auth] Seeded account restored: ${key}`);
+      } else {
+        // Mark as seeded so it's never accidentally deleted
+        if(!users[key].seeded){ users[key].seeded=true; changed=true; }
+      }
+    });
+    if(changed) this.saveUsers(users);
+  },
+
+  // ── Recovery code storage ────────────────────────────────────
+  saveRecoveryCode(userKey, code){
+    // Store the hash of the code (never store plaintext)
+    try{ localStorage.setItem(this.RECOVERY_PRE+userKey, _alasHash(code)); }catch{}
+    // Also bake a copy into the user record for portability
+    const users=this.getUsers();
+    if(users[userKey]){ users[userKey].recoveryHash=_alasHash(code); this.saveUsers(users); }
+  },
+  verifyRecoveryCode(userKey, code){
+    const users=this.getUsers();
+    const u=users[userKey];
+    if(!u) return false;
+    // Check both inline record and standalone key
+    const expected = u.recoveryHash || localStorage.getItem(this.RECOVERY_PRE+userKey);
+    if(!expected) return false;
+    return _alasHash(code.trim().toLowerCase())===expected;
+  },
 
   register(username, password){
     const u=username.trim().toLowerCase();
@@ -30460,22 +30776,133 @@ const AUTH = {
     if(password.length<4) return{ok:false,msg:'Password must be at least 4 characters.'};
     const users=this.getUsers();
     // Strict duplicate check (case-insensitive)
-    if(users[u]) return{ok:false,msg:`"${username.trim()}" is already taken — choose a different username.`};
+    if(users[u] && users[u].hash!==null) return{ok:false,msg:`"${username.trim()}" is already taken — choose a different username.`};
     const isOwner=(u==='galixy');
-    users[u]={display:username.trim(),hash:_alasHash(password),created:Date.now(),lastLogin:Date.now(),lastActivity:Date.now(),rank:isOwner?'owner':'user',role:isOwner?'keeper':'player'};
+    // Generate recovery code
+    const recoveryCode = _generateRecoveryCode();
+    users[u]={
+      display:username.trim(),
+      hash:_alasHash(password),
+      recoveryHash:_alasHash(recoveryCode.toLowerCase()),
+      created:Date.now(),lastLogin:Date.now(),lastActivity:Date.now(),
+      rank:isOwner?'owner':'user',role:isOwner?'keeper':'player',
+      seeded: !!SEEDED_ACCOUNTS[u]
+    };
     this.saveUsers(users);
-    return this._success(u,users[u].display);
+    // Show recovery code to user before proceeding
+    AUTH._pendingRecoveryCode = recoveryCode;
+    AUTH._pendingLoginKey = u;
+    AUTH._pendingLoginDisplay = users[u].display;
+    return{ok:true,recoveryCode};
   },
 
   login(username, password){
     const u=username.trim().toLowerCase();
     const users=this.getUsers();
     if(!users[u]) return{ok:false,msg:'Account not found. Check your username or register.'};
+    // Seeded account with no password set — ask user to set one
+    if(users[u].hash===null){
+      AUTH._pendingSetPasswordKey=u;
+      AUTH._pendingSetPasswordDisplay=users[u].display;
+      return{ok:false,needsSetPassword:true,msg:''};
+    }
     if(users[u].hash!==_alasHash(password)) return{ok:false,msg:'Incorrect password.'};
     // Update last login timestamp
     users[u].lastLogin=Date.now(); users[u].lastActivity=Date.now();
     this.saveUsers(users);
     return this._success(u,users[u].display);
+  },
+
+  setPassword(userKey, newPassword){
+    if(newPassword.length<4) return{ok:false,msg:'Password must be at least 4 characters.'};
+    const users=this.getUsers();
+    if(!users[userKey]) return{ok:false,msg:'Account not found.'};
+    // Generate recovery code on first password set
+    const recoveryCode = _generateRecoveryCode();
+    users[userKey].hash = _alasHash(newPassword);
+    users[userKey].recoveryHash = _alasHash(recoveryCode.toLowerCase());
+    users[userKey].lastLogin=Date.now(); users[userKey].lastActivity=Date.now();
+    this.saveUsers(users);
+    AUTH._pendingRecoveryCode = recoveryCode;
+    AUTH._pendingLoginKey = userKey;
+    AUTH._pendingLoginDisplay = users[userKey].display;
+    return{ok:true,recoveryCode};
+  },
+
+  changePassword(oldPassword, newPassword){
+    if(!this.currentUser) return{ok:false,msg:'Not signed in.'};
+    if(newPassword.length<4) return{ok:false,msg:'New password must be at least 4 characters.'};
+    const users=this.getUsers();
+    const u=this.currentUser.key;
+    if(!users[u]) return{ok:false,msg:'Account not found.'};
+    // Keeper (galixy) can change other users' passwords without current password check
+    const isKeeperReset = AUTH.isGalixy() && AUTH._keeperResetTarget && AUTH._keeperResetTarget!==u;
+    if(!isKeeperReset && users[u].hash!==null && users[u].hash!==_alasHash(oldPassword)){
+      return{ok:false,msg:'Current password is incorrect.'};
+    }
+    users[u].hash=_alasHash(newPassword);
+    this.saveUsers(users);
+    return{ok:true};
+  },
+
+  resetPasswordWithCode(username, code, newPassword){
+    const u=username.trim().toLowerCase();
+    if(newPassword.length<4) return{ok:false,msg:'New password must be at least 4 characters.'};
+    if(!this.verifyRecoveryCode(u, code)){
+      return{ok:false,msg:'Recovery code is incorrect. Check your saved code and try again.'};
+    }
+    const users=this.getUsers();
+    if(!users[u]) return{ok:false,msg:'Account not found.'};
+    // Generate a new recovery code after reset
+    const newRecovery = _generateRecoveryCode();
+    users[u].hash=_alasHash(newPassword);
+    users[u].recoveryHash=_alasHash(newRecovery.toLowerCase());
+    users[u].lastLogin=Date.now(); users[u].lastActivity=Date.now();
+    this.saveUsers(users);
+    AUTH._pendingRecoveryCode = newRecovery;
+    return{ok:true,newRecoveryCode:newRecovery,userKey:u,display:users[u].display};
+  },
+
+  // Keeper-only: set any user's password directly (no old-password check)
+  keeperSetPassword(targetKey, newPassword){
+    if(!this.isGalixy()) return{ok:false,msg:'Access denied.'};
+    if(newPassword.length<4) return{ok:false,msg:'Password must be at least 4 characters.'};
+    const users=this.getUsers();
+    if(!users[targetKey]) return{ok:false,msg:'User not found.'};
+    users[targetKey].hash=_alasHash(newPassword);
+    this.saveUsers(users);
+    return{ok:true};
+  },
+
+  // Export all credential data as a downloadable backup JSON
+  exportCredentialBackup(){
+    const users=this.getUsers();
+    const backup={
+      exported: new Date().toISOString(),
+      version: 'alas_users_v1',
+      users: users,
+      note: 'This file contains hashed passwords and recovery codes. Import by pasting into the Keeper Panel credential restore tool.'
+    };
+    const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url; a.download='ALAS_credentials_backup_'+Date.now()+'.json';
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a); URL.revokeObjectURL(url);
+    return true;
+  },
+
+  // Import a previously exported credential backup
+  importCredentialBackup(jsonStr){
+    try{
+      const parsed=JSON.parse(jsonStr);
+      if(!parsed.users || typeof parsed.users!=='object') return{ok:false,msg:'Invalid backup file format.'};
+      // Merge (not overwrite) — preserve existing accounts
+      const existing=this.getUsers();
+      const merged={...parsed.users,...existing}; // existing takes priority
+      this.saveUsers(merged);
+      return{ok:true,count:Object.keys(parsed.users).length};
+    }catch(e){ return{ok:false,msg:'Could not parse backup file: '+e.message}; }
   },
 
   _success(key, displayName){
@@ -30601,6 +31028,23 @@ const AUTH = {
     if(u['galixy'].rank!=='owner'){u['galixy'].rank='owner';changed=true;}
     if(u['galixy'].role!=='keeper'){u['galixy'].role='keeper';changed=true;}
     if(changed) this.saveUsers(u);
+    // Also ensure all seeded accounts exist
+    this.ensureSeededAccounts();
+  },
+
+  // Keeper Panel: delete a user (cannot delete galixy or seeded accounts)
+  keeperDeleteUser(key){
+    if(key==='galixy') return{ok:false,msg:'Cannot delete Owner account.'};
+    const users=this.getUsers();
+    if(!users[key]) return{ok:false,msg:'User not found.'};
+    if(users[key].seeded) return{ok:false,msg:`"${key}" is a protected account and cannot be deleted. You can reset its password or character data.`};
+    delete users[key];
+    this.saveUsers(users);
+    // Also clean up state and log keys
+    try{ localStorage.removeItem(this.STATE_PRE+key); }catch{}
+    try{ localStorage.removeItem(this.LOG_PRE+key); }catch{}
+    try{ localStorage.removeItem(this.RECOVERY_PRE+key); }catch{}
+    return{ok:true};
   },
 };
 
@@ -30783,24 +31227,38 @@ async function _fbTestAndSave(){
 function openAuthModal(){
   AUTH._authMode='login';
   _applyAuthMode();
+  authSwitchView('main');
   document.getElementById('authOverlay').classList.add('open');
-  setTimeout(()=>document.getElementById('authUsername').focus(),80);
+  setTimeout(()=>document.getElementById('authUsername')?.focus(),80);
 }
 function closeAuthModal(){
   document.getElementById('authOverlay').classList.remove('open');
-  document.getElementById('authError').textContent='';
+  const errEl=document.getElementById('authError'); if(errEl) errEl.textContent='';
+  // Reset to sign-in view and clear changepw mode flag after close
+  setTimeout(()=>{
+    AUTH._authMode='login';
+    _applyAuthMode();
+    authSwitchView('main');
+  },350);
 }
 function authToggleMode(){
   AUTH._authMode=AUTH._authMode==='login'?'register':'login';
   _applyAuthMode();
-  document.getElementById('authError').textContent='';
+  authSwitchView('main');
+  const errEl=document.getElementById('authError'); if(errEl) errEl.textContent='';
 }
 function _applyAuthMode(){
   const isReg=AUTH._authMode==='register';
-  document.getElementById('authModalTitle').textContent=isReg?'Register':'Sign In';
-  document.getElementById('authModalSub').textContent=isReg?'Create your Alas account':'Access your character across sessions';
-  document.getElementById('authSubmitBtn').textContent=isReg?'Create Account':'Sign In';
-  document.getElementById('authToggle').innerHTML=isReg?'Already have an account? <span>Sign in</span>':'No account? <span>Register here</span>';
+  const titleEl=document.getElementById('authModalTitle');
+  const subEl=document.getElementById('authModalSub');
+  const btnEl=document.getElementById('authSubmitBtn');
+  const togEl=document.getElementById('authToggle');
+  const fgEl=document.getElementById('authForgotLink');
+  if(titleEl) titleEl.textContent=isReg?'Register':'Sign In';
+  if(subEl) subEl.textContent=isReg?'Create your Alas account':'Access your character across sessions';
+  if(btnEl) btnEl.textContent=isReg?'Create Account':'Sign In';
+  if(togEl) togEl.innerHTML=isReg?'Already have an account? <span>Sign in</span>':'No account? <span>Register here</span>';
+  if(fgEl) fgEl.style.display=isReg?'none':'block';
 }
 function authSubmit(){
   const username=document.getElementById('authUsername').value.trim();
@@ -30808,14 +31266,138 @@ function authSubmit(){
   const errEl=document.getElementById('authError');
   errEl.textContent='';
   if(!username||!password){ errEl.textContent='Please enter username and password.'; return; }
-  const result=AUTH._authMode==='register'?AUTH.register(username,password):AUTH.login(username,password);
-  if(!result.ok){ errEl.textContent=result.msg; return; }
-  const _evType = AUTH._authMode==='register'?'register':'login';
-  AUTH.logTraffic(_evType, {displayName:username.trim()});
-  _logTrafficCloud(_evType, {displayName:username.trim()});
+
+  if(AUTH._authMode==='register'){
+    const result=AUTH.register(username,password);
+    if(!result.ok){ errEl.textContent=result.msg; return; }
+    // Show recovery code before proceeding
+    AUTH.logTraffic('register',{displayName:username.trim()});
+    _logTrafficCloud('register',{displayName:username.trim()});
+    // Show recovery code view
+    const codeEl=document.getElementById('recoveryCodeDisplay');
+    if(codeEl) codeEl.textContent=result.recoveryCode;
+    authSwitchView('recovery');
+  } else {
+    const result=AUTH.login(username,password);
+    if(result.needsSetPassword){
+      // Seeded account with no password — show set-password view
+      const nameEl=document.getElementById('setpwUsername');
+      if(nameEl) nameEl.textContent=AUTH._pendingSetPasswordDisplay||username;
+      authSwitchView('setPassword');
+      return;
+    }
+    if(!result.ok){ errEl.textContent=result.msg; return; }
+    AUTH.logTraffic('login',{displayName:username.trim()});
+    _logTrafficCloud('login',{displayName:username.trim()});
+    closeAuthModal();
+    launchFireworks();
+    _authLoginSuccess();
+  }
+}
+
+function authSwitchView(view){
+  document.querySelectorAll('.auth-view').forEach(v=>v.classList.remove('active'));
+  const target=document.getElementById('authView'+view.charAt(0).toUpperCase()+view.slice(1));
+  if(target) target.classList.add('active');
+  // Toggle forgot link — only show in main login view
+  const forgotLink=document.getElementById('authForgotLink');
+  if(forgotLink) forgotLink.style.display=(view==='main'&&AUTH._authMode==='login')?'block':'none';
+}
+
+function openForgotPasswordView(){
+  // Pre-fill username if user already typed one
+  const un=document.getElementById('authUsername')?.value||'';
+  const fUn=document.getElementById('forgotUsername');
+  if(fUn&&un) fUn.value=un;
+  authSwitchView('forgot');
+}
+
+function openChangePasswordModal(){
+  if(!AUTH.currentUser){ openAuthModal(); return; }
+  AUTH._authMode='changepw';
+  // Clear fields
+  ['changepwCurrent','changepwNew','changepwConfirm'].forEach(id=>{
+    const el=document.getElementById(id); if(el) el.value='';
+  });
+  const errEl=document.getElementById('changepwError'); if(errEl) errEl.textContent='';
+  const okEl=document.getElementById('changepwSuccess'); if(okEl) okEl.textContent='';
+  const subEl=document.getElementById('changepwSub');
+  if(subEl) subEl.textContent='Update the password for '+AUTH.currentUser.name+'.';
+  const curRow=document.getElementById('changepwCurrentRow');
+  if(curRow) curRow.style.display='block'; // always show for self-change
+  AUTH._keeperResetTarget=null;
+  document.getElementById('authOverlay').classList.add('open');
+  authSwitchView('changePw');
+  setTimeout(()=>document.getElementById('changepwCurrent')?.focus(),80);
+}
+
+function authSubmitChangePassword(){
+  const oldPw = document.getElementById('changepwCurrent')?.value||'';
+  const newPw = document.getElementById('changepwNew')?.value||'';
+  const confirmPw = document.getElementById('changepwConfirm')?.value||'';
+  const errEl=document.getElementById('changepwError');
+  const okEl=document.getElementById('changepwSuccess');
+  if(errEl) errEl.textContent='';
+  if(okEl) okEl.textContent='';
+  if(newPw!==confirmPw){ if(errEl) errEl.textContent='Passwords do not match.'; return; }
+  const result=AUTH.changePassword(oldPw, newPw);
+  if(!result.ok){ if(errEl) errEl.textContent=result.msg; return; }
+  if(okEl) okEl.textContent='✓ Password updated successfully!';
+  setTimeout(()=>closeAuthModal(), 1800);
+  showToast('Password updated successfully.');
+}
+
+function authSubmitSetPassword(){
+  const key=AUTH._pendingSetPasswordKey;
+  const newPw=document.getElementById('setpwNew')?.value||'';
+  const confirmPw=document.getElementById('setpwConfirm')?.value||'';
+  const errEl=document.getElementById('setpwError');
+  if(errEl) errEl.textContent='';
+  if(!key){ if(errEl) errEl.textContent='Session error — close and try again.'; return; }
+  if(newPw!==confirmPw){ if(errEl) errEl.textContent='Passwords do not match.'; return; }
+  const result=AUTH.setPassword(key, newPw);
+  if(!result.ok){ if(errEl) errEl.textContent=result.msg; return; }
+  // Show recovery code
+  const codeEl=document.getElementById('recoveryCodeDisplay');
+  if(codeEl) codeEl.textContent=result.recoveryCode;
+  authSwitchView('recovery');
+}
+
+function authRecoveryAcknowledged(){
+  const key=AUTH._pendingLoginKey;
+  const display=AUTH._pendingLoginDisplay;
+  AUTH._pendingRecoveryCode=null;
+  if(key){
+    AUTH._pendingLoginKey=null; AUTH._pendingLoginDisplay=null;
+    const users=AUTH.getUsers();
+    if(users[key]){
+      users[key].lastLogin=Date.now(); users[key].lastActivity=Date.now();
+      AUTH.saveUsers(users);
+      AUTH._success(key,display||users[key].display);
+    }
+  }
+  AUTH.logTraffic('login',{displayName:display||key});
+  _logTrafficCloud('login',{displayName:display||key});
   closeAuthModal();
   launchFireworks();
   _authLoginSuccess();
+}
+
+function authSubmitForgotPassword(){
+  const username=(document.getElementById('forgotUsername')?.value||'').trim();
+  const code=(document.getElementById('forgotCode')?.value||'').trim();
+  const newPw=document.getElementById('forgotNewPw')?.value||'';
+  const errEl=document.getElementById('forgotError');
+  if(errEl) errEl.textContent='';
+  if(!username||!code||!newPw){ if(errEl) errEl.textContent='Please fill in all fields.'; return; }
+  const result=AUTH.resetPasswordWithCode(username,code,newPw);
+  if(!result.ok){ if(errEl) errEl.textContent=result.msg; return; }
+  // New recovery code generated — show it
+  AUTH._pendingLoginKey=result.userKey;
+  AUTH._pendingLoginDisplay=result.display;
+  const codeEl=document.getElementById('recoveryCodeDisplay');
+  if(codeEl) codeEl.textContent=result.newRecoveryCode;
+  authSwitchView('recovery');
 }
 
 function _authLoginSuccess(){
@@ -31223,7 +31805,7 @@ function _escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
 // ── Init — restore session on page load ───────────────────────
 (function(){
   AUTH.restoreSession();
-  AUTH.ensureGalixyRank();
+  AUTH.ensureGalixyRank();      // also calls ensureSeededAccounts internally
   AUTH.logTraffic('visit');
   _logTrafficCloud('visit');
   // Always hide Keeper-only elements by default (CSS .galixy-only sets display:none)
