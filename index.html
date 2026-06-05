@@ -851,6 +851,20 @@
             accent-color: var(--gold);
             flex-shrink: 0;
         }
+        /* EX checkbox locked when not proficient */
+        input.pchk:disabled {
+            opacity: 0.28;
+            cursor: not-allowed;
+            accent-color: var(--txt-dim);
+        }
+        .sk-chk-wrap.ex-locked {
+            opacity: 0.3;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+        .sk-chk-wrap.ex-locked .sk-chk-lbl {
+            color: var(--txt-dim);
+        }
 
         .save-name {
             font-family: 'Cinzel',serif;
@@ -13365,6 +13379,8 @@ function saveAll(){
     const skId = sk.name.replace(/\s+/g,'_');
     const pe = document.getElementById('sp_'+skId); if(pe) state.skillProf[skId]=pe.checked;
     const ee = document.getElementById('se_'+skId); if(ee) state.skillExp[skId]=ee.checked;
+    // Expertise requires Proficiency — clean up any inconsistency
+    if(state.skillExp[skId] && !state.skillProf[skId]) state.skillExp[skId]=false;
   });
   // Save profs
   state.saveProficiencies = ABILITIES.filter(ab=>{const el=document.getElementById('sav_'+ab);return el&&el.checked;});
@@ -14537,22 +14553,30 @@ function buildSkillsGrid(){
   const prof=getProf();
   SKILLS_DATA.forEach(sk=>{
     const skId=sk.name.replace(/\s+/g,'_');
-    const isPr=state.skillProf&&state.skillProf[skId];
-    const isEx=state.skillExp&&state.skillExp[skId];
+    const isPr=!!(state.skillProf&&state.skillProf[skId]);
+    // Expertise requires proficiency — auto-clear inconsistent state
+    if(!isPr && state.skillExp && state.skillExp[skId]) state.skillExp[skId]=false;
+    const isEx=!!(state.skillExp&&state.skillExp[skId]);
     const base=getMod(sk.ab);
     const tot=base+(isPr?prof:0)+(isEx?prof:0);
     const row=document.createElement('div');
     row.className='skill-row';
     const hasInfo=sk.what||sk.when;
+    // EX is disabled (and unchecked) when not proficient
+    const exLocked=!isPr;
     row.innerHTML=`
       <div class="skill-row-top">
         <div class="sk-chks">
           <div class="sk-chk-wrap">
-            <input type="checkbox" class="pchk" id="sp_${skId}" ${isPr?'checked':''} onchange="saveAll()">
+            <input type="checkbox" class="pchk" id="sp_${skId}" ${isPr?'checked':''}
+                   onchange="onProficiencyChange('${skId}')">
             <span class="sk-chk-lbl">PR</span>
           </div>
-          <div class="sk-chk-wrap">
-            <input type="checkbox" class="pchk" id="se_${skId}" ${isEx?'checked':''} onchange="saveAll()">
+          <div class="sk-chk-wrap${exLocked?' ex-locked':''}" id="exwrap_${skId}">
+            <input type="checkbox" class="pchk" id="se_${skId}"
+                   ${isEx?'checked':''} ${exLocked?'disabled':''}
+                   onchange="saveAll()"
+                   title="${exLocked?'Requires Proficiency (PR) first':'Expertise — doubles proficiency bonus'}">
             <span class="sk-chk-lbl">EX</span>
           </div>
         </div>
@@ -14571,6 +14595,28 @@ function buildSkillsGrid(){
     `;
     g.appendChild(row);
   });
+}
+
+// ── Proficiency toggle — gates Expertise on Proficiency ──────
+function onProficiencyChange(skId){
+  const prEl  = document.getElementById('sp_'+skId);
+  const exEl  = document.getElementById('se_'+skId);
+  const exWrap= document.getElementById('exwrap_'+skId);
+  if(!prEl||!exEl) return;
+  const isProficient = prEl.checked;
+  if(!isProficient){
+    // Remove expertise when proficiency is un-checked
+    exEl.checked  = false;
+    exEl.disabled = true;
+    exEl.title    = 'Requires Proficiency (PR) first';
+    if(exWrap) exWrap.classList.add('ex-locked');
+  } else {
+    // Unlock expertise when proficiency is checked
+    exEl.disabled = false;
+    exEl.title    = 'Expertise — doubles proficiency bonus';
+    if(exWrap) exWrap.classList.remove('ex-locked');
+  }
+  saveAll();
 }
 
 function toggleSkillInfo(skId){
