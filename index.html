@@ -9701,6 +9701,33 @@
                         </select>
                     </div>
                 </div>
+                <!-- Beastkin Lineage selector — shown only when race = Beastkin -->
+                <div id="beastkinLineageRow" style="display:none;margin-top:6px;">
+                    <div class="fld">
+                        <span class="fld-lbl">Beastkin Lineage</span>
+                        <select class="fld-sel" id="beastkinLineage" onchange="onLineageChange()">
+                            <option value="">— Select Lineage —</option>
+                            <option value="Felinekin (Sythari)">Felinekin — Sythari</option>
+                            <option value="Rabbitkin (Velkyn)">Rabbitkin — Velkyn</option>
+                            <option value="Ravenkin (Kynsu)">Ravenkin — Kynsu</option>
+                            <option value="Bullkin (Gor'Vakh)">Bullkin — Gor'Vakh</option>
+                            <option value="Foxkin (Veyshi)">Foxkin — Veyshi</option>
+                            <option value="Frogkin (Tho'ren)">Frogkin — Tho'ren</option>
+                            <option value="Turtlekin (Kaelorum)">Turtlekin — Kaelorum</option>
+                            <option value="Bearkin (Ur'Khaim)">Bearkin — Ur'Khaim</option>
+                            <option value="Boarkin (Droggan)">Boarkin — Droggan</option>
+                            <option value="Wolfkin (Vaelthir)">Wolfkin — Vaelthir</option>
+                            <option value="Deerkin (Lyraneth)">Deerkin — Lyraneth</option>
+                            <option value="Badgerkin (Groveth)">Badgerkin — Groveth</option>
+                            <option value="Goatkin (Kurnath)">Goatkin — Kurnath</option>
+                            <option value="Serpentkin (Xha'reth)">Serpentkin — Xha'reth</option>
+                            <option value="Horsekin (Vaelorin)">Horsekin — Vaelorin</option>
+                            <option value="Ratkin (Skrel'ven)">Ratkin — Skrel'ven</option>
+                            <option value="Cowkin (Bovarin)">Cowkin — Bovarin</option>
+                            <option value="Lizardkin (Saurik)">Lizardkin — Saurik</option>
+                        </select>
+                    </div>
+                </div>
                 <div id="biomeBonusPanel"></div>
                 <div class="id-grid">
                     <div class="fld">
@@ -10108,6 +10135,14 @@
                     <div id="slSubFilter" style="display:none;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px;padding:6px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:4px;"></div>
                     <div id="spellListGrid" style="display:flex;flex-direction:column;gap:8px;"></div>
                     <div id="spellListEmpty" style="font-family:'EB Garamond',serif;font-size:13px;color:var(--txt-dim);font-style:italic;padding:10px 0;">No completed spells yet — press <strong style="color:var(--gold-d)">Complete</strong> on a spell card above to add it to your list.</div>
+
+                    <!-- ─── UNIVERSAL CANTRIPS ─── -->
+                    <div class="sec-hdr" style="margin-top:28px;">Universal Cantrips</div>
+                    <div style="font-family:'EB Garamond',serif;font-size:13px;color:var(--txt-dim);font-style:italic;margin-bottom:14px;line-height:1.5;">
+                        These 25 cantrips are available to <strong style="color:var(--gold-d)">all classes</strong> at no Resonance Cost (RC 0). They are universal tools of resonance — functional, practical, and available from Level 1.
+                        D&amp;D-origin cantrips are SRD-compatible; Alas-origin cantrips are unique to the Karanthian setting.
+                    </div>
+                    <div id="cantripSection"></div>
                 </div>
 
                 <!-- ─── ABILITIES ─── -->
@@ -10861,6 +10896,240 @@ const BIOMES = {
   'Drakonian':['Volcanic / Emberforge','Mountain / Highland','Coastal / Maritime'],
   'Goliath':['Mountain / Highland','Arctic / Tundra']
 };
+
+// ═══════════════════════════════════════════════════
+// BEASTKIN LINEAGES — All 18 confirmed PHB entries
+// Natural Weapon scales: 1d4→1d6 at L6, 1d6→1d8 at L11, 1d8→1d10 at L16
+// ═══════════════════════════════════════════════════
+const BEASTKIN_LINEAGES = {
+  'Felinekin (Sythari)':{
+    thrael:'Sythari', essence:'Precision. Independence. Predator\'s Grace.',
+    asi:'+2 DEX, +1 WIS', speed:35, hitDie:'d8', baseHP:8,
+    weapon:'Claws 1d4 (Finesse, Slashing)', darkvision:'60 ft.',
+    primarySigil:'Air', secondarySigil:'Fire',
+    biomes:['Forest / Woodland','Plains / Grassland','Urban / Civilized'],
+    traits:[
+      'Predator\'s Grace: Proficiency in Stealth. Move 10+ ft. before claw attack → +1d4 damage.',
+      'Retractable Claws: Conceal or extend claws at will. Concealed → ADV on Deception to hide natural weapons.',
+      'Low-Light Reflex: Cannot be surprised while conscious. ADV on Initiative rolls in dim light or darkness.',
+      'Darkvision 60 ft.: See in darkness as dim light. Cannot discern color in darkness.',
+    ]},
+  'Rabbitkin (Velkyn)':{
+    thrael:'Velkyn', essence:'Instinct. Speed. Survival.',
+    asi:'+2 DEX, +1 CHA', speed:40, hitDie:'d6', baseHP:7,
+    weapon:'Kick 1d4 (Finesse, Bludgeoning)', darkvision:'None',
+    primarySigil:'Air', secondarySigil:'Nature',
+    biomes:['Plains / Grassland','Forest / Woodland','Mountain / Highland'],
+    traits:[
+      'Sprinter\'s Instinct: Speed 40 ft. When you Dash, opportunity attacks vs. you have disadvantage until next turn.',
+      'Triple Jump: Jump distance tripled. Use DEX instead of STR for all jump calculations.',
+      'Lucky: 1/day, reroll any d20 after seeing result. Must use new result.',
+      'Threat Sense: ADV on Perception (hearing). Cannot be surprised while 1+ ally is within 30 ft.',
+    ]},
+  'Ravenkin (Kynsu)':{
+    thrael:'Kynsu', essence:'Memory. Echo. Observer.',
+    asi:'+2 INT, +1 WIS', speed:30, hitDie:'d6', baseHP:7,
+    weapon:'Talons 1d4 (Finesse, Piercing)', darkvision:'30 ft.',
+    primarySigil:'Air', secondarySigil:'Chaos',
+    biomes:['Urban / Civilized','Mountain / Highland','Coastal / Maritime'],
+    traits:[
+      'Echo Memory: Perfectly reproduce any voice, sound, or short musical phrase heard even once.',
+      'Perfect Recall: ADV on History and Investigation checks for personally witnessed events. Cannot forget chosen memories.',
+      'Kyn\'s Eye: Darkvision 30 ft. ADV on Insight checks to detect lying by voice alone.',
+      'Fragile Frame: −1 HP per level (reflected in d6 hit die).',
+    ]},
+  'Bullkin (Gor\'Vakh)':{
+    thrael:'Gor\'Vakh', essence:'Control. Burden. Chosen Force.',
+    asi:'+2 STR, +1 CON', speed:30, hitDie:'d10', baseHP:10,
+    weapon:'Horn Gore 1d8 (Bludgeoning)', darkvision:'None',
+    primarySigil:'Earth', secondarySigil:'Fire',
+    biomes:['Plains / Grassland','Mountain / Highland','Urban / Civilized'],
+    traits:[
+      'Unstoppable: If you move at least 10 ft. in a straight line before attacking, target must save CON DC 13 or be knocked prone.',
+      'Bovine Endurance: ADV on CON saves vs. exhaustion, extreme heat, and forced march.',
+      'Pack Mule: Carry capacity doubled. Not encumbered by heavy gear that would slow other races.',
+      'Gore Rush: Horn Gore on a charge deals 2d8 instead of 1d8 (once per short rest).',
+    ]},
+  'Foxkin (Veyshi)':{
+    thrael:'Veyshi', essence:'Cunning. Misdirection. Opportunity.',
+    asi:'+2 CHA, +1 DEX', speed:35, hitDie:'d8', baseHP:8,
+    weapon:'Bite 1d4 (Piercing)', darkvision:'60 ft.',
+    primarySigil:'Chaos', secondarySigil:'Air',
+    biomes:['Urban / Civilized','Plains / Grassland','Forest / Woodland'],
+    traits:[
+      'Silver Tongue: ADV on Deception and Persuasion checks. When lying, DIS on Insight vs. you.',
+      'Opportunist: Once per turn, you may take the Hide action as a bonus action if a creature within 5 ft. attacked something else.',
+      'Fox Fire: 1/Short Rest, make a creature within 30 ft. reroll a d20 (your choice to use either result).',
+      'Darkvision 60 ft.: See in darkness as dim light.',
+    ]},
+  'Frogkin (Tho\'ren)':{
+    thrael:'Tho\'ren', essence:'Adaptation. Patience. Eruption.',
+    asi:'+1 STR, +1 CON, +1 WIS', speed:30, hitDie:'d8', baseHP:8,
+    weapon:'Tongue Slam 1d6 (Bludgeoning, 15 ft. reach)', darkvision:'Darkvision 30 ft.',
+    primarySigil:'Water', secondarySigil:'Nature',
+    biomes:['Coastal / Maritime','Forest / Woodland','Dead Lands / Corrupted'],
+    traits:[
+      'Amphibious: Breathe air and water. Swim speed 30 ft. No penalty in aquatic combat.',
+      'Prehensile Tongue: 15 ft. reach melee attack. Can grapple targets up to one size larger with tongue.',
+      'Leaping Ambush: Long jump up to 20 ft. without a running start. Fall damage halved.',
+      'Adaptive Camouflage: In natural terrain (not urban), may attempt Hide without cover if motionless.',
+    ]},
+  'Turtlekin (Kaelorum)':{
+    thrael:'Kaelorum', essence:'Endurance. Time. Inevitability.',
+    asi:'+2 CON, +1 WIS', speed:25, hitDie:'d10', baseHP:12,
+    weapon:'Shell Ram 1d6 (Bludgeoning)', darkvision:'None',
+    primarySigil:'Earth', secondarySigil:'Water',
+    biomes:['Coastal / Maritime','Mountain / Highland','Plains / Grassland'],
+    traits:[
+      'Shell Defense: As a bonus action, retract into shell. AC = 20, speed = 0, cannot be prone. Exit = bonus action.',
+      'Natural Shell: AC bonus +2 while not wearing armor. Stacks with shields.',
+      'Enduring Patience: Can hold breath for 1 hour. ADV on CON saves vs. poison and disease.',
+      'Slow Metabolism: Require only half food and water. Immune to magical aging effects.',
+    ]},
+  'Bearkin (Ur\'Khaim)':{
+    thrael:'Ur\'Khaim', essence:'Power. Protection. Endure.',
+    asi:'+2 STR, +1 CON', speed:30, hitDie:'d12', baseHP:12,
+    weapon:'Maul 1d8 (Bludgeoning)', darkvision:'Darkvision 60 ft.',
+    primarySigil:'Earth', secondarySigil:'Nature',
+    biomes:['Forest / Woodland','Mountain / Highland','Arctic / Tundra'],
+    traits:[
+      'Powerful Build: Carry capacity as Large creature. ADV on grapple checks. Cannot be moved against your will without magical compulsion.',
+      'Predator\'s Nose: ADV on Perception (smell). Track any creature that has passed through an area in the last 24 hours.',
+      'Thick Hide: Resistance to cold damage. ADV on CON saves vs. exhaustion from cold environments.',
+      'Rending Maul: On critical hit with natural weapon, target is Grappled (escape DC = STR save DC).',
+    ]},
+  'Boarkin (Droggan)':{
+    thrael:'Droggan', essence:'Ferocity. Momentum. Unrelenting.',
+    asi:'+2 STR, +1 CON', speed:30, hitDie:'d10', baseHP:11,
+    weapon:'Gore 1d6 (Piercing)', darkvision:'None',
+    primarySigil:'Fire', secondarySigil:'Earth',
+    biomes:['Plains / Grassland','Forest / Woodland','Mountain / Highland'],
+    traits:[
+      'Relentless: 1/Deep Rest — when reduced to 0 HP, drop to 1 HP instead.',
+      'Charge: Move 20+ ft. in straight line, attack → target makes STR save (DC 13) or is pushed 10 ft. and knocked prone.',
+      'Thick Skull: ADV on saves vs. being stunned or knocked unconscious by physical impact.',
+      'Gore Momentum: First attack on your turn after moving at least 15 ft. deals +1d6 damage.',
+    ]},
+  'Wolfkin (Vaelthir)':{
+    thrael:'Vaelthir', essence:'Royalty. Pack. Strategy.',
+    asi:'+2 STR, +1 CON', speed:35, hitDie:'d8', baseHP:9,
+    weapon:'Bite 1d6 (Piercing)', darkvision:'Darkvision 60 ft.',
+    primarySigil:'Air', secondarySigil:'Nature',
+    biomes:['Plains / Grassland','Forest / Woodland','Arctic / Tundra'],
+    traits:[
+      'Pack Tactics: ADV on attack rolls vs. a creature if one of your allies is adjacent to it and not incapacitated.',
+      'Howl: 1/Short Rest — creatures within 60 ft. that can hear you must make WIS save (DC 13) or be Frightened until end of next turn.',
+      'Predator\'s Instinct: ADV on Initiative. Cannot be surprised.',
+      'Rend: On successful bite attack, target is Bleeding — takes 1d4 damage at start of their turn until they use an action to stanch it.',
+    ]},
+  'Deerkin (Lyraneth)':{
+    thrael:'Lyraneth', essence:'Grace. Resonance. Nature\'s Will.',
+    asi:'+2 DEX, +1 WIS', speed:35, hitDie:'d8', baseHP:8,
+    weapon:'Antler Ram 1d6 (Bludgeoning)', darkvision:'None',
+    primarySigil:'Nature', secondarySigil:'Light',
+    biomes:['Forest / Woodland','Plains / Grassland','Mountain / Highland'],
+    traits:[
+      'Resonance Attunement: +2 to Instability saving throws. You sense Vein corruption within 60 ft.',
+      'Ethereal Leap: Once per turn, jump up to 30 ft. without provoking opportunity attacks.',
+      'Nature\'s Grace: ADV on DEX saving throws and Acrobatics checks. Difficult natural terrain does not reduce speed.',
+      'Healing Presence: 1/Deep Rest, touch a creature → they regain HP equal to your WIS modifier + proficiency bonus.',
+    ]},
+  'Badgerkin (Groveth)':{
+    thrael:'Groveth', essence:'Rage. Survival. Unbreakable.',
+    asi:'+1 STR, +2 CON', speed:25, hitDie:'d12', baseHP:12,
+    weapon:'Claws 1d6 (Slashing)', darkvision:'Darkvision 30 ft.',
+    primarySigil:'Earth', secondarySigil:'Chaos',
+    biomes:['Forest / Woodland','Mountain / Highland','Dead Lands / Corrupted'],
+    traits:[
+      'Burrowing Fury: Burrow speed 20 ft. Can move through earth, loose stone, or soft terrain without leaving a tunnel.',
+      'Last Stand: While at 1/4 HP or below, all attacks deal +1d4 damage and you have resistance to physical damage.',
+      'Fearless: Immune to Frightened condition. ADV on saves vs. magical fear.',
+      'Tenacious Grip: Cannot be disarmed. ADV on saves to avoid being grappled or restrained.',
+    ]},
+  'Goatkin (Kurnath)':{
+    thrael:'Kurnath', essence:'Balance. Endurance. Unyielding.',
+    asi:'+1 DEX, +1 CON, +1 WIS', speed:30, hitDie:'d8', baseHP:8,
+    weapon:'Headbutt 1d4 (Bludgeoning)', darkvision:'None',
+    primarySigil:'Earth', secondarySigil:'Air',
+    biomes:['Mountain / Highland','Plains / Grassland','Arid / Desert'],
+    traits:[
+      'Mountain Walker: Cannot fall prone from terrain effects. ADV on Athletics (climbing) and on saves vs. being knocked prone.',
+      'Sure-Footed: Climb speed 30 ft. No Acrobatics check required for difficult balance terrain.',
+      'Stubborn Endurance: 1/Short Rest, when reduced to 0 HP, make CON save (DC 10 + damage taken) to stay at 1 HP.',
+      'Hardy: +2 to CON saves and +1 hit point per level (reflected in mixed ASI).',
+    ]},
+  'Serpentkin (Xha\'reth)':{
+    thrael:'Xha\'reth', essence:'Deception. Patience. Inevitability.',
+    asi:'+1 CON, +2 CHA', speed:30, hitDie:'d8', baseHP:8,
+    weapon:'Venomous Bite 1d4 + Poison (Piercing)', darkvision:'Darkvision 60 ft.',
+    primarySigil:'Chaos', secondarySigil:'Nature',
+    biomes:['Arid / Desert','Dead Lands / Corrupted','Coastal / Maritime'],
+    traits:[
+      'Venom: Bite attack — target must make CON save (DC 8+CON+Prof) or take 1d6 poison damage and be Poisoned for 1 minute.',
+      'Serpent\'s Grace: ADV on Stealth checks. Move silently — no penalty for armor if proficient.',
+      'Constrictor: On successful grapple, target takes 1d6 bludgeoning damage at start of each of your turns while grappled.',
+      'Cold Sense: Darkvision 60 ft. Heat sense (detect warm-blooded creatures within 30 ft. in darkness or while blinded).',
+    ]},
+  'Horsekin (Vaelorin)':{
+    thrael:'Vaelorin', essence:'Freedom. Momentum. Endless Horizon.',
+    asi:'+2 DEX, +1 CON', speed:40, hitDie:'d10', baseHP:10,
+    weapon:'Kick 1d8 (Bludgeoning)', darkvision:'None',
+    primarySigil:'Air', secondarySigil:'Earth',
+    biomes:['Plains / Grassland','Arid / Desert','Mountain / Highland'],
+    traits:[
+      'Gallop: When you Dash on your turn, your speed increases by an additional 20 ft. that turn only.',
+      'Endurance Runner: Can move at full speed for 8 hours without making exhaustion checks. Advantage on CON saves vs. forced march.',
+      'Trample: On a charge of 20+ ft., target must make STR save (DC 13) or be knocked prone. You may then move over them without penalty.',
+      'Powerful Kick: On critical hit with kick, target is knocked 10 ft. away and falls prone (no save).',
+    ]},
+  'Ratkin (Skrel\'ven)':{
+    thrael:'Skrel\'ven', essence:'Resourcefulness. Guile. Survival.',
+    asi:'+2 DEX, +1 INT', speed:30, hitDie:'d6', baseHP:7,
+    weapon:'Gnaw 1d4 (Piercing)', darkvision:'Darkvision 60 ft.',
+    primarySigil:'Chaos', secondarySigil:'Air',
+    biomes:['Urban / Civilized','Dead Lands / Corrupted','Coastal / Maritime'],
+    traits:[
+      'Scurry: Move through spaces as small as 6 inches without squeezing. ADV on Acrobatics checks to escape grapples.',
+      'Scrounger: Once per Short Rest, find a useful mundane item (rope, torch, small tool) in any urban or dungeon environment.',
+      'Disease Immunity: Immune to non-magical diseases. ADV on saves vs. magical disease and sickness.',
+      'Rat King Network: In any settlement, after 1 hour of searching, you can locate a black market, underground contact, or safe house.',
+    ]},
+  'Cowkin (Bovarin)':{
+    thrael:'Bovarin', essence:'Nurture. Resilience. Provision.',
+    asi:'+1 STR, +2 CON', speed:30, hitDie:'d10', baseHP:11,
+    weapon:'Horn Gore 1d6 (Piercing)', darkvision:'None',
+    primarySigil:'Nature', secondarySigil:'Earth',
+    biomes:['Plains / Grassland','Urban / Civilized','Coastal / Maritime'],
+    traits:[
+      'Bovine Constitution: ADV on saves vs. disease, poison, and environmental exhaustion. Require only half food intake.',
+      'Caretaker: 1/Deep Rest, provide a short-rest\'s worth of healing to one creature by sharing your vital warmth (equivalent to spending 2 Hit Dice).',
+      'Pack Mule: Carry capacity doubled. Not encumbered by heavy gear. Can pull or haul loads as a draft animal.',
+      'Goring Charge: On charge of 15+ ft., horn attack deals 2d6 instead of 1d6.',
+    ]},
+  'Lizardkin (Saurik)':{
+    thrael:'Saurik', essence:'Adaptation. Regeneration. Dominance.',
+    asi:'+1 CON, +1 STR, +1 DEX', speed:30, hitDie:'d8', baseHP:9,
+    weapon:'Tail Swipe 1d6 (Bludgeoning, 5 ft. sweep)', darkvision:'Darkvision 30 ft.',
+    primarySigil:'Earth', secondarySigil:'Chaos',
+    biomes:['Arid / Desert','Dead Lands / Corrupted','Coastal / Maritime'],
+    traits:[
+      'Regeneration: At the start of each of your turns, regain 1 HP if you have at least 1 HP and are not at your maximum HP. Paused while at 0 HP.',
+      'Prehensile Tail: Tail Swipe hits all creatures in a 5 ft. arc. Tail can grip objects — acts as a third hand for non-weapon purposes.',
+      'Cold Blood: ADV on saves vs. magical cold and temperature extremes. Do not require temperature regulation.',
+      'Wall Crawler: Climb speed 30 ft. Can climb on any surface, including inverted ceilings, without Athletics checks.',
+    ]},
+};
+
+function getBeastkinLineage(){
+  const el=document.getElementById('beastkinLineage');
+  return el?(el.value||''):'';
+}
+
+function onLineageChange(){
+  updateRaceInfoPanel();
+  buildRacialSkillsDisplay();
+  saveAll();
+}
 
 const BIOME_DATA = {
   'Arid / Desert':{
@@ -13082,6 +13351,8 @@ function saveAll(){
   ['swimSpeed','flySpeed','climbSpeed','burrowSpeed'].forEach(id=>{const el=document.getElementById(id);if(el)state[id]=el.value||'';});
   // currentBiome is set directly on state (not from a DOM element) — preserve it explicitly
   if(state.currentBiome===undefined) state.currentBiome=null;
+  // Save race-specific sub-selections
+  state.beastkinLineage = document.getElementById('beastkinLineage')?.value||'';
   _debouncedSave();
   updateSpellLimitDisplay();
   updateAbilityLimitDisplay();
@@ -13733,6 +14004,11 @@ function updateArmorAC(){
 // ═══════════════════════════════════════════════════
 function onRaceChange(){
   const race=document.getElementById('charRace').value;
+  // Show/hide Beastkin lineage selector
+  const lineageRow=document.getElementById('beastkinLineageRow');
+  if(lineageRow) lineageRow.style.display=(race==='Beastkin')?'block':'none';
+  if(race!=='Beastkin'){const lineageSel=document.getElementById('beastkinLineage');if(lineageSel)lineageSel.value='';}
+  // Biome dropdown
   const biomeEl=document.getElementById('charBiome');
   biomeEl.innerHTML='<option value="">— Select —</option>';
   if(BIOMES[race]){
@@ -13872,6 +14148,100 @@ const EP_CONDITIONS = [
 
 function getEpCondition(ep){
   return EP_CONDITIONS.find(c => ep >= c.min && ep <= c.max) || EP_CONDITIONS[EP_CONDITIONS.length-1];
+}
+
+// ═══════════════════════════════════════════════════
+// UNIVERSAL CANTRIPS — Available to ALL Classes
+// RC 0 (at-will). Source: Alas PHB v2.8 + D&D SRD cross-compatible
+// ═══════════════════════════════════════════════════
+const CANTRIPS = [
+  {name:'Prestidigitation',origin:'D&D',cat:'Utility',rc:0,dur:'1 hr',
+   effect:'Minor sensory effects: small sounds, odors, or visual illusions up to 1-ft cube. Clean or soil an object. Warm or chill food. Color, mark, or scent an item for 1 hour. No single effect can deal damage or alter the properties of a creature.'},
+  {name:'Message',origin:'D&D',cat:'Social',rc:0,dur:'Instant',
+   effect:'Whisper a message of up to 25 words to a creature within 120 ft. Only the target hears it. They may whisper a reply of up to 25 words that only you hear. Walls do not block this; Silence does.'},
+  {name:'Mending',origin:'D&D',cat:'Craft',rc:0,dur:'Instant',
+   effect:'Repair a single break or tear in an object up to 1 ft in any dimension. The repair is seamless. Takes 1 minute to cast. Cannot repair damage caused by magical effects — only physical wear, breakage, or cuts.'},
+  {name:'Guidance',origin:'D&D',cat:'Utility',rc:0,dur:'1 min',
+   effect:'Touch a willing creature. Once before the sigil ends, they may roll 1d4 and add the result to one ability check of their choice. They decide before or after rolling the check.'},
+  {name:'Resonance Read',origin:'Alas',cat:'Detection',rc:0,dur:'Instant',
+   effect:'Detect the current Resonance, Instability, and Corruption level of one willing creature or object within 30 ft. Results appear as color impressions and pressure sensations — exact values require a DC 10 Arcana check to interpret.'},
+  {name:'Minor Illusion',origin:'D&D',cat:'Utility',rc:0,dur:'1 min',
+   effect:'Create a silent image or a sound originating from a point within 30 ft. An image cannot be larger than a 5-ft cube. A sound can be anything from a whisper to a shout. A creature may use an action to make an INT (Investigation) check vs. your spell DC to disbelieve.'},
+  {name:'Stabilize',origin:'D&D',cat:'Combat',rc:0,dur:'Instant',
+   effect:'Touch a creature with 0 HP. They stabilize — death saves stop and they remain unconscious at 0 HP. Cannot be used on a creature that has already failed three death saves in the current encounter. Does not restore HP.'},
+  {name:'True Strike',origin:'D&D',cat:'Combat',rc:0,dur:'Conc., up to 1 rnd',
+   effect:'Extend your perception toward one creature within 30 ft. On your next turn, your first attack roll against that creature has advantage. The sigil ends if you move more than 30 ft from the target or lose line of sight before attacking.'},
+  {name:'Resistance',origin:'D&D',cat:'Utility',rc:0,dur:'Conc., up to 1 min',
+   effect:'Touch a willing creature. Once before the sigil ends, they may roll 1d4 and add the result to one saving throw of their choice. They decide before or after rolling. Cannot be maintained alongside Guidance on the same target.'},
+  {name:'Blade Ward',origin:'D&D',cat:'Utility',rc:0,dur:'1 rnd',
+   effect:'Trace a sigil of warding. Until the end of your next turn, you have resistance to bludgeoning, piercing, and slashing damage dealt by weapon attacks. Takes your action. Cannot stack with other damage resistance from spells.'},
+  {name:'Vein Sense',origin:'Alas',cat:'Detection',rc:0,dur:'Instant',
+   effect:'Detect whether a Karanthian Vein is present within 300 ft, its approximate direction, and its saturation state (dormant, faint, steady, or strong). Does not reveal Corruption state. Returns nothing in Void-dead terrain or sealed underground chambers.'},
+  {name:'Sigil Sense',origin:'Alas',cat:'Detection',rc:0,dur:'1 rnd',
+   effect:'For 1 round, you become aware of whether any active sigil, spell, or maintained magical effect is present within 30 ft. You learn only that something is being held — not its nature, origin, or caster. Functions through walls and solid obstacles.'},
+  {name:'Scar Echo',origin:'Alas',cat:'Detection',rc:0,dur:'Instant',
+   effect:'Touch a surface, object, or structure. Sense the emotional resonance of the last event that left a magical or violent impression on it — within the past 7 days. You receive a brief sensory impression (sight, sound, or feeling), not a complete memory. No information on identity.'},
+  {name:'Mark of Intent',origin:'Alas',cat:'Social',rc:0,dur:'24 hr',
+   effect:'Speak a short declaration (up to 10 words) and touch an object, door, or threshold. The words bind to it as a faint resonance impression — readable by any creature that touches the surface and concentrates for 6 seconds. No literacy required. Fades after 24 hours or when the object is destroyed.'},
+  {name:'Candor Read',origin:'Alas',cat:'Social',rc:0,dur:'Instant',
+   effect:'Focus on one creature within 15 ft that is speaking. You sense whether the creature believes what it is saying — not whether it is true, only whether it believes it to be. Returns no result on constructs, undead, or creatures immune to charm. DC 15 WIS save negates if the target is aware of your attention.'},
+  {name:'Tongue Touch',origin:'Alas',cat:'Social',rc:0,dur:'1 min',
+   effect:'Touch a written document or inscription. For 1 minute you can read it as though it were written in a language you know, provided it is written in a language that exists in Alas. Does not decode ciphers, magic scripts, or Void-corrupted text. Cannot be used to speak or write the language — reading only.'},
+  {name:'Drift Step',origin:'Alas',cat:'Utility',rc:0,dur:'1 rnd',
+   effect:'Your footsteps make no sound until the start of your next turn. Objects you touch and carry make no contact sound. Does not suppress rustling clothing, breathing, or speech. Grants no bonus to Stealth checks — it simply removes one source of noise.'},
+  {name:'Featherweight',origin:'Alas',cat:'Utility',rc:0,dur:'1 hr',
+   effect:'Touch one object weighing up to 50 lbs. For 1 hour it weighs as though it were one-tenth its actual mass for the purpose of carrying and lifting only. It remains full-weight for the purpose of impact, throwing range, and structural support. Cannot be cast on worn or carried weapons.'},
+  {name:'Preservation',origin:'Alas',cat:'Craft',rc:0,dur:'30 days',
+   effect:'Touch one object, food item, or written document up to 5 lbs. It is protected from natural decay, moisture, extreme temperatures, and insect damage for 30 days. Does not prevent magical damage or intentional physical destruction. Frequently used by scribes, merchants, and battlefield surgeons.'},
+  {name:'Glyph Mark',origin:'Alas',cat:'Craft',rc:0,dur:'Permanent',
+   effect:'Inscribe a personal resonance mark — invisible to mundane sight — on any surface or object you touch. The mark is readable by Resonance Read or Sigil Sense and identifies you as its author. You may have up to 5 active marks at once. Marks persist until dispelled or until the surface is destroyed.'},
+  {name:'Warmth',origin:'Alas',cat:'Craft',rc:0,dur:'8 hr',
+   effect:'Touch a creature or object. It radiates gentle warmth for 8 hours — enough to keep a creature comfortable in freezing temperatures (but not in supernaturally cold environments). Can be used to dry wet clothing, prevent hypothermia onset, or warm a meal. Does not deal damage.'},
+  {name:'Weight Read',origin:'Alas',cat:'Detection',rc:0,dur:'Instant',
+   effect:'Focus on a creature within 30 ft for 6 seconds. You sense the approximate weight of any objects they are carrying but not wearing — not individual items, only a vague sense of total carried mass: nothing / light / moderate / heavy / strained. Used by merchants, toll-keepers, and bounty hunters.'},
+  {name:'Disruption Knock',origin:'Alas',cat:'Combat',rc:0,dur:'Instant',
+   effect:'Release a short, focused resonance pulse through a melee touch attack (+prof, no damage mod). On hit: the target loses concentration on any sigil or spell they are currently maintaining. No damage. No Instability. Cannot be used against a creature immune to magical disruption. Does not work at range.'},
+  {name:'Dead Air',origin:'Alas',cat:'Utility',rc:0,dur:'1 min',
+   effect:'Create a 5-ft radius zone of sound-dampening resonance centered on a point you can see within 30 ft. Sounds originating inside the zone are inaudible outside it. Sounds from outside enter normally. Lasts 1 minute. A creature that moves out of the zone can be heard normally again. Cannot suppress Thaumaturgy or equivalent sigils.'},
+  {name:'Anchor',origin:'Alas',cat:'Utility',rc:0,dur:'1 rnd',
+   effect:'Touch one object weighing up to 100 lbs that is resting on a surface. It becomes immovable by non-magical means until the start of your next turn, or until you release it as a free action. Creatures attempting to move it must succeed on a STR check (DC 14). Useful for securing doors, pinning dropped weapons, or bracing structures.'},
+];
+
+const CANTRIP_CAT_COLORS = {
+  Utility:'#3dd6db', Social:'#c9a227', Detection:'#40c060', Combat:'#c82030', Craft:'#a060e0'
+};
+
+function hexToRgb(hex){
+  const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
+  return `${r},${g},${b}`;
+}
+
+function buildCantripList(){
+  const sec = document.getElementById('cantripSection');
+  if(!sec) return;
+  const cats = {};
+  CANTRIPS.forEach(c=>{ if(!cats[c.cat]) cats[c.cat]=[]; cats[c.cat].push(c); });
+  const catOrder = ['Combat','Detection','Social','Utility','Craft'];
+  let html = '';
+  catOrder.forEach(cat=>{
+    if(!cats[cat]) return;
+    const col = CANTRIP_CAT_COLORS[cat]||'var(--gold)';
+    html += `<div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:${col};text-transform:uppercase;padding:7px 0 5px;border-bottom:1px solid rgba(${hexToRgb(col)},.25);margin-bottom:8px;">${cat}</div>`;
+    cats[cat].forEach(c=>{
+      const originCol = c.origin==='Alas' ? 'var(--res)' : 'var(--gold)';
+      html += `<div style="background:rgba(${hexToRgb(col)},.04);border:1px solid rgba(${hexToRgb(col)},.18);border-radius:5px;padding:9px 12px;margin-bottom:7px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+          <span style="font-family:'Cinzel',serif;font-size:10px;color:var(--txt);letter-spacing:.5px;">${c.name}</span>
+          <span style="font-family:'Cinzel',serif;font-size:6.5px;padding:1px 6px;border:1px solid ${originCol};border-radius:3px;color:${originCol};letter-spacing:1px;">${c.origin}</span>
+          <span style="font-family:'Cinzel',serif;font-size:6.5px;padding:1px 6px;border:1px solid rgba(${hexToRgb(col)},.5);border-radius:3px;color:${col};letter-spacing:1px;">${cat}</span>
+          <span style="margin-left:auto;font-family:'EB Garamond',serif;font-size:11px;color:var(--txt-dim);">${c.dur}</span>
+          <span style="font-family:'Cinzel',serif;font-size:7px;padding:1px 7px;background:rgba(61,214,219,.08);border:1px solid rgba(61,214,219,.3);border-radius:3px;color:var(--res);">RC 0</span>
+        </div>
+        <div style="font-family:'EB Garamond',serif;font-size:12.5px;color:var(--txt-dim);line-height:1.5;">${c.effect}</div>
+      </div>`;
+    });
+  });
+  sec.innerHTML = html;
 }
 
 function buildDeathSaveBlips(){
@@ -14022,11 +14392,17 @@ function doRest(type){
   const hpCurEl=document.getElementById('hpCur');
   let msg='';
   if(type==='resonance'){
+    // Instability reset
     state.instability=0;
     document.getElementById('insVal').textContent=0;
     document.getElementById('insState').textContent='Stable';
     updateScarTiers();
-    msg='Resonance Rest — Instability reset to 0';
+    // Restore half RP (per PHB: Resonance Rest restores Instability AND ½ RP)
+    const rpRestore=Math.floor(rpMax/2);
+    const newRpRes=Math.min(rpMax,(parseInt(rpCurEl.value)||0)+rpRestore);
+    rpCurEl.value=newRpRes; state.rpCur=newRpRes;
+    updateBar('rp'); updateRpState();
+    msg=`Resonance Rest — Instability reset · +${rpRestore} Resonance restored`;
   } else if(type==='recovery'){
     const restore=Math.floor(rpMax/2);
     const newRp=Math.min(rpMax,(parseInt(rpCurEl.value)||0)+restore);
@@ -14257,6 +14633,10 @@ function updateRaceInfoPanel(){
   const panel=document.getElementById('raceInfoPanel');
   if(!race||!RACES[race]){panel.innerHTML='';return;}
   const r=RACES[race];
+  // Beastkin lineage sub-panel (injected after standard panel)
+  const lineageKey=document.getElementById('beastkinLineage')?.value||'';
+  const linData=(race==='Beastkin'&&lineageKey&&typeof BEASTKIN_LINEAGES!=='undefined')
+    ? BEASTKIN_LINEAGES[lineageKey] : null;
   panel.innerHTML=`
     <div class="sec-hdr">Racial Reference — ${race}</div>
     <div class="race-info-card">
@@ -14296,6 +14676,39 @@ function updateRaceInfoPanel(){
       </div>
     </div>
   `;
+  // Beastkin lineage panel (injected after base race panel)
+  if(linData){
+    panel.innerHTML += `
+      <div class="race-info-card" style="margin-top:10px;border-color:rgba(61,214,219,.3);background:rgba(61,214,219,.04);">
+        <div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--res);text-transform:uppercase;margin-bottom:8px;">
+          ◈ ${lineageKey} · Thrael Name: ${linData.thrael}
+        </div>
+        <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--gold);margin-bottom:8px;">"${linData.essence}"</div>
+        <div class="ri-stats" style="margin-bottom:8px;">
+          <div class="ri-stat"><div class="ri-stat-n">ASI</div><div class="ri-stat-v" style="font-size:9px;">${linData.asi}</div></div>
+          <div class="ri-stat"><div class="ri-stat-n">Speed</div><div class="ri-stat-v">${linData.speed} ft.</div></div>
+          <div class="ri-stat"><div class="ri-stat-n">Hit Die</div><div class="ri-stat-v">${linData.hitDie}</div></div>
+          <div class="ri-stat"><div class="ri-stat-n">Base HP</div><div class="ri-stat-v">${linData.baseHP}+CON</div></div>
+        </div>
+        <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--txt-dim);margin-bottom:3px;">NATURAL WEAPON</div>
+        <div style="font-family:'EB Garamond',serif;font-size:12px;margin-bottom:8px;">${linData.weapon} <span style="color:var(--txt-dim);font-size:11px;">(scales 1d6 L6 · 1d8 L11 · 1d10 L16)</span></div>
+        <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--txt-dim);margin-bottom:3px;">DARKVISION</div>
+        <div style="font-family:'EB Garamond',serif;font-size:12px;margin-bottom:8px;">${linData.darkvision}</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--txt-dim);">PRIMARY SIGIL:</span>
+          <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--res);">${linData.primarySigil}</span>
+          <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--txt-dim);margin-left:8px;">SECONDARY:</span>
+          <span style="font-family:'EB Garamond',serif;font-size:12px;color:var(--gold);">${linData.secondarySigil}</span>
+        </div>
+        <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--txt-dim);margin-bottom:5px;">LINEAGE TRAITS</div>
+        <ul class="ri-traits">${linData.traits.map(t=>`<li>${t}</li>`).join('')}</ul>
+        <div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;color:var(--txt-dim);margin:6px 0 3px;">AVAILABLE BIOMES</div>
+        <div style="font-family:'EB Garamond',serif;font-size:12px;color:var(--txt-dim);">${linData.biomes.join(' · ')}</div>
+      </div>
+    `;
+  } else if(race==='Beastkin'){
+    panel.innerHTML += `<div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);padding:8px 0;">Select a Beastkin Lineage above to view lineage-specific traits and stats.</div>`;
+  }
   // Also update the Attributes tab Alas Heavy card
   const ahCard = document.getElementById('alasHeavyCombat');
   if(ahCard){
@@ -25003,6 +25416,11 @@ function restoreSimpleInputs(){
   // Restore alternate movement speeds
   ['swimSpeed','flySpeed','climbSpeed','burrowSpeed'].forEach(id=>{const el=document.getElementById(id);if(el&&state[id]!==undefined)el.value=state[id];});
   const asSel = document.getElementById('attunedSigil'); if(asSel){ asSel.value = state.attunedSigil||''; renderAttunedSigilPanel(state.attunedSigil||''); }
+  // Restore race-specific sub-selectors
+  const blSel=document.getElementById('beastkinLineage');
+  if(blSel && state.beastkinLineage) blSel.value=state.beastkinLineage;
+  const blRow=document.getElementById('beastkinLineageRow');
+  if(blRow) blRow.style.display=(state.race==='Beastkin')?'block':'none';
 }
 
 // window load handler moved to DOMContentLoaded restructure above
@@ -27537,6 +27955,7 @@ function executeGemCombine(force){
 // Build gem tab on first switch
 document.addEventListener('DOMContentLoaded', ()=>{
   setTimeout(()=>{ if(typeof buildGemTab==='function') buildGemTab(); }, 200);
+  setTimeout(()=>{ if(typeof buildCantripList==='function') buildCantripList(); }, 250);
 });
 
 // ─── SAVE ON EXIT ────────────────────────────────────────────────────────────
@@ -27629,24 +28048,65 @@ function clearSheet(){
   state = {};
   ensureStateDefaults();
   _debouncedSave();
+  // Clear dynamic card lists
   ['inventoryList','sigilsList','featuresList','abilitiesList','setsList','activeEffectsList'].forEach(id=>{
     const el=document.getElementById(id);if(el)el.innerHTML='';
   });
   const compTab=document.getElementById('companionsTabContent');
   if(compTab){compTab.innerHTML=''; companionsBuilt=false;}
+  // Restore simple inputs to blank defaults from empty state
   restoreSimpleInputs();
+  // Reset biome dropdown (dynamically populated, not covered by restoreSimpleInputs)
+  const biomeEl=document.getElementById('charBiome');
+  if(biomeEl) biomeEl.innerHTML='<option value="">— Select Race —</option>';
+  // Hide race-specific sub-selectors
+  const blRow=document.getElementById('beastkinLineageRow');
+  if(blRow) blRow.style.display='none';
+  const blSel=document.getElementById('beastkinLineage');
+  if(blSel) blSel.value='';
+  const dbRow=document.getElementById('drakonianBreathRow');
+  if(dbRow) dbRow.style.display='none';
+  const dbSel=document.getElementById('drakonianBreath');
+  if(dbSel) dbSel.value='';
+  // Rebuild stat grids
   buildAbilityGrid();buildSavesGrid();buildSkillsGrid();
   buildExhaustionPips();buildDeathSaveBlips();buildScarTiers();
   updateBar('hp');updateBar('rp');updateRpState();
-  if(document.getElementById('insVal')) document.getElementById('insVal').textContent='0';
-  if(document.getElementById('corVal')) document.getElementById('corVal').textContent='0';
-  // Clear biome display and mechanics
+  // Reset tracker displays fully
+  const insV=document.getElementById('insVal'); if(insV) insV.textContent='0';
+  const insS=document.getElementById('insState'); if(insS) insS.textContent=getTrackerState(0,INS_STATES);
+  const corV=document.getElementById('corVal'); if(corV) corV.textContent='0';
+  const corS=document.getElementById('corState'); if(corS) corS.textContent=getTrackerState(0,COR_STATES);
+  // Clear race/class/background display panels
+  const racePanel=document.getElementById('raceInfoPanel'); if(racePanel) racePanel.innerHTML='';
+  if(typeof updateRacialTraitsDisplay==='function') updateRacialTraitsDisplay();
+  if(typeof buildRacialSkillsDisplay==='function') buildRacialSkillsDisplay();
+  if(typeof updateClassDisplay==='function') updateClassDisplay();
+  if(typeof buildClassSigilDisplay==='function') buildClassSigilDisplay();
+  if(typeof buildClassProgressionDisplay==='function') buildClassProgressionDisplay();
+  if(typeof buildBackgroundDisplay==='function') buildBackgroundDisplay();
+  if(typeof buildLoreTab==='function') buildLoreTab();
+  if(typeof buildLangGrid==='function') buildLangGrid();
+  // Reset factions to defaults
+  state.factions = (typeof DEFAULT_FACTIONS!=='undefined') ? DEFAULT_FACTIONS.map(n=>({name:n,rep:0})) : [];
+  if(typeof buildFactionsGrid==='function') buildFactionsGrid();
+  // Clear biome mechanics
   const biomePnl = document.getElementById('biomeBonusPanel');
   if(biomePnl) biomePnl.innerHTML='';
   state._biomeInitBonus=0; state._biomePerceptionBonus=0;
   state._biomeSocialBonus=0; state._biomeWaterSigilRC=0; state._biomeFireSigilRC=0;
-  if(typeof renderSpellList   === 'function') renderSpellList();   // FIX: clear spell list on New Character
-  if(typeof renderAbilityList === 'function') renderAbilityList(); // FIX: clear ability list on New Character
+  // Refresh all computed displays
+  if(typeof updateCalcs==='function') updateCalcs();
+  if(typeof updateArmorAC==='function') updateArmorAC();
+  if(typeof updateScarTiers==='function') updateScarTiers();
+  if(typeof updateEpDesc==='function') updateEpDesc();
+  if(typeof renderEquipSlots==='function') renderEquipSlots();
+  if(typeof renderSpellList==='function') renderSpellList();
+  if(typeof renderAbilityList==='function') renderAbilityList();
+  if(typeof renderActiveEffectsList==='function') renderActiveEffectsList();
+  if(typeof updateEffectsRpBadge==='function') updateEffectsRpBadge();
+  if(typeof updateSpellLimitDisplay==='function') updateSpellLimitDisplay();
+  if(typeof updateAbilityLimitDisplay==='function') updateAbilityLimitDisplay();
 }
 
 function _loadStateObject(loaded){
@@ -29500,9 +29960,9 @@ function copyReport(){
                                         <div class="dms-action"><div class="dms-act-name">REACTION</div><div class="dms-act-desc">Opportunity Attack (leave melee without Disengaging), Shield Sigil, Parry, class reactions.</div></div>
                                         <div class="dms-action"><div class="dms-act-name">OPPORTUNITY ATTACK</div><div class="dms-act-desc">Triggered when hostile leaves your melee reach without Disengaging. One melee attack as reaction.</div></div>
                                         <div class="dms-action"><div class="dms-act-name">GRAPPLE / SHOVE</div><div class="dms-act-desc">Attack action. Contested STR (Athletics) vs STR/DEX (Athletics/Acrobatics). Grapple = Speed 0. Shove = 5 ft. or prone.</div></div>
-                                        <div class="dms-action"><div class="dms-act-name">RESONANCE REST</div><div class="dms-act-desc">1 hour. Instability resets. RP partially restored (half). Does not restore HP.</div></div>
-                                        <div class="dms-action"><div class="dms-act-name">SHORT REST</div><div class="dms-act-desc">1 hour. Spend Hit Dice to recover HP. RP +½ max. Instability −1 (minimum 0).</div></div>
-                                        <div class="dms-action"><div class="dms-act-name">LONG REST</div><div class="dms-act-desc">8 hours. HP and RP fully restored. Instability resets. Exhaustion −1. Scar review.</div></div>
+                                        <div class="dms-action"><div class="dms-act-name">RESONANCE REST (1 hr)</div><div class="dms-act-desc">1 hour. Instability resets to 0. RP restored by ½ max. Does not restore HP. Use after high-Instability casts.</div></div>
+                                        <div class="dms-action"><div class="dms-act-name">RECOVERY REST (4 hr)</div><div class="dms-act-desc">4 hours. RP +½ max. Exhaustion −1. Does not restore HP. No Instability reset.</div></div>
+                                        <div class="dms-action"><div class="dms-act-name">DEEP REST (8 hr)</div><div class="dms-act-desc">8 hours. HP and RP fully restored. Instability resets. Exhaustion −2. Scar tier review. Corruption check if Unstable casts during rest.</div></div>
                                     </div>
                                 </div>
 
