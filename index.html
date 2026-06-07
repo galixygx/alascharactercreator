@@ -13485,7 +13485,7 @@ function addActiveEffect(data){
   card.dataset.effectType = effectType;
 
   card.innerHTML = `
-    <button class="c-remove" onclick="this.parentElement.remove();${save};updateCalcs();updateEffectsRpBadge();updateEffectsHeader()">×</button>
+    <button class="c-remove" onclick="_animRemoveCard(this,()=>{${save};updateCalcs();updateEffectsRpBadge();updateEffectsHeader()})">×</button>
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
       <span style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;">Effect Type</span>
       <button type="button" class="sp-pill ae-type-btn${!isPassive?' sp-atk-on':''}" data-etype="active"
@@ -15240,7 +15240,7 @@ function addSpell(data){
   }
 
   card.innerHTML = `
-    <button class="c-remove" onclick="this.parentElement.remove();saveCards('sigilsList','sigils')">×</button>
+    <button class="c-remove" onclick="_animRemoveCard(this,()=>saveCards('sigilsList','sigils'))">×</button>
 
     <!-- Row 1: Identity -->
     <div class="c-row" style="grid-template-columns:2fr 1fr 80px 80px 80px">
@@ -15698,7 +15698,7 @@ function addAbility(data){
   const abAeStats= (()=>{ try{ return data.aeStats?JSON.parse(data.aeStats):{} }catch(e){return{}} })();
 
   card.innerHTML = `
-    <button class="c-remove" onclick="this.parentElement.remove();saveCards('abilitiesList','abilities')">×</button>
+    <button class="c-remove" onclick="_animRemoveCard(this,()=>saveCards('abilitiesList','abilities'))">×</button>
 
     <!-- Row 1: Identity -->
     <div class="c-row c-4col ab-card-row">
@@ -16646,7 +16646,7 @@ function addFeature(data){
   const card=document.createElement('div');
   card.className='item-card';
   card.innerHTML=`
-    <button class="c-remove" onclick="this.parentElement.remove();saveCards('featuresList','features')">×</button>
+    <button class="c-remove" onclick="_animRemoveCard(this,()=>saveCards('featuresList','features'))">×</button>
     <div class="c-row c-3col">
       <div class="c-fld"><span class="c-fld-lbl">Name</span><input class="c-inp" value="${data.name||''}" placeholder="Feature / Action…" oninput="saveCards('featuresList','features')"></div>
       <div class="c-fld"><span class="c-fld-lbl">Source</span><input class="c-inp" value="${data.source||''}" placeholder="Class / Race / Item…" oninput="saveCards('featuresList','features')"></div>
@@ -16666,7 +16666,7 @@ function addInventory(data){
   const SLOT_OPTS = ['none','Head','Body','Hands','Legs','Feet','Ring 1','Ring 2','Ring 3','Ring 4','Ring 5','Necklace','Earring L','Earring R','Bracelet L','Bracelet R'];
   const slotOptions = SLOT_OPTS.map(s=>`<option value="${s}"${(data.slot||'none')===s?' selected':''}>${s==='none'?'No Slot':s}</option>`).join('');
   card.innerHTML=`
-    <button class="c-remove" onclick="this.parentElement.remove();renderEquipSlots();updateArmorAC();saveCards('inventoryList','inventory')">×</button>
+    <button class="c-remove" onclick="_animRemoveCard(this,()=>{renderEquipSlots();updateArmorAC();saveCards('inventoryList','inventory')})">×</button>
     <div class="c-row c-4col">
       <div class="c-fld"><span class="c-fld-lbl">Item</span><input class="c-inp" value="${data.name||''}" placeholder="Item name…" oninput="saveCards('inventoryList','inventory')"></div>
       <div class="c-fld"><span class="c-fld-lbl">Qty</span><input class="c-inp inv-qty" type="number" value="${data.qty||1}" min="0" oninput="saveCards('inventoryList','inventory')"></div>
@@ -19126,7 +19126,7 @@ function addSet(data){
     `<option value="${i+2}"${(i+2===totalPieces)?' selected':''}>${i+2} Pieces</option>`).join('');
 
   card.innerHTML=`
-    <button class="c-remove" onclick="this.parentElement.remove();updateCalcs();updateArmorAC();saveSets()" title="Remove Set">×</button>
+    <button class="c-remove" onclick="_animRemoveCard(this,()=>{updateCalcs();updateArmorAC();saveSets()})" title="Remove Set">×</button>
 
     <!-- ── SET HEADER ── -->
     <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--bdr-g);">
@@ -19387,6 +19387,19 @@ function saveSets(){
   });
   state.sets=sets;
   _debouncedSave();
+}
+
+// Animation bug fix — wires up the previously-orphaned .card-removing /
+// @keyframes cardRemove (defined in CSS as "U04 — brief flash on removal")
+// so cards fade+slide out instead of vanishing instantly when deleted.
+function _animRemoveCard(btn, afterFn){
+  var card = btn ? btn.parentElement : null;
+  if(!card){ if(afterFn) afterFn(); return; }
+  card.classList.add('card-removing');
+  setTimeout(function(){
+    card.remove();
+    if(afterFn) afterFn();
+  }, 220);
 }
 
 function saveCards(listId, stateKey){
@@ -33414,8 +33427,13 @@ function kpInjectConditionsIntoCards(){
       var v = parseInt(inp.value)||0;
       inp.value = Math.max(0, v - 1);
       inp.dispatchEvent(new Event('input'));
-      if(isHP && v > 0) inp.classList.add('hp-damage-num');
-      setTimeout(function(){ inp.classList.remove('hp-damage-num'); }, 600);
+      if(isHP && v > 0){
+        // Force-restart the flash animation (matches pattern used elsewhere —
+        // without remove+reflow, rapid clicks no-op on an already-applied class)
+        inp.classList.remove('hp-damage-num'); void inp.offsetWidth; inp.classList.add('hp-damage-num');
+        clearTimeout(inp._dmgFlashT);
+        inp._dmgFlashT = setTimeout(function(){ inp.classList.remove('hp-damage-num'); }, 600);
+      }
     });
     plus.addEventListener('click', function(){
       var max = parseInt(document.getElementById(type+'Max').value)||999;
