@@ -22693,12 +22693,17 @@ function dieKeyToSides(k){
 // initDice3DButton, diceAnimate, syncDice3DFromState, rollSelected3DDie):
 //   1. The default, normal-case behavior MUST remain a live, rotating,
 //      shader-shaded Three.js WebGL die — exactly as built here.
-//   2. The flat 2D fallback (_renderFlatDiceFace / _showFlatRollResult /
-//      window._alasSettings.flatDice) exists ONLY as a last-resort fallback
-//      for (a) the user explicitly enabling "Disable 3D Dice" in Settings,
-//      or (b) a genuine WebGL/THREE failure on the device. It must never
-//      become the default, and must never be widened to trigger in cases
-//      where the 3D path would have worked.
+//   2. The flat 2D fallback (_renderFlatDiceFace / _showFlatRollResult)
+//      exists ONLY as a last-resort fallback for a genuine WebGL/THREE
+//      failure on the device (or THREE still loading — see the retry in
+//      initDice3DButton). It must never become the default.
+//      NOTE: `window._alasSettings.flatDice` ("Disable 3D Dice" in Settings)
+//      is now PERMANENTLY force-reset to `false` and ignored everywhere
+//      (loadSettings/applySettings/initDice3DButton/diceAnimate/
+//      rollSelected3DDie) — wiring it up live on 2026-06-07 caused the
+//      stuck-flat-mode regression reported twice as "still fucked up".
+//      DO NOT make this setting affect the dice again without an explicit,
+//      specific user request — see the long comment at initDice3DButton().
 //   3. Do NOT delete, comment out, replace, or functionally neuter the
 //      WebGL render path (THREE.Scene/Camera/WebGLRenderer/diceAnimate
 //      render loop) without an explicit, specific user request to do so
@@ -22798,15 +22803,16 @@ function diceBuildGeometry(sides){
 
 // PROTECTED — DO NOT REMOVE: this is the live render loop for the rotating
 // 3D die. Keep `requestAnimationFrame(diceAnimate)` as the unconditional
-// first line — the loop must always keep ticking so 3D resumes instantly
-// the moment dice3dInited/flatDice flip back to the normal (3D) state.
+// first line — the loop must always keep ticking and rendering whenever the
+// WebGL scene is initialized. UNCONDITIONAL — no settings flag may gate
+// this render call. (A "Disable 3D Dice" setting was wired in here on
+// 2026-06-07 and immediately caused a stuck-flat-mode regression that the
+// user reported as "still fucked up" twice — REMOVED. Do not re-add a
+// flatDice/setting-based early-return here without an explicit, specific
+// user request to do so.)
 // See the big guard comment above `let dice3dInited` for full context.
 function diceAnimate(){
   requestAnimationFrame(diceAnimate);
-  // Honor "Disable 3D Dice" — skip the actual WebGL render (the expensive part)
-  // so the setting genuinely cuts GPU load as its description promises, while
-  // staying ready to resume instantly if the setting is switched back off.
-  if(window._alasSettings && window._alasSettings.flatDice) return;
   if(!dice3dInited || !diceShellMaterial || !diceRenderer || !diceScene || !diceCamera) return;
   diceShellMaterial.uniforms.time.value += 0.01;
   diceDieGroup.rotation.x += 0.01;
@@ -24758,10 +24764,29 @@ function _bindDiceButtonRoll(diceContainer){
 // The WebGL/Three.js scene setup below MUST remain the default path that
 // runs whenever THREE is loaded, WebGL works, and the user has NOT opted
 // into flat mode via Settings. The `_renderFlatDiceFace` branches exist
-// ONLY as narrowly-scoped fallbacks (explicit "Disable 3D Dice" setting, or
-// genuine WebGL init failure) — never widen them, never make them default.
+// ONLY as a narrowly-scoped, last-resort fallback for a genuine WebGL/THREE
+// failure on the device — never widen it, never make it default, and NEVER
+// gate it behind a settings toggle (that exact change — wiring "Disable 3D
+// Dice" into this function on 2026-06-07 — caused a stuck-flat regression
+// reported twice as "still fucked up"; it has been REMOVED, see below).
 // See the big guard comment above `let dice3dInited` (~line 22672) for the
 // full "NEVER take away the 3D unless SPECIFICALLY prompted" instruction.
+//
+// REMOVED 2026-06-07: a `window._alasSettings.flatDice` check used to live
+// here (and in diceAnimate/rollSelected3DDie) wiring up the "Disable 3D
+// Dice" Settings toggle. That toggle had been *dead* (saved but never read)
+// since launch — wiring it live retroactively activated a stale/stray
+// `flatDice:true` already sitting in users' saved settings, instantly and
+// silently swapping their rotating 3D die for the flat ⚄ fallback with no
+// way for them to know why. A follow-up "one-time migration" attempt to
+// reset that stale value did NOT fully resolve it (the setting kept getting
+// re-saved as true via applySettings() reading a stale checkbox state).
+// Conclusion: this setting is NOT safe to wire up without a much more
+// careful design — DO NOT re-enable it without an explicit user request.
+// The sidebar 3D die now ALWAYS renders in 3D (matching pre-2026-06-07
+// behavior exactly), with the flat face reserved purely for genuine WebGL
+// construction failures below.
+let _diceThreeRetries = 0;
 function initDice3DButton(){
   const diceContainer = document.getElementById('diceButton3D');
   if(!diceContainer) return;
@@ -24770,16 +24795,24 @@ function initDice3DButton(){
   // is functional even if 3D setup below fails or is skipped entirely.
   _bindDiceButtonRoll(diceContainer);
 
-  const wantsFlat = !!(window._alasSettings && window._alasSettings.flatDice);
-
-  if(wantsFlat || typeof THREE === 'undefined'){
+  if(typeof THREE === 'undefined'){
+    // THREE may simply not have finished loading yet (deferred CDN script
+    // racing window 'load') — retry a few times before concluding it's a
+    // genuine failure. Prevents a transient timing hiccup from permanently
+    // parking the button in flat mode for the rest of the session.
+    if(_diceThreeRetries < 20){
+      _diceThreeRetries++;
+      setTimeout(initDice3DButton, 150);
+      return;
+    }
     dice3dInited = false;
-    diceContainer.classList.remove('flat-mode'); // reset before re-render so re-toggling refreshes label
+    diceContainer.classList.remove('flat-mode');
     _renderFlatDiceFace(diceContainer);
     return;
   }
+  _diceThreeRetries = 0;
 
-  // Coming back from flat mode → rebuild the WebGL scene fresh
+  // Coming back from a flat-fallback render → rebuild the WebGL scene fresh
   if(diceContainer.classList.contains('flat-mode')){
     diceContainer.classList.remove('flat-mode');
     diceContainer.innerHTML = '';
@@ -24899,13 +24932,12 @@ function rollSelected3DDie(sides, forcedRaw, total){
 
   const displayValue = (total !== undefined && total !== null && !Number.isNaN(Number(total))) ? Number(total) : result;
 
-  // Honor "Disable 3D Dice" — skip the full-screen 3D roll animation entirely
-  // and show the flat number instead (this is the GPU-saving behavior the
-  // setting's description promises, and previously did nothing at all).
-  if(window._alasSettings && window._alasSettings.flatDice){
-    _showFlatRollResult(displayValue);
-    return;
-  }
+  // PROTECTED — DO NOT gate the full-screen 3D roll animation behind the
+  // "Disable 3D Dice" settings flag. That wiring (added/removed 2026-06-07)
+  // is what caused the rotating-3D-dice regression — see the long comment
+  // above initDice3DButton(). The 3D roll animation always plays; the flat
+  // result (_showFlatRollResult) remains purely a last-resort fallback for
+  // genuine WebGL/THREE failure, handled a few lines below via `!renderer`.
 
   const rollLayer = document.createElement('div');
   rollLayer.style.position = 'fixed';
@@ -26063,17 +26095,22 @@ function loadSettings(){
     // First visit: VTT off by default for performance
     if(!s){ s = { vttOff: true }; }
     else if(s.vttOff === undefined){ s.vttOff = true; }
-    // ONE-TIME MIGRATION: "Disable 3D Dice" was a dead toggle (saved to
-    // settings but never actually wired to anything) until just now. Anyone
-    // who ever clicked it saw zero effect and had no reason to click it back
-    // off — so a stray `flatDice:true` could be sitting in their saved
-    // settings completely unnoticed. Now that the setting actually works,
-    // that stale value would suddenly (and unexpectedly) replace the
-    // rotating 3D die with the flat fallback. Force it back to its true
-    // default — off — exactly once, so the dice displays exactly as it
-    // always visually did. Anyone who wants the flat-dice mode can simply
-    // re-enable it in Settings, where it now genuinely works.
-    if(!s._flatDiceMigrated){ s.flatDice = false; s._flatDiceMigrated = true; }
+    // PERMANENT OVERRIDE — DO NOT REMOVE (see "PROTECTED" guard above
+    // `let dice3dInited`, ~line 22672, and at initDice3DButton()).
+    // "Disable 3D Dice" was a dead toggle for the sidebar/roll dice (saved
+    // to settings, never read) until 2026-06-07, when wiring it up live
+    // retroactively activated stray `flatDice:true` values already sitting
+    // unnoticed in users' saved settings — instantly and silently swapping
+    // their rotating 3D die for a flat ⚄ icon. A one-time migration to
+    // reset that stale value did NOT fully resolve it (re-saves through
+    // applySettings() kept restoring `true`). Rather than keep chasing that
+    // rabbit hole, the setting's effect on the dice has been removed
+    // entirely (see initDice3DButton/diceAnimate/rollSelected3DDie) AND is
+    // force-reset to `false` here on every load, permanently, so no stored
+    // value — old, new, or future — can ever again cause the dice to render
+    // in flat mode. The dice now always renders in 3D, exactly as it always
+    // did before 2026-06-07.
+    s.flatDice = false;
     window._alasSettings = s;
     try{ localStorage.setItem('alas_settings_v1', JSON.stringify(s)); }catch(_e){}
   } catch(e){ window._alasSettings = { vttOff: true }; }
@@ -26097,18 +26134,20 @@ function applySettings(){
   var g = function(id){ var e=document.getElementById(id); return e ? e.checked : false; };
   s.vttOff     = g('sVttOff');
   s.lowAnim    = g('sLowAnim');
-  s.flatDice   = g('sFlatDice');
+  // PERMANENT — DO NOT read/persist `sFlatDice` into `s.flatDice` here.
+  // This is what re-broke the rotating 3D dice: the checkbox could end up
+  // checked (stale UI state, browser autofill, etc.) and this line would
+  // immediately re-save `flatDice:true`, undoing the force-reset in
+  // loadSettings() and silently flipping the dice back to flat mode. The
+  // dice no longer reads this setting at all (see initDice3DButton /
+  // diceAnimate / rollSelected3DDie) — keep it permanently inert.
+  s.flatDice   = false;
   s.lowMap     = g('sLowMap');
   s.compact    = g('sCompact');
   s.hiContrast = g('sHiContrast');
   try{ localStorage.setItem('alas_settings_v1', JSON.stringify(s)); } catch(e){}
   _applySettingsDOM();
-  // BUGFIX: "Disable 3D Dice" was saved to settings but never actually applied
-  // anywhere — toggling it had zero effect on the sidebar button or roll
-  // animation. Re-render the sidebar dice button immediately so the change
-  // is visible without a page reload (rollSelected3DDie reads the live
-  // setting itself, so no extra wiring needed there).
-  if(typeof initDice3DButton === 'function') initDice3DButton();
+  _syncSettingsUI();
   // If VTT is active tab and user just turned it off, show placeholder
   var activePanel = document.querySelector('#tab-vtt.active');
   if(s.vttOff && activePanel){ showVttDisabledMsg(); }
