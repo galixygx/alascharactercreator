@@ -26006,7 +26006,19 @@ function loadSettings(){
     // First visit: VTT off by default for performance
     if(!s){ s = { vttOff: true }; }
     else if(s.vttOff === undefined){ s.vttOff = true; }
+    // ONE-TIME MIGRATION: "Disable 3D Dice" was a dead toggle (saved to
+    // settings but never actually wired to anything) until just now. Anyone
+    // who ever clicked it saw zero effect and had no reason to click it back
+    // off — so a stray `flatDice:true` could be sitting in their saved
+    // settings completely unnoticed. Now that the setting actually works,
+    // that stale value would suddenly (and unexpectedly) replace the
+    // rotating 3D die with the flat fallback. Force it back to its true
+    // default — off — exactly once, so the dice displays exactly as it
+    // always visually did. Anyone who wants the flat-dice mode can simply
+    // re-enable it in Settings, where it now genuinely works.
+    if(!s._flatDiceMigrated){ s.flatDice = false; s._flatDiceMigrated = true; }
     window._alasSettings = s;
+    try{ localStorage.setItem('alas_settings_v1', JSON.stringify(s)); }catch(_e){}
   } catch(e){ window._alasSettings = { vttOff: true }; }
   _applySettingsDOM();
   _syncSettingsUI();
