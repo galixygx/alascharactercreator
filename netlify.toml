@@ -37,12 +37,18 @@
 
 # ── Redirects ─────────────────────────────────────────────
 
-# Redirect bare domain to www  (or flip — pick one)
-[[redirects]]
-  from   = "https://alascharactercreator.com/*"
-  to     = "https://www.alascharactercreator.com/:splat"
-  status = 301
-  force  = true
+# NOTE: Do NOT add a www↔bare-domain redirect rule here.
+# Netlify's site settings already define "alascharactercreator.com" as the
+# Custom (primary) domain and "www.alascharactercreator.com" as a Domain
+# alias — Netlify automatically redirects the alias to the primary domain.
+# A `[[redirects]]` rule here that forces the *opposite* direction
+# (bare → www) fights that built-in behavior and creates an infinite
+# 301 redirect loop (alascharactercreator.com → www → alascharactercreator.com → ...),
+# making the entire live site unreachable ("ERR_TOO_MANY_REDIRECTS").
+# This was confirmed live via curl on 2026-06-07 — both the bare domain and
+# the www subdomain were redirecting to each other in an endless loop.
+# If you ever want to change the canonical domain, change it in
+# Site settings → Domain management on Netlify — not here.
 
 # Serve index.html for every path (single-page app)
 [[redirects]]
