@@ -10929,6 +10929,20 @@
         </div>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════════════════════
+         ⚠️  PROTECTED — DO NOT REMOVE OR DISABLE  ⚠️
+         This loads Three.js, which powers the rotating 3D dice (sidebar
+         button + full-screen roll animation). The user has EXPLICITLY and
+         EMPHATICALLY instructed (2026-06-07): "NEVER take away the 3D unless
+         SPECIFICALLY prompted" and to "EMBED INTO CODE to NEVER ALLOW
+         THREE.JS to be UNWRITTEN unless PROMPTED."
+         Do NOT delete this tag, change it to a flat/2D fallback-only mode,
+         gate it behind a default-on "lite mode", or otherwise reduce/remove
+         the 3D rendering path UNLESS the user explicitly and specifically
+         asks for that exact change in this conversation. See matching guard
+         comments at createDiceShellMaterial(), initDice3DButton(), and
+         diceAnimate() (search "PROTECTED — DO NOT REMOVE").
+         ═══════════════════════════════════════════════════════════════════ -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js" defer></script>
     <script>// ═══════════════════════════════════════════════════
 // DATA
@@ -22668,6 +22682,36 @@ function dieKeyToSides(k){
   return DICE_MAX[k] || 20;
 }
 
+// ═══════════════════════════════════════════════════════════════════════
+// ⚠️  PROTECTED — DO NOT REMOVE OR DISABLE THE 3D DICE  ⚠️
+//
+// User instruction (verbatim, 2026-06-07): "NEVER take away the 3D unless
+// SPECIFICALLY prompted and then EMBED INTO CODE to NEVER ALLOW THREE.JS
+// to be UNWRITTEN unless PROMPTED."
+//
+// Rules for ANY future edit to this section (createDiceShellMaterial,
+// initDice3DButton, diceAnimate, syncDice3DFromState, rollSelected3DDie):
+//   1. The default, normal-case behavior MUST remain a live, rotating,
+//      shader-shaded Three.js WebGL die — exactly as built here.
+//   2. The flat 2D fallback (_renderFlatDiceFace / _showFlatRollResult /
+//      window._alasSettings.flatDice) exists ONLY as a last-resort fallback
+//      for (a) the user explicitly enabling "Disable 3D Dice" in Settings,
+//      or (b) a genuine WebGL/THREE failure on the device. It must never
+//      become the default, and must never be widened to trigger in cases
+//      where the 3D path would have worked.
+//   3. Do NOT delete, comment out, replace, or functionally neuter the
+//      WebGL render path (THREE.Scene/Camera/WebGLRenderer/diceAnimate
+//      render loop) without an explicit, specific user request to do so
+//      in the live conversation — a refactor, "cleanup", or unrelated bug
+//      fix is NOT sufficient justification.
+//   4. If you need to debug "the dice looks broken," first verify the site
+//      itself is reachable (check for redirect loops / deploy issues —
+//      see netlify.toml history, commit 5d07f6c) before assuming the
+//      Three.js code is at fault. A 2026-06-07 "still fucked up" report
+//      turned out to be an infinite www<->bare-domain redirect loop making
+//      the entire live site unreachable, NOT a dice rendering bug — the
+//      dice code was correct and deployed the whole time.
+// ═══════════════════════════════════════════════════════════════════════
 // ─── Three.js 3D die (sidebar) ───
 let dice3dInited = false;
 let diceScene, diceCamera, diceRenderer, diceDieGroup, diceDieMesh, diceShellMaterial;
@@ -22752,6 +22796,11 @@ function diceBuildGeometry(sides){
   diceAddDragonEye(diceDieGroup);
 }
 
+// PROTECTED — DO NOT REMOVE: this is the live render loop for the rotating
+// 3D die. Keep `requestAnimationFrame(diceAnimate)` as the unconditional
+// first line — the loop must always keep ticking so 3D resumes instantly
+// the moment dice3dInited/flatDice flip back to the normal (3D) state.
+// See the big guard comment above `let dice3dInited` for full context.
 function diceAnimate(){
   requestAnimationFrame(diceAnimate);
   // Honor "Disable 3D Dice" — skip the actual WebGL render (the expensive part)
@@ -24705,6 +24754,14 @@ function _bindDiceButtonRoll(diceContainer){
   });
 }
 
+// PROTECTED — DO NOT REMOVE OR ALTER THE 3D-FIRST BEHAVIOR OF THIS FUNCTION.
+// The WebGL/Three.js scene setup below MUST remain the default path that
+// runs whenever THREE is loaded, WebGL works, and the user has NOT opted
+// into flat mode via Settings. The `_renderFlatDiceFace` branches exist
+// ONLY as narrowly-scoped fallbacks (explicit "Disable 3D Dice" setting, or
+// genuine WebGL init failure) — never widen them, never make them default.
+// See the big guard comment above `let dice3dInited` (~line 22672) for the
+// full "NEVER take away the 3D unless SPECIFICALLY prompted" instruction.
 function initDice3DButton(){
   const diceContainer = document.getElementById('diceButton3D');
   if(!diceContainer) return;
