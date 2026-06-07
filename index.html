@@ -4482,6 +4482,26 @@
                 vertical-align: top;
             }
 
+            /* Flat-dice fallback face — shown when "Disable 3D Dice" is on,
+               THREE.js failed to load, or WebGL is unavailable on this device.
+               Keeps the sidebar dice button visible & clickable in all cases. */
+            .dice-button-3d.flat-mode {
+                flex-direction: column;
+                gap: 2px;
+            }
+            .dice-flat-face {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 2px;
+                font-family: 'Cinzel',serif;
+                color: var(--gold);
+                user-select: none;
+            }
+            .dice-flat-face .dice-flat-icon { font-size: 26px; line-height: 1; }
+            .dice-flat-face .dice-flat-label { font-size: 13px; letter-spacing: 1.5px; color: var(--txt-dim); }
+
         .ri-section-lbl {
             font-family: 'Cinzel',serif;
             font-size: 7.5px;
@@ -22734,7 +22754,11 @@ function diceBuildGeometry(sides){
 
 function diceAnimate(){
   requestAnimationFrame(diceAnimate);
-  if(!diceShellMaterial || !diceRenderer || !diceScene || !diceCamera) return;
+  // Honor "Disable 3D Dice" — skip the actual WebGL render (the expensive part)
+  // so the setting genuinely cuts GPU load as its description promises, while
+  // staying ready to resume instantly if the setting is switched back off.
+  if(window._alasSettings && window._alasSettings.flatDice) return;
+  if(!dice3dInited || !diceShellMaterial || !diceRenderer || !diceScene || !diceCamera) return;
   diceShellMaterial.uniforms.time.value += 0.01;
   diceDieGroup.rotation.x += 0.01;
   diceDieGroup.rotation.y += 0.015;
@@ -24652,9 +24676,59 @@ function compFilter(val, btn){
   if(btn) btn.classList.add('cf-active');
 }
 
+// Flat fallback face for the sidebar dice button — used when "Disable 3D Dice"
+// is enabled in Settings, THREE.js failed to load, or WebGL init throws.
+// Without this, the button rendered as an empty box with no click handler
+// (BUG: handlers were only attached at the very end of WebGL setup, so any
+// failure along the way left a dead, unclickable button).
+function _renderFlatDiceFace(container){
+  const sides = dieKeyToSides((typeof state!=='undefined' && state.selectedDie) || 'd20');
+  const label = sides === 100 ? 'd%' : ('d' + sides);
+  container.classList.add('flat-mode');
+  container.innerHTML = '<div class="dice-flat-face"><span class="dice-flat-icon">⚄</span><span class="dice-flat-label">'+label+'</span></div>';
+}
+
+// Binds the click/keyboard roll-prompt handlers exactly once, regardless of
+// which display mode (3D / flat) the button ends up in.
+function _bindDiceButtonRoll(diceContainer){
+  if(diceContainer._rollBound) return;
+  diceContainer._rollBound = true;
+  diceContainer.addEventListener('click', function(ev){
+    ev.stopPropagation();
+    openRollIntentPrompt();
+  });
+  diceContainer.addEventListener('keydown', function(ev){
+    if(ev.key === 'Enter' || ev.key === ' '){
+      ev.preventDefault();
+      openRollIntentPrompt();
+    }
+  });
+}
+
 function initDice3DButton(){
   const diceContainer = document.getElementById('diceButton3D');
-  if(!diceContainer || typeof THREE === 'undefined') return;
+  if(!diceContainer) return;
+
+  // Always wire up the click/keyboard handler first — guarantees the button
+  // is functional even if 3D setup below fails or is skipped entirely.
+  _bindDiceButtonRoll(diceContainer);
+
+  const wantsFlat = !!(window._alasSettings && window._alasSettings.flatDice);
+
+  if(wantsFlat || typeof THREE === 'undefined'){
+    dice3dInited = false;
+    diceContainer.classList.remove('flat-mode'); // reset before re-render so re-toggling refreshes label
+    _renderFlatDiceFace(diceContainer);
+    return;
+  }
+
+  // Coming back from flat mode → rebuild the WebGL scene fresh
+  if(diceContainer.classList.contains('flat-mode')){
+    diceContainer.classList.remove('flat-mode');
+    diceContainer.innerHTML = '';
+    dice3dInited = false;
+  }
+
   if(dice3dInited){
     syncDice3DFromState();
     return;
@@ -24678,8 +24752,13 @@ function initDice3DButton(){
     diceContainer.innerHTML = '';
     diceContainer.appendChild(diceRenderer.domElement);
   } catch(_wglerr){
-    console.warn('Sidebar 3D die: WebGL unavailable, skipping.');
+    // BUGFIX: this used to `return` here, which skipped the click-handler
+    // attachment further below — leaving a visible-but-dead button on any
+    // device where WebGL init throws. Fall back to the flat face instead
+    // (handler is already bound at the top of this function).
+    console.warn('Sidebar 3D die: WebGL unavailable, falling back to flat face.');
     dice3dInited = false;
+    _renderFlatDiceFace(diceContainer);
     return;
   }
 
@@ -24702,17 +24781,6 @@ function initDice3DButton(){
   dice3dInited = true;
   syncDice3DFromState();
   diceAnimate();
-
-  diceContainer.addEventListener('click', function(ev){
-    ev.stopPropagation();
-    openRollIntentPrompt();
-  });
-  diceContainer.addEventListener('keydown', function(ev){
-    if(ev.key === 'Enter' || ev.key === ' '){
-      ev.preventDefault();
-      openRollIntentPrompt();
-    }
-  });
 }
 
 // ═══════════════════════════════════════════════════
@@ -24742,6 +24810,21 @@ function _getRollRenderer(){
   return _rollRenderer;
 }
 
+// Shown in place of the full 3D roll animation when "Disable 3D Dice" is on,
+// or when WebGL/THREE isn't available — uses the *actual* rolled value
+// (display = total when provided, else the resolved die result) so the
+// number shown always matches what got logged to the roll history.
+function _showFlatRollResult(displayValue){
+  const layer = document.createElement('div');
+  layer.style.position = 'fixed';
+  layer.style.inset = '0';
+  layer.style.pointerEvents = 'none';
+  layer.style.zIndex = '99999';
+  layer.innerHTML = '<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:Cinzel,serif;font-size:80px;color:#c9a227;text-shadow:0 0 30px rgba(201,162,39,.8);pointer-events:none;">'+displayValue+'</div>';
+  document.body.appendChild(layer);
+  setTimeout(function(){ layer.remove(); }, 1100);
+}
+
 function rollSelected3DDie(sides, forcedRaw, total){
   if(typeof THREE === 'undefined') return;
 
@@ -24755,6 +24838,16 @@ function rollSelected3DDie(sides, forcedRaw, total){
     result = sides === 100
       ? (Math.floor(Math.random() * 10) + 1) * 10
       : Math.floor(Math.random() * sides) + 1;
+  }
+
+  const displayValue = (total !== undefined && total !== null && !Number.isNaN(Number(total))) ? Number(total) : result;
+
+  // Honor "Disable 3D Dice" — skip the full-screen 3D roll animation entirely
+  // and show the flat number instead (this is the GPU-saving behavior the
+  // setting's description promises, and previously did nothing at all).
+  if(window._alasSettings && window._alasSettings.flatDice){
+    _showFlatRollResult(displayValue);
+    return;
   }
 
   const rollLayer = document.createElement('div');
@@ -24780,10 +24873,13 @@ function rollSelected3DDie(sides, forcedRaw, total){
 
   const renderer = _getRollRenderer();
   if(!renderer){
-    // WebGL unavailable — show plain text result and bail
-    rollLayer.style.pointerEvents='none';
-    rollLayer.innerHTML='<div style="position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-family:Cinzel,serif;font-size:80px;color:#c9a227;text-shadow:0 0 30px rgba(201,162,39,.8);pointer-events:none;">'+(total!==undefined&&total!==null&&!Number.isNaN(Number(total))?Number(total):Math.floor(Math.random()*sides)+1)+'</div>';
-    setTimeout(function(){rollLayer.remove();},1600);
+    // WebGL unavailable — show the flat result instead.
+    // BUGFIX: this previously displayed `total` if present, else a brand-new
+    // random re-roll — which could show a different number than the result
+    // already computed (and logged to history) above. Now uses the same
+    // `displayValue` so the number on screen always matches the real roll.
+    rollLayer.remove();
+    _showFlatRollResult(displayValue);
     return;
   }
 
@@ -24845,7 +24941,6 @@ function rollSelected3DDie(sides, forcedRaw, total){
   let settledFrames = 0;
   let hasSettled = false;
 
-  const displayValue = (total !== undefined && total !== null && !Number.isNaN(Number(total))) ? Number(total) : result;
   const resultLabel = createFloatingRollResult(displayValue);
   rollLayer.appendChild(resultLabel);
 
@@ -25939,6 +26034,12 @@ function applySettings(){
   s.hiContrast = g('sHiContrast');
   try{ localStorage.setItem('alas_settings_v1', JSON.stringify(s)); } catch(e){}
   _applySettingsDOM();
+  // BUGFIX: "Disable 3D Dice" was saved to settings but never actually applied
+  // anywhere — toggling it had zero effect on the sidebar button or roll
+  // animation. Re-render the sidebar dice button immediately so the change
+  // is visible without a page reload (rollSelected3DDie reads the live
+  // setting itself, so no extra wiring needed there).
+  if(typeof initDice3DButton === 'function') initDice3DButton();
   // If VTT is active tab and user just turned it off, show placeholder
   var activePanel = document.querySelector('#tab-vtt.active');
   if(s.vttOff && activePanel){ showVttDisabledMsg(); }
