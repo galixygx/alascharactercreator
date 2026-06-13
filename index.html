@@ -39,22 +39,24 @@
             box-sizing: border-box;
         }
 
-        /* Alas-styled number input spinners */
+        /* Alas-styled number input spinners (custom, cross-browser) */
+        input[type="number"] {
+            -moz-appearance: textfield;
+            padding-right: 17px !important;
+            background-repeat: no-repeat !important;
+            background-position: right center !important;
+            background-size: 13px 26px !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='32' viewBox='0 0 16 32'%3E%3Crect x='1' y='1' width='14' height='30' rx='3' fill='%231e1e38' stroke='%234a3a18'/%3E%3Cline x1='1' y1='16' x2='15' y2='16' stroke='%234a3a18'/%3E%3Cpath d='M8 6 L12 12 L4 12 Z' fill='%23c9a227'/%3E%3Cpath d='M8 26 L12 20 L4 20 Z' fill='%23c9a227'/%3E%3C/svg%3E") !important;
+            transition: background-image .15s ease;
+        }
+        input[type="number"]:hover,
+        input[type="number"]:focus {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='32' viewBox='0 0 16 32'%3E%3Crect x='1' y='1' width='14' height='30' rx='3' fill='%23252540' stroke='%237a6218'/%3E%3Cline x1='1' y1='16' x2='15' y2='16' stroke='%237a6218'/%3E%3Cpath d='M8 6 L12 12 L4 12 Z' fill='%23e8c547'/%3E%3Cpath d='M8 26 L12 20 L4 20 Z' fill='%23e8c547'/%3E%3C/svg%3E") !important;
+        }
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
-            opacity: 1;
-            cursor: pointer;
-            height: 1.5em;
-            margin-left: 5px;
-            border-radius: var(--rad);
-            filter: invert(1) sepia(1) saturate(6) hue-rotate(20deg) brightness(0.85) contrast(1.15);
-            transition: filter .15s ease;
-        }
-        input[type="number"]:hover::-webkit-inner-spin-button,
-        input[type="number"]:hover::-webkit-outer-spin-button,
-        input[type="number"]:focus::-webkit-inner-spin-button,
-        input[type="number"]:focus::-webkit-outer-spin-button {
-            filter: invert(1) sepia(1) saturate(8) hue-rotate(20deg) brightness(1.05) contrast(1.25);
+            -webkit-appearance: none;
+            margin: 0;
         }
 
         body {
@@ -34945,6 +34947,29 @@ window.toggleSidebar = function(){
 })();
 
 /* ── UPGRADE 7 handled by CSS ambientBreath ──────────────── */
+
+/* ── Alas-styled number spinners: click-to-step handler ──── */
+(function(){
+  document.addEventListener('click', function(e){
+    var el = e.target;
+    if(!(el instanceof HTMLInputElement) || el.type !== 'number') return;
+    if(el.disabled || el.readOnly) return;
+    var rect = el.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
+    if(x < rect.width - 17) return;
+    var step = parseFloat(el.step) || 1;
+    var min = el.min !== '' ? parseFloat(el.min) : -Infinity;
+    var max = el.max !== '' ? parseFloat(el.max) : Infinity;
+    var val = parseFloat(el.value);
+    if(isNaN(val)) val = 0;
+    val += (y < rect.height / 2) ? step : -step;
+    val = Math.min(max, Math.max(min, val));
+    el.value = val;
+    el.dispatchEvent(new Event('input', {bubbles:true}));
+    el.dispatchEvent(new Event('change', {bubbles:true}));
+  });
+})();
 
 /* ── UPGRADE 8: Scroll-to-top button ────────────────────── */
 (function(){
