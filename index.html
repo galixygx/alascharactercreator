@@ -7196,6 +7196,58 @@
         .forge-close-x { position:absolute; top:12px; right:14px; background:none; border:none; color:var(--txt-dim); font-size:16px; cursor:pointer; transition:color .2s; }
         .forge-close-x:hover { color:var(--cor); }
 
+        /* ═══════════ ARCANE SURGE (1d6 Instability Check) ═══════════ */
+        .surge-overlay {
+            position:fixed; inset:0; z-index:11500; display:none;
+            align-items:center; justify-content:center;
+            background:radial-gradient(ellipse at 50% 40%, rgba(40,30,70,.85), rgba(4,4,10,.96));
+            backdrop-filter:blur(3px);
+        }
+        .surge-overlay.open { display:flex; animation:forgeFadeIn .25s ease; }
+        .surge-modal {
+            position:relative; width:440px; max-width:92vw; text-align:center;
+            background:linear-gradient(180deg,#12101e,#0a0a14);
+            border:1px solid #404080; border-radius:10px;
+            box-shadow:0 0 50px rgba(120,100,200,.25), inset 0 0 40px rgba(0,0,0,.5);
+            padding:24px 26px 22px;
+        }
+        .surge-title {
+            font-family:'Cinzel',serif; font-size:11px; letter-spacing:4px; text-transform:uppercase;
+            color:#a0a0e0; margin-bottom:3px;
+        }
+        .surge-sub { font-family:'EB Garamond',serif; font-style:italic; font-size:12px; color:var(--txt-dim); margin-bottom:16px; }
+        .surge-sub b { color:#c0c0f0; font-style:normal; }
+        .surge-die {
+            width:88px; height:88px; margin:4px auto 16px; position:relative;
+            display:flex; align-items:center; justify-content:center;
+            background:linear-gradient(145deg,#23203c,#14121f);
+            border:2px solid #404080; border-radius:14px;
+            font-family:'Cinzel',serif; font-size:42px; color:#c0c0f0;
+            box-shadow:inset 0 0 22px rgba(0,0,0,.6), 0 0 22px rgba(120,100,200,.18);
+        }
+        .surge-die.rolling { animation:forgeDieShake .12s linear infinite; }
+        .surge-outcome-title {
+            font-family:'Cinzel',serif; font-size:16px; letter-spacing:2px; text-transform:uppercase;
+            margin-bottom:8px; animation:forgeFadeIn .4s ease;
+        }
+        .surge-outcome-text {
+            font-family:'EB Garamond',serif; font-size:13.5px; line-height:1.6; color:var(--txt-lbl);
+            margin-bottom:12px; padding:0 6px;
+        }
+        .surge-effects { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
+        .surge-effect-pill {
+            font-family:'Cinzel',serif; font-size:7.5px; letter-spacing:1px; padding:3px 10px; border-radius:3px; text-transform:uppercase;
+        }
+        .surge-effect-pill.ins { color:var(--cor); border:1px solid rgba(200,32,48,.4); background:rgba(200,32,48,.1); }
+        .surge-effect-pill.rp  { color:var(--res); border:1px solid rgba(61,214,219,.4); background:rgba(61,214,219,.1); }
+        .surge-effect-pill.none { color:var(--txt-dim); border:1px solid var(--bdr); background:var(--surf3); }
+        .surge-continue-btn {
+            display:inline-block; padding:9px 28px; cursor:pointer;
+            background:rgba(120,100,200,.14); border:1px solid #5050a0; border-radius:5px;
+            font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:#c0c0f0; text-transform:uppercase; transition:all .2s;
+        }
+        .surge-continue-btn:hover { background:rgba(120,100,200,.26); }
+
         /* ─── TACTICAL BALANCE BUILDER ─── */
         .tac-builder {
             margin-top:10px;
@@ -11709,16 +11761,31 @@ const SIGIL_COMPENDIUM = {
     {name:'Void Collapse',rc:12,ip:5,aff:'Chaos',ct:'Action',effect:'40-ft radius implosion. 10d10 force (CON half). All STR save or pulled to center. Caster Instability check required.'},
   ],
   'Arcane':[
-    {name:'Raw Bolt',rc:0,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'Ranged attack (60 ft). 1d10 force damage. Scales 2d10/3d10/4d10 at L5/11/17. ⚠ Unstable: roll 1d6 Instability on cast.'},
-    {name:'Arc Spark',rc:0,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'Touch or 15 ft. 1d8 force, and the target sheds no light-based concealment until end of your next turn. ⚠ Unstable: roll 1d6 Instability on cast.'},
-    {name:'Resonant Shield',rc:2,ip:0,aff:'Arcane',d6ins:true,ct:'Reaction',effect:'When hit: +1d6 + INT to AC against the triggering attack, possibly turning a hit into a miss. ⚠ Unstable: roll 1d6 Instability on cast.'},
-    {name:'Unwoven Strike',rc:3,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'Ranged (90 ft). 3d8 force, ignores resistance to non-magical damage. CON save or target loses its reaction. ⚠ Unstable: roll 1d6 Instability on cast.'},
-    {name:'Null Field',rc:3,ip:0,aff:'Arcane',d6ins:false,ct:'Action',effect:'10-ft radius for 1 min. The raw Vein is held still here — no Instability is rolled for Arcane sigils cast wholly within the field. A rare moment of order. (Stabilizing — no 1d6 roll.)'},
-    {name:'Surge Lance',rc:4,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'120-ft line, 5 ft wide. 5d8 force (DEX half). On a failed save, target is pushed 10 ft. ⚠ Unstable: roll 1d6 Instability on cast.'},
-    {name:'Splinter the Weave',rc:6,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'30-ft radius. 6d8 force (DEX half). Each creature that fails rolls on the Wild Surge table (DM). ⚠ Unstable: roll 1d6 Instability on cast — Arcane raw energy at full bloom.'},
-    {name:'Origin Cascade',rc:9,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'40-ft radius. 9d8 force (CON half). The Six Sigils briefly re-converge: choose Fire, Water, Air, Earth, Light, or Shadow — half the damage becomes that type and applies its rider. ⚠ Unstable: roll 1d6 Instability on cast.'},
+    {name:'Raw Bolt',rc:0,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'Ranged attack (60 ft). 1d10 force damage. Scales 2d10/3d10/4d10 at L5/11/17. ⚠ Instability Check — roll 1d6 on the Arcane Surge table.'},
+    {name:'Arc Spark',rc:0,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'Touch or 15 ft. 1d8 force, and the target sheds no light-based concealment until end of your next turn. ⚠ Instability Check — roll 1d6 on the Arcane Surge table.'},
+    {name:'Resonant Shield',rc:2,ip:0,aff:'Arcane',d6ins:true,ct:'Reaction',effect:'When hit: +1d6 + INT to AC against the triggering attack, possibly turning a hit into a miss. ⚠ Instability Check — roll 1d6 on the Arcane Surge table.'},
+    {name:'Unwoven Strike',rc:3,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'Ranged (90 ft). 3d8 force, ignores resistance to non-magical damage. CON save or target loses its reaction. ⚠ Instability Check — roll 1d6 on the Arcane Surge table.'},
+    {name:'Null Field',rc:3,ip:0,aff:'Arcane',d6ins:false,ct:'Action',effect:'10-ft radius for 1 min. The raw Vein is held still here — Arcane sigils cast wholly within the field make no Instability Check. A rare moment of order. (Stabilizing — no Surge roll.)'},
+    {name:'Surge Lance',rc:4,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'120-ft line, 5 ft wide. 5d8 force (DEX half). On a failed save, target is pushed 10 ft. ⚠ Instability Check — roll 1d6 on the Arcane Surge table.'},
+    {name:'Splinter the Weave',rc:6,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'30-ft radius. 6d8 force (DEX half). Each creature that fails rolls on the Wild Surge table (DM). ⚠ Instability Check — roll 1d6 on the Arcane Surge table; raw energy at full bloom.'},
+    {name:'Origin Cascade',rc:9,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'40-ft radius. 9d8 force (CON half). The Six Sigils briefly re-converge: choose Fire, Water, Air, Nature, Light, or Chaos — half the damage becomes that type and applies its rider. ⚠ Instability Check — roll 1d6 on the Arcane Surge table.'},
   ],
 };
+
+// ── ARCANE SURGE TABLE (1d6 Instability Check) ─────────────────────────────────
+// When an Arcane sigil "calls for an Instability Check Roll," the caster rolls 1d6
+// on this scale; the face rolled determines the OUTCOME (not a flat point gain).
+// Low rolls warp the raw Vein violently; high rolls channel it cleanly. A sigil may
+// define its own `insScale` to override this shared default.
+const ARCANE_SURGE_TABLE = [
+  null, // index 0 unused — d6 results are 1..6
+  {roll:1, title:'Catastrophic Inversion', text:'The spell resolves at DOUBLE effect — but the raw Vein turns it inward. You become the target instead of the one you intended.', ins:3, color:'#c82030'},
+  {roll:2, title:'Violent Backlash', text:'The energy recoils through you. The spell still strikes your target, but the nearest other creature to you — friend or foe — is caught in it as well.', ins:2, color:'#e06838'},
+  {roll:3, title:'Wild Scatter', text:'The cast slips your grip and strikes a random valid target within range instead of the one you chose.', ins:1, color:'#e8a020'},
+  {roll:4, title:'Held Steady', text:'You wrestle the raw energy into the shape you meant. The spell works as cast — touching the Vein still costs you a little.', ins:1, color:'#a0a0e0'},
+  {roll:5, title:'Clean Channel', text:'For one breath the Vein answers cleanly. The spell works exactly as intended and stirs no further instability.', ins:0, color:'#60c060'},
+  {roll:6, title:'Resonant Surge', text:'The Six Sigils briefly align within you. The spell resolves at +50% effect (round up), and you regain 2 Resonance Points as the Vein flows true.', ins:0, rp:2, color:'#3dd6db'},
+];
 
 // ── CLASS SIGIL POOLS (PHB p.26–43) ────────────────────────────────────
 const CLASS_SIGILS = {
@@ -15414,34 +15481,52 @@ function castSigilByRC(rc, ip, name, aff, card){
     updateScarTiers();
   }
 
-  // ── ARCANE RAW-ENERGY INSTABILITY (1d6 roll) ──────────────────────────────
-  // Arcane is the Original Source, split into the Six Sigils. What remains is
-  // raw, unstable energy — so most Arcane sigils force a 1d6 Instability roll
-  // on cast. Sigils flagged d6ins:false (e.g. stabilizing fields) are exempt.
+  // ── ARCANE INSTABILITY CHECK (1d6 Surge roll) ─────────────────────────────
+  // Arcane is the Original Source, split into the Six Sigils. What remains is raw,
+  // unstable energy — so most Arcane sigils call for an Instability Check: roll 1d6
+  // on the Arcane Surge table and apply the OUTCOME for the rolled face. Sigils
+  // flagged d6ins:false (e.g. stabilizing fields) make no check.
   let arcaneD6 = 0;
   if(aff === 'Arcane'){
     const arcEntry = (SIGIL_COMPENDIUM['Arcane']||[]).find(function(s){ return s.name === name; });
     const rolls = !arcEntry || arcEntry.d6ins !== false; // default: roll unless explicitly exempt
     if(rolls){
+      const tbl = (arcEntry && arcEntry.insScale) || ARCANE_SURGE_TABLE;
       arcaneD6 = 1 + Math.floor(Math.random()*6);
-      const rawInsA = (state.instability||0) + arcaneD6;
-      if(rawInsA > 7){
-        state.instability = 7;
-        const ovfA = rawInsA - 7;
-        state.corruption = Math.min(10, (state.corruption||0) + ovfA);
-        const corValElA = document.getElementById('corVal');
-        const corStateElA = document.getElementById('corState');
-        if(corValElA) corValElA.textContent = state.corruption;
-        if(corStateElA) corStateElA.textContent = getTrackerState(state.corruption, COR_STATES);
-      } else {
-        state.instability = rawInsA;
+      const outcome = tbl[arcaneD6] || {title:'Surge', text:'', ins:0};
+      // Apply the outcome's Instability delta through the normal overflow logic.
+      const insDelta = outcome.ins || 0;
+      if(insDelta > 0){
+        const rawInsA = (state.instability||0) + insDelta;
+        if(rawInsA > 7){
+          state.instability = 7;
+          const ovfA = rawInsA - 7;
+          state.corruption = Math.min(10, (state.corruption||0) + ovfA);
+          const corValElA = document.getElementById('corVal');
+          const corStateElA = document.getElementById('corState');
+          if(corValElA) corValElA.textContent = state.corruption;
+          if(corStateElA) corStateElA.textContent = getTrackerState(state.corruption, COR_STATES);
+        } else {
+          state.instability = rawInsA;
+        }
+        const insValElA = document.getElementById('insVal');
+        const insStateElA = document.getElementById('insState');
+        if(insValElA) insValElA.textContent = state.instability;
+        if(insStateElA) insStateElA.textContent = getTrackerState(state.instability, INS_STATES);
+        updateScarTiers();
       }
-      const insValElA = document.getElementById('insVal');
-      const insStateElA = document.getElementById('insState');
-      if(insValElA) insValElA.textContent = state.instability;
-      if(insStateElA) insStateElA.textContent = getTrackerState(state.instability, INS_STATES);
-      updateScarTiers();
-      showToast('⚠ Arcane surge — rolled 1d6 = +' + arcaneD6 + ' Instability (raw energy)');
+      // Apply any Resonance regain (e.g. a 6 — Resonant Surge).
+      if(outcome.rp && outcome.rp > 0){
+        const rpEl2 = document.getElementById('rpCur');
+        const rpMaxV = parseInt((document.getElementById('rpMax')||{}).value)||0;
+        if(rpEl2){
+          rpEl2.value = Math.min(rpMaxV || 999, (parseInt(rpEl2.value)||0) + outcome.rp);
+          updateBar('rp'); updateRpState();
+          state.rpCur = parseInt(rpEl2.value);
+        }
+      }
+      // Surface the surge outcome in an immersive modal.
+      openArcaneSurge(name, arcaneD6, outcome);
     }
   }
   window.__arcaneD6Last = arcaneD6; // expose for the U05 cast-toast wrapper
@@ -15460,7 +15545,7 @@ function castSigilByRC(rc, ip, name, aff, card){
   const parts = [];
   if(rc > 0) parts.push(`−${rc} RC`); else parts.push('At-Will');
   if(totalIns > 0) parts.push(`+${totalIns} INS`);
-  if(arcaneD6 > 0) parts.push(`+${arcaneD6} INS (1d6 Arcane)`);
+  if(arcaneD6 > 0) parts.push(`Arcane Surge: rolled ${arcaneD6}`);
   showToast(`${name} cast — ${parts.join(' · ')}`);
 
   saveAll();
@@ -15515,6 +15600,49 @@ function castSigilByRC(rc, ip, name, aff, card){
     else if(_ins >= 1) _castTier = 1;
     if(_castTier > 0) setTimeout(()=>openCastingScaleModal(_castTier), 400);
   }
+}
+
+// ── ARCANE SURGE MODAL: animated 1d6 Instability Check result ─────────────────
+function openArcaneSurge(spellName, roll, outcome){
+  const ov = document.getElementById('surgeOverlay');
+  if(!ov){ return; }
+  const die = document.getElementById('surgeDie');
+  const titleEl = document.getElementById('surgeOutcomeTitle');
+  const textEl = document.getElementById('surgeOutcomeText');
+  const effEl = document.getElementById('surgeEffects');
+  const subEl = document.getElementById('surgeSub');
+  const contBtn = document.getElementById('surgeContinueBtn');
+  if(subEl) subEl.innerHTML = '<b>'+(spellName||'Arcane sigil')+'</b> calls for an Instability Check — roll <b>1d6</b>.';
+  // reset
+  titleEl.textContent=''; textEl.textContent=''; effEl.innerHTML='';
+  contBtn.style.display='none';
+  die.className='surge-die rolling'; die.textContent='?';
+  ov.classList.add('open');
+  let ticks=0;
+  const spin=setInterval(function(){
+    die.textContent = 1 + Math.floor(Math.random()*6);
+    if(++ticks>=14){
+      clearInterval(spin);
+      die.textContent = roll;
+      die.className='surge-die';
+      die.style.color = outcome.color || '#c0c0f0';
+      die.style.borderColor = outcome.color || '#404080';
+      titleEl.textContent = outcome.title || 'Surge';
+      titleEl.style.color = outcome.color || '#c0c0f0';
+      textEl.textContent = outcome.text || '';
+      // effect pills
+      let pills='';
+      if(outcome.ins && outcome.ins>0) pills += '<span class="surge-effect-pill ins">+'+outcome.ins+' Instability</span>';
+      if(outcome.rp && outcome.rp>0)   pills += '<span class="surge-effect-pill rp">+'+outcome.rp+' Resonance</span>';
+      if(!pills) pills = '<span class="surge-effect-pill none">No instability gained</span>';
+      effEl.innerHTML = pills;
+      contBtn.style.display='inline-block';
+    }
+  }, 55);
+}
+function closeArcaneSurge(){
+  const ov = document.getElementById('surgeOverlay');
+  if(ov) ov.classList.remove('open');
 }
 
 // ─── Element ↔ Damage type maps ───────────────────────────
@@ -17599,8 +17727,8 @@ function buildClassSigilDisplay(){
       if(origin === 'Arcane'){
         html += `<div style="margin-top:9px;padding:9px 11px;background:rgba(80,80,140,.12);border:1px solid #404080;border-left:3px solid #a0a0e0;border-radius:4px;font-family:'EB Garamond',serif;font-size:12px;line-height:1.55;color:#b8b8e0;">
           <span style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:#a0a0e0;text-transform:uppercase;display:block;margin-bottom:4px;">⚠ Raw Energy — The Original Source</span>
-          Arcane is the original source of all magic. When it split into the <em>Six Sigils</em> (Fire, Water, Air, Earth, Light, Shadow), the Resonance left behind became raw, unbound energy. Every Arcane-Born carries that instability inside them.<br><br>
-          <b style="color:#c0c0f0;">On casting most Arcane sigils you roll 1d6 and add the result to your Instability</b> — the surge is automatic and unavoidable. Only rare stabilizing sigils (marked “no 1d6 roll”) are exempt. Watch your Instability track closely; it overflows into Corruption at 7.
+          Arcane is the original source of all magic. When it split into the <em>Six Sigils</em> (Fire, Water, Air, Nature, Light, Chaos), the Resonance left behind became raw, unbound energy. Every Arcane-Born carries that instability inside them.<br><br>
+          <b style="color:#c0c0f0;">Most Arcane sigils call for an Instability Check:</b> when you cast one, roll 1d6 on the <em>Arcane Surge table</em> — the face you roll determines the outcome, not a flat point gain. A <b style="color:#e06838;">1</b> inverts the spell back onto you at double effect; a <b style="color:#3dd6db;">6</b> empowers it and returns Resonance. Only rare stabilizing sigils (marked “no Surge roll”) are exempt. Instability still overflows into Corruption at 7.
         </div>`;
       }
     }
@@ -30604,6 +30732,19 @@ function copyReport(){
         </div>
     </div>
 
+    <!-- ═══════════ ARCANE SURGE (1d6 Instability Check) ═══════════ -->
+    <div id="surgeOverlay" class="surge-overlay" onclick="if(event.target===this)closeArcaneSurge()">
+        <div class="surge-modal">
+            <div class="surge-title">Arcane Instability Check</div>
+            <div class="surge-sub" id="surgeSub">The raw Vein answers — roll <b>1d6</b>.</div>
+            <div class="surge-die" id="surgeDie">?</div>
+            <div class="surge-outcome-title" id="surgeOutcomeTitle"></div>
+            <div class="surge-outcome-text" id="surgeOutcomeText"></div>
+            <div class="surge-effects" id="surgeEffects"></div>
+            <button type="button" class="surge-continue-btn" id="surgeContinueBtn" onclick="closeArcaneSurge()" style="display:none">✦ Continue</button>
+        </div>
+    </div>
+
     <!-- ═══════════ DM / KEEPER PANEL — V4.8 OVERHAUL ═══════════ -->
     <div class="dm-overlay" id="dmOverlay" onclick="if(event.target===this)closeDMPanel()">
         <div class="dm-modal" style="max-width:980px;width:96vw">
@@ -34427,7 +34568,7 @@ document.addEventListener('click', function(e){
     if(rc > 0) msg += ' — −' + rc + ' RP';
     if(ip > 0) msg += ' · +' + ip + ' Instability';
     var arcD6 = window.__arcaneD6Last || 0;
-    if(arcD6 > 0) msg += ' · +' + arcD6 + ' Instability (1d6 Arcane)';
+    if(arcD6 > 0) msg += ' · Arcane Surge (1d6 = ' + arcD6 + ')';
     if(typeof showToast === 'function') showToast(msg);
     window.__arcaneD6Last = 0;
     return result;
