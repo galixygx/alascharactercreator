@@ -17763,6 +17763,17 @@ function buildClassSigilDisplay(){
   // ── SIGIL-ADAPTATION (all classes except Sigil-Touched) ───────────────────────
   const freeAll = (!cs.isOriginBased && state.sigilAdaptation === 'Non Elemental');
   const noMagic = (!cs.isOriginBased && SIGIL_ADAPTATIONS[state.sigilAdaptation] && SIGIL_ADAPTATIONS[state.sigilAdaptation].noMagic);
+
+  // ── SIGIL SAVE DC banner — the appropriate DC for every sigil save/check ───────
+  if(!noMagic){
+    const _sigAb = cs.spAb || 'INT';
+    const _sigDC = 8 + getProf() + getMod(_sigAb);
+    html += `<div style="background:linear-gradient(90deg,rgba(201,162,39,.1),transparent);border:1px solid var(--bdr-g);border-left:3px solid var(--gold);border-radius:4px;padding:9px 12px;margin-bottom:14px;">
+      <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;margin-bottom:3px;">Sigil Save DC — ${_sigAb} · <span style="font-size:14px;color:var(--gold-l);">${_sigDC}</span></div>
+      <div style="font-family:'EB Garamond',serif;font-size:11.5px;line-height:1.5;color:var(--txt-lbl);">Whenever one of your sigils forces a saving throw or check and does <b>not</b> print its own DC, the target rolls against your <b style="color:var(--gold-l);">Sigil Save DC of ${_sigDC}</b> (8 + proficiency + ${_sigAb} modifier). This is also the DC for any “half on a successful save” damage roll. It updates automatically with your level and ability scores. Any sigil, ability, or creature that lists a specific DC uses that printed value instead.</div>
+    </div>`;
+  }
+
   if(!cs.isOriginBased){
     const adapt = state.sigilAdaptation || '';
     const adaptData = SIGIL_ADAPTATIONS[adapt];
