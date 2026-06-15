@@ -11976,23 +11976,23 @@ const CLASS_PROGRESSION = {
   ],
   'Sigil-Touched Adept':[
     {lvl:1,feats:['Innate Resonance — Cantrip-tier Origin sigils cost 0 RC','Sigil Origin (choose affinity: Vein-Born / Ember-Touched / Storm-Kissed / Void-Kissed / Tideblood / Lightborn)']},
-    {lvl:2,feats:['Metamagic (2 options: Careful / Distant / Empowered / Extended / Heightened / Quickened / Subtle / Twinned)']},
+    {lvl:2,feats:['Metamagic (2 Sigil Points: Careful / Distant / Empowered / Extended / Heightened / Quickened / Subtle / Twinned)']},
     {lvl:3,feats:['Origin Feature I']},
     {lvl:4,feats:['Ability Score Improvement']},
     {lvl:5,feats:['Multi-Attack (2 attacks)','Resonance Surge — Spend 2 RC: maximize one damage die']},
     {lvl:6,feats:['Origin Feature II']},
-    {lvl:7,feats:['Metamagic (3 options)']},
+    {lvl:7,feats:['Metamagic (3 Sigil Points)']},
     {lvl:8,feats:['Ability Score Improvement']},
-    {lvl:9,feats:['Sigil Empowerment — Sigil attacks count as magical; add INT mod to one damage roll per sigil']},
+    {lvl:9,feats:['Sigil Empowerment — Sigil attacks count as empowered magic; add INT mod to one damage roll per sigil/cast']},
     {lvl:10,feats:['Origin Feature III']},
-    {lvl:11,feats:['Multi-Attack (3 attacks)','Metamagic (4 options)']},
+    {lvl:11,feats:['Multi-Attack (3 attacks)','Metamagic (4 Sigil Points)']},
     {lvl:12,feats:['Ability Score Improvement']},
     {lvl:13,feats:['Overchannel (1/day) — Maximize damage on Standard sigil; +3 Instability']},
     {lvl:14,feats:['Origin Pinnacle']},
     {lvl:15,feats:['Resonance Immunity — Cannot suffer backlash from own sigils; Environmental Instability negated on 11+ (d20)']},
     {lvl:16,feats:['Ability Score Improvement']},
     {lvl:17,feats:['Overchannel (2/day)']},
-    {lvl:18,feats:['Metamagic (5 options)']},
+    {lvl:18,feats:['Metamagic (5 Sigil Points)']},
     {lvl:19,feats:['Ability Score Improvement']},
     {lvl:20,feats:['Multi-Attack (4 attacks)','Sigil Apotheosis — Resonance Pool max +20; Once/day: cast any known sigil at 0 RC, no Instability']},
   ],
@@ -12205,9 +12205,59 @@ const FEAT_DETAILS = {
   'Sacred Oath':{desc:'Choose your Sacred Oath at Level 3 — the specific commitment that fuels your power. The oath is a binding commitment, not a mechanical tag. Violating your oath causes 2 Corruption. Your oath provides features at Levels 3, 7, 10, and 15.',stats:'Oath of the Fractured Crown: justice focus. Oath of the Last Ember: protection focus. Oath of the Open Truth: knowledge/honesty focus. | Oath violation: +2 Corruption (DM call)'},
   'Channel Divinity':{desc:'Turn Undead: Present your holy symbol. Each undead within 30 ft. that can see or hear you must make a WIS save or be Turned for 1 minute (must flee, cannot take reactions, cannot approach you). Preserve the Relic: Prevent a magical item from being destroyed for 1 minute. Your Divine Domain grants additional Channel Divinity options.',stats:'Recharge: Short Rest | L2: 1 use | L6: 2 | L13: 3 | L18: 4 | Turn Undead: WIS save or Turned 1 min (30 ft.) | Destroy Undead threshold scales with level'},
   'Innate Resonance':{desc:'Cantrip-tier sigils of your Sigil Origin affinity cost 0 RC instead of their base cost. Your Resonance Pool functions normally (starts at 8, +1d4 per level). Intelligence is your spellcasting ability for all sigil effects — your structural understanding of the Vein\'s architecture, not raw personality, powers your magic.',stats:'Origin cantrips: 0 RC | Resonance Pool: 8 + 1d4/level | Spellcasting Ability: INT | Spell Save DC: 8 + prof + INT mod'},
-  'Metamagic':{desc:'Apply a Metamagic option to a sigil when you cast it. Each option has a Sorcery Point cost. You can apply only one Metamagic option per sigil unless otherwise stated. Options: Careful (protect allies in area, CON save guaranteed), Distant (double range), Empowered (reroll damage dice), Extended (double duration), Heightened (target has disadvantage on first save), Quickened (cast as Bonus Action), Subtle (no verbal/somatic components), Twinned (duplicate single-target onto second target at no extra cost).',stats:'L2: 2 options | L7: 3 | L11: 4 | L18: 5 | Cost: varies by option | Pool: = Sorcerer level'},
+  'Metamagic':{desc:'Metamagic lets you reshape a sigil as you cast it. You have a pool of SIGIL POINTS — 2 at L2, growing to 5 by L18 — that you spend to apply Metamagic effects. HOW TO USE: when you cast a sigil, before resolving it, declare a Metamagic effect and subtract its Sigil Point cost (most cost 1; Twinned costs an amount equal to the sigil\'s RC, minimum 1). You may apply only one Metamagic effect per cast unless a feature says otherwise. IMPORTANT: Sigil Points DO NOT REGENERATE — they are not restored by Resonance Rest or Long Rest. Once spent, they are gone until the DM awards more (typically through story progression, attunement, or leveling). Spend them deliberately. EFFECTS: Careful (allies of your choice in the area automatically succeed the save and take no damage), Distant (double the sigil\'s range, or make a touch sigil 30 ft), Empowered (reroll any number of the damage dice, keep the new rolls), Extended (double the duration), Heightened (one target rolls its first save against the sigil with disadvantage), Quickened (cast the sigil as a Bonus Action instead of an Action), Subtle (cast with no spoken word or gesture — undetectable, ignores Silence), Twinned (a sigil that targets only one creature also targets a second creature within range at no extra RC).',stats:'Sigil Point pool: 2 (L2) · 3 (L7) · 4 (L11) · 5 (L18) | Cost: 1 per effect (Twinned = sigil\'s RC, min 1) | One effect per cast | ⚠ Sigil Points DO NOT REGENERATE — not restored by any rest'},
   'Eldritch Blast':{desc:'Your primary offensive cantrip. A ranged attack that deals force damage — it always deals force, regardless of Invocations. At higher levels, you launch multiple beams that can target the same or different creatures. Each beam requires its own attack roll. Eldritch Invocations can modify each beam individually.',stats:'L1: 1 beam, 1d10 | L5: 2 beams, 2d10 | L11: 3 beams, 3d10 | L17: 4 beams, 4d10 | Range: 120 ft. | Type: Force | RC: 0'},
   'Ability Score Improvement':{desc:'Increase one ability score by 2, or increase two different ability scores by 1 each. No score can exceed 20 (increases to 30 at Ascendant tier and beyond). You may instead take a Feat at DM\'s discretion. This improvement is permanent and cannot be undone.',stats:'Option A: +2 to one score (max 20 standard) | Option B: +1 each to two different scores | Feat option: DM discretion'},
+  'Overchannel':{desc:'Overchannel lets you tear extra power out of the Vein at a cost to your own stability. HOW TO USE: when you cast a Standard-tier sigil (RC 1–6, not a cantrip and not a high-tier sigil above RC 6), you may declare Overchannel. The sigil deals MAXIMUM damage instead of rolling — every damage die is treated as its highest value. In exchange you immediately gain +3 Instability (which overflows into Corruption at 7, as normal). You declare Overchannel before rolling damage; it cannot be combined with Resonance Surge on the same cast. At L13 you may Overchannel once per day; at L17 this increases to twice per day. Uses refresh on a Long Rest. At L15, Resonance Immunity means you no longer suffer backlash from your own sigils, but the +3 Instability from Overchannel is a cost you choose to pay and still applies.',stats:'L13: 1/day | L17: 2/day | Effect: Standard sigil (RC 1–6) deals MAXIMUM damage | Cost: +3 Instability (overflows to Corruption at 7) | Declare before rolling damage | Cannot combine with Resonance Surge | Refresh: Long Rest'},
+};
+
+// ── SIGIL-TOUCHED ADEPT — UNIQUE ORIGIN FEATURES ────────────────────────────────
+// Each Sigil Origin grants a completely distinct progression of features at
+// L3 (I), L6 (II), L10 (III), and L14 (Pinnacle). Keyed by affinity to match
+// state.sigilOrigin. Surfaced in the Class Progression rows for Sigil-Touched Adept.
+const ORIGIN_FEATURES = {
+  'Arcane':{
+    'I':{name:'Unbound Channel',desc:'Your grip on the raw Vein is steadier than most Arcane-Born. Once per Resonance Rest, after you roll on an Arcane Surge table you may shift the result one face up or down (your choice) before resolving the outcome.',stats:'1/Resonance Rest | Shift an Arcane Surge roll ±1 face before it resolves'},
+    'II':{name:'Stabilizer\'s Instinct',desc:'You have learned to bleed off the worst of the backlash. Whenever an Arcane Surge outcome would add Instability to you, reduce that amount by your INT modifier (minimum 0 gained).',stats:'Reduce self-Instability from Arcane Surges by your INT mod (min 0)'},
+    'III':{name:'Six-Fold Echo',desc:'For an instant you hold the Source whole. Once per Long Rest, when you cast an Arcane sigil you may also apply the elemental rider of one of the Six Sigils (Fire, Water, Air, Nature, Light, or Chaos) to that sigil\'s damage.',stats:'1/Long Rest | Add one of the Six Sigils\' elemental riders to an Arcane sigil'},
+    'Pinnacle':{name:'Source Reclamation',desc:'The raw Vein answers you as it answers no one else. Once per Long Rest, when you would gain Corruption from Arcane Instability overflowing past 7, you may instead convert that overflow into an equal number of Resonance Points.',stats:'1/Long Rest | Convert Instability→Corruption overflow into equal Resonance Points'},
+  },
+  'Light':{
+    'I':{name:'Radiant Ward',desc:'Your light shelters those near you. Whenever you cast a Light sigil, one ally of your choice within 30 ft gains temporary HP equal to your INT modifier.',stats:'On Light cast: one ally within 30 ft gains temp HP = INT mod'},
+    'II':{name:'Purging Glow',desc:'Once per Resonance Rest, as a Bonus Action, you may end one Charmed, Frightened, or Blinded condition on yourself or an ally within 30 ft.',stats:'1/Resonance Rest | Bonus Action | End one Charmed/Frightened/Blinded within 30 ft'},
+    'III':{name:'Beacon',desc:'You are a fixed point of true light. Creatures of your choice within 30 ft cannot benefit from invisibility or magical darkness against you, and your Light sigils ignore resistance to radiant damage.',stats:'See through invis/magical darkness 30 ft | Light sigils ignore radiant resistance'},
+    'Pinnacle':{name:'Dawnbreaker',desc:'Once per Long Rest, release a 30-ft burst of dawnlight: 4d8 radiant damage (CON save for half). Undead and Corrupted creatures roll the save with disadvantage, and each ally in the burst heals HP equal to your INT modifier.',stats:'1/Long Rest | 30-ft burst, 4d8 radiant (CON half) | Undead/Corrupted: save at DAdv | Allies heal INT mod'},
+  },
+  'Nature':{
+    'I':{name:'Verdant Step',desc:'The living world parts for you. Difficult terrain made of plants or natural growth no longer slows you, and you have advantage on saves to avoid being Restrained.',stats:'Ignore natural difficult terrain | ADV on saves vs Restrained'},
+    'II':{name:'Living Conduit',desc:'Your magic feeds you as it flows. Once per Resonance Rest, when you cast a Nature sigil you regain HP equal to your INT modifier.',stats:'1/Resonance Rest | Regain HP = INT mod on a Nature cast'},
+    'III':{name:'Wildbond',desc:'You speak with beasts and plants at will. Once per Long Rest you may call a Vein-touched beast (CR 2 or lower) to aid you; it acts on your initiative for 10 minutes, then departs.',stats:'Speak with beasts & plants at will | 1/Long Rest: summon a CR ≤ 2 beast ally for 10 min'},
+    'Pinnacle':{name:'Heartwood Resonance',desc:'Once per Long Rest, root yourself to the Vein for 1 minute: you cannot be moved against your will, you regain 2d8 HP at the start of each of your turns, and your Nature sigils cost 2 less RC (minimum 0).',stats:'1/Long Rest | 1 min: immovable, regen 2d8 HP/turn, Nature sigils −2 RC (min 0)'},
+  },
+  'Water':{
+    'I':{name:'Tidecaller',desc:'The water knows you. You can breathe underwater and gain a swim speed equal to your walking speed, and the cold damage of your Water sigils reduces a struck target\'s speed by 10 ft until the end of its next turn.',stats:'Water breathing + swim speed = walk speed | Water sigil cold: −10 ft target speed'},
+    'II':{name:'Flowing Mind',desc:'You bend rather than break. Once per Resonance Rest, when you fail a saving throw, you may use your Reaction to add your INT modifier to the result, possibly turning the failure into a success.',stats:'1/Resonance Rest | Reaction | +INT mod to a failed save'},
+    'III':{name:'Riptide',desc:'Your water seizes and drags. Once per turn when you hit a creature with a Water sigil, you may push it 10 ft and reduce its speed to 0 until the start of your next turn (CON save negates).',stats:'1/turn on Water hit: push 10 ft + speed 0 until your next turn (CON negates)'},
+    'Pinnacle':{name:'Abyssal Surge',desc:'Once per Long Rest, flood a 30-ft radius for 1 minute: the area is difficult terrain, enemies that start their turn within it make a CON save or are knocked prone, and your Water sigils deal +1d8 cold while the flood lasts.',stats:'1/Long Rest | 30-ft flood, 1 min: difficult terrain, CON save or prone, +1d8 cold to Water sigils'},
+  },
+  'Air':{
+    'I':{name:'Windstride',desc:'The air carries you. Your walking speed increases by 10 ft, you take no damage from falls of less than 30 ft, and you have advantage on Initiative rolls.',stats:'+10 ft speed | No fall damage under 30 ft | ADV on Initiative'},
+    'II':{name:'Static Field',desc:'A charge clings to your skin. Once per turn, when a creature within 5 ft hits you with an attack, it takes lightning damage equal to your INT modifier.',stats:'1/turn: attacker within 5 ft takes lightning = INT mod'},
+    'III':{name:'Tempest Step',desc:'Once per Resonance Rest, as a Bonus Action, you vanish in a gust and reappear up to 30 ft away (no RC cost). Additionally, your Air sigils ignore resistance to lightning and thunder damage.',stats:'1/Resonance Rest | Bonus Action 30-ft teleport (0 RC) | Air sigils ignore lightning/thunder resistance'},
+    'Pinnacle':{name:'Eye of the Storm',desc:'Once per Long Rest, for 1 minute you gain a flying speed equal to twice your walking speed, your Air sigils cost 2 less RC (minimum 0), and they deal +1d8 lightning damage.',stats:'1/Long Rest | 1 min: fly = 2× speed, Air sigils −2 RC (min 0) and +1d8 lightning'},
+  },
+  'Fire':{
+    'I':{name:'Cinderskin',desc:'Embers live under your skin. You have resistance to fire damage, and once per turn when a creature within 5 ft hits you with a melee attack it takes fire damage equal to your proficiency bonus.',stats:'Resistance to fire | 1/turn: melee attacker within 5 ft takes fire = prof bonus'},
+    'II':{name:'Kindled Might',desc:'Your flames cling and spread. Once per turn, a creature damaged by one of your Fire sigils also takes 1d4 fire damage at the start of its next turn.',stats:'1/turn: Fire-sigil target takes 1d4 fire at start of its next turn'},
+    'III':{name:'Conflagration',desc:'You can let the fire run rather than fight it. Once per Resonance Rest, when you cast a Fire sigil you may forgo its Instability cost entirely; instead, the sigil\'s area of effect increases by 5 ft.',stats:'1/Resonance Rest | Fire sigil gains no Instability; instead +5 ft area'},
+    'Pinnacle':{name:'Emberheart Ascendant',desc:'Once per Long Rest, become living flame for 1 minute: you are immune to fire damage, your first Fire sigil each round deals maximum damage, and any creature that starts its turn within 5 ft of you takes 1d10 fire damage.',stats:'1/Long Rest | 1 min: fire immune, first Fire sigil/round deals max damage, 1d10 fire aura (5 ft)'},
+  },
+  'Chaos':{
+    'I':{name:'Entropic Touch',desc:'Your magic frays what it touches. Once per turn when you deal damage with a sigil, the target gains +1 Instability; against a creature that has no Instability track, it instead takes 1d4 psychic damage.',stats:'1/turn on sigil damage: target +1 Instability (or 1d4 psychic if no track)'},
+    'II':{name:'Void Sight',desc:'You see what the dark hides. You can see normally through magical darkness, you sense the presence of Corruption within 30 ft, and you have advantage on saves against being Frightened.',stats:'See through magical darkness | Detect Corruption within 30 ft | ADV vs Frightened'},
+    'III':{name:'Unmaking',desc:'You can pull a working apart at the seams. Once per Long Rest, target one magical effect within 60 ft and make an INT check against DC 10 + the effect\'s level (or tier); on a success the effect ends.',stats:'1/Long Rest | End a magical effect within 60 ft: INT check vs DC 10 + level/tier'},
+    'Pinnacle':{name:'Avatar of Unmaking',desc:'Once per Long Rest, tear open a rift for 1 minute: enemies that start their turn within 20 ft gain +1 Instability, you cannot gain Corruption for the duration, and your Chaos sigils deal +1d10 necrotic damage.',stats:'1/Long Rest | 20-ft rift, 1 min: enemies +1 Instability/turn, you gain no Corruption, +1d10 necrotic to Chaos sigils'},
+  },
 };
 
 // ── PLACES DATA ──────────────────────────────────────────────────────────
@@ -17968,6 +18018,23 @@ function buildClassProgressionDisplay(){
       }
       if(matched) rowDescs.push(matched);
     });
+
+    // Sigil-Touched Adept: resolve the generic "Origin Feature" rows to the
+    // unique features of the character's chosen Sigil Origin.
+    if(cls === 'Sigil-Touched Adept'){
+      const ORIGIN_TIER = {'Origin Feature I':'I','Origin Feature II':'II','Origin Feature III':'III','Origin Pinnacle':'Pinnacle'};
+      row.feats.forEach(f => {
+        const tier = ORIGIN_TIER[f];
+        if(!tier) return;
+        const origin = state.sigilOrigin || '';
+        if(origin && ORIGIN_FEATURES[origin] && ORIGIN_FEATURES[origin][tier]){
+          const of = ORIGIN_FEATURES[origin][tier];
+          rowDescs.push({name: of.name + ' — ' + origin + ' Origin', data:{desc: of.desc, stats: of.stats}});
+        } else {
+          rowDescs.push({name: f, data:{desc:'Each Sigil Origin grants completely different Origin Features. Choose your Sigil Origin in the Sigils tab to reveal this one.', stats:''}});
+        }
+      });
+    }
 
     const hasDesc = rowDescs.length > 0;
     const expandHint = hasDesc ? `<span class="prog-expand-hint">▼ Click for details</span>` : '';
