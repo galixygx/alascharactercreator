@@ -7196,58 +7196,6 @@
         .forge-close-x { position:absolute; top:12px; right:14px; background:none; border:none; color:var(--txt-dim); font-size:16px; cursor:pointer; transition:color .2s; }
         .forge-close-x:hover { color:var(--cor); }
 
-        /* ═══════════ ARCANE SURGE (1d6 Instability Check) ═══════════ */
-        .surge-overlay {
-            position:fixed; inset:0; z-index:11500; display:none;
-            align-items:center; justify-content:center;
-            background:radial-gradient(ellipse at 50% 40%, rgba(40,30,70,.85), rgba(4,4,10,.96));
-            backdrop-filter:blur(3px);
-        }
-        .surge-overlay.open { display:flex; animation:forgeFadeIn .25s ease; }
-        .surge-modal {
-            position:relative; width:440px; max-width:92vw; text-align:center;
-            background:linear-gradient(180deg,#12101e,#0a0a14);
-            border:1px solid #404080; border-radius:10px;
-            box-shadow:0 0 50px rgba(120,100,200,.25), inset 0 0 40px rgba(0,0,0,.5);
-            padding:24px 26px 22px;
-        }
-        .surge-title {
-            font-family:'Cinzel',serif; font-size:11px; letter-spacing:4px; text-transform:uppercase;
-            color:#a0a0e0; margin-bottom:3px;
-        }
-        .surge-sub { font-family:'EB Garamond',serif; font-style:italic; font-size:12px; color:var(--txt-dim); margin-bottom:16px; }
-        .surge-sub b { color:#c0c0f0; font-style:normal; }
-        .surge-die {
-            width:88px; height:88px; margin:4px auto 16px; position:relative;
-            display:flex; align-items:center; justify-content:center;
-            background:linear-gradient(145deg,#23203c,#14121f);
-            border:2px solid #404080; border-radius:14px;
-            font-family:'Cinzel',serif; font-size:42px; color:#c0c0f0;
-            box-shadow:inset 0 0 22px rgba(0,0,0,.6), 0 0 22px rgba(120,100,200,.18);
-        }
-        .surge-die.rolling { animation:forgeDieShake .12s linear infinite; }
-        .surge-outcome-title {
-            font-family:'Cinzel',serif; font-size:16px; letter-spacing:2px; text-transform:uppercase;
-            margin-bottom:8px; animation:forgeFadeIn .4s ease;
-        }
-        .surge-outcome-text {
-            font-family:'EB Garamond',serif; font-size:13.5px; line-height:1.6; color:var(--txt-lbl);
-            margin-bottom:12px; padding:0 6px;
-        }
-        .surge-effects { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:16px; }
-        .surge-effect-pill {
-            font-family:'Cinzel',serif; font-size:7.5px; letter-spacing:1px; padding:3px 10px; border-radius:3px; text-transform:uppercase;
-        }
-        .surge-effect-pill.ins { color:var(--cor); border:1px solid rgba(200,32,48,.4); background:rgba(200,32,48,.1); }
-        .surge-effect-pill.rp  { color:var(--res); border:1px solid rgba(61,214,219,.4); background:rgba(61,214,219,.1); }
-        .surge-effect-pill.none { color:var(--txt-dim); border:1px solid var(--bdr); background:var(--surf3); }
-        .surge-continue-btn {
-            display:inline-block; padding:9px 28px; cursor:pointer;
-            background:rgba(120,100,200,.14); border:1px solid #5050a0; border-radius:5px;
-            font-family:'Cinzel',serif; font-size:9px; letter-spacing:2px; color:#c0c0f0; text-transform:uppercase; transition:all .2s;
-        }
-        .surge-continue-btn:hover { background:rgba(120,100,200,.26); }
-
         /* ─── TACTICAL BALANCE BUILDER ─── */
         .tac-builder {
             margin-top:10px;
@@ -15530,55 +15478,10 @@ function castSigilByRC(rc, ip, name, aff, card){
     updateScarTiers();
   }
 
-  // ── ARCANE INSTABILITY CHECK (1d6 Surge roll) ─────────────────────────────
-  // Arcane is the Original Source, split into the Six Sigils. What remains is raw,
-  // unstable energy — so most Arcane sigils call for an Instability Check: roll 1d6
-  // on the Arcane Surge table and apply the OUTCOME for the rolled face. Sigils
-  // flagged d6ins:false (e.g. stabilizing fields) make no check.
-  let arcaneD6 = 0;
-  if(aff === 'Arcane'){
-    const arcEntry = (SIGIL_COMPENDIUM['Arcane']||[]).find(function(s){ return s.name === name; });
-    const rolls = !arcEntry || arcEntry.d6ins !== false; // default: roll unless explicitly exempt
-    if(rolls){
-      const tbl = (arcEntry && arcEntry.insScale) || ARCANE_SURGE_TABLE;
-      arcaneD6 = 1 + Math.floor(Math.random()*6);
-      const outcome = tbl[arcaneD6] || {title:'Surge', text:'', ins:0};
-      // Apply the outcome's Instability delta through the normal overflow logic.
-      const insDelta = outcome.ins || 0;
-      if(insDelta > 0){
-        const rawInsA = (state.instability||0) + insDelta;
-        if(rawInsA > 7){
-          state.instability = 7;
-          const ovfA = rawInsA - 7;
-          state.corruption = Math.min(10, (state.corruption||0) + ovfA);
-          const corValElA = document.getElementById('corVal');
-          const corStateElA = document.getElementById('corState');
-          if(corValElA) corValElA.textContent = state.corruption;
-          if(corStateElA) corStateElA.textContent = getTrackerState(state.corruption, COR_STATES);
-        } else {
-          state.instability = rawInsA;
-        }
-        const insValElA = document.getElementById('insVal');
-        const insStateElA = document.getElementById('insState');
-        if(insValElA) insValElA.textContent = state.instability;
-        if(insStateElA) insStateElA.textContent = getTrackerState(state.instability, INS_STATES);
-        updateScarTiers();
-      }
-      // Apply any Resonance regain (e.g. a 6 — Resonant Surge).
-      if(outcome.rp && outcome.rp > 0){
-        const rpEl2 = document.getElementById('rpCur');
-        const rpMaxV = parseInt((document.getElementById('rpMax')||{}).value)||0;
-        if(rpEl2){
-          rpEl2.value = Math.min(rpMaxV || 999, (parseInt(rpEl2.value)||0) + outcome.rp);
-          updateBar('rp'); updateRpState();
-          state.rpCur = parseInt(rpEl2.value);
-        }
-      }
-      // Surface the surge outcome in an immersive modal.
-      openArcaneSurge(name, arcaneD6, outcome);
-    }
-  }
-  window.__arcaneD6Last = arcaneD6; // expose for the U05 cast-toast wrapper
+  // NOTE: The Arcane Surge (1d6 Instability Check) is presented as a visible
+  // reference table on each Arcane sigil card (see buildArcaneSurgeTableHtml).
+  // Players roll and apply it manually at the table — it is intentionally NOT
+  // part of the automated cast/roll logic.
 
   // Mark daily-use slot as spent (custom sigil cards only)
   if(card && rc > 0){
@@ -15594,7 +15497,6 @@ function castSigilByRC(rc, ip, name, aff, card){
   const parts = [];
   if(rc > 0) parts.push(`−${rc} RC`); else parts.push('At-Will');
   if(totalIns > 0) parts.push(`+${totalIns} INS`);
-  if(arcaneD6 > 0) parts.push(`Arcane Surge: rolled ${arcaneD6}`);
   showToast(`${name} cast — ${parts.join(' · ')}`);
 
   saveAll();
@@ -15649,49 +15551,6 @@ function castSigilByRC(rc, ip, name, aff, card){
     else if(_ins >= 1) _castTier = 1;
     if(_castTier > 0) setTimeout(()=>openCastingScaleModal(_castTier), 400);
   }
-}
-
-// ── ARCANE SURGE MODAL: animated 1d6 Instability Check result ─────────────────
-function openArcaneSurge(spellName, roll, outcome){
-  const ov = document.getElementById('surgeOverlay');
-  if(!ov){ return; }
-  const die = document.getElementById('surgeDie');
-  const titleEl = document.getElementById('surgeOutcomeTitle');
-  const textEl = document.getElementById('surgeOutcomeText');
-  const effEl = document.getElementById('surgeEffects');
-  const subEl = document.getElementById('surgeSub');
-  const contBtn = document.getElementById('surgeContinueBtn');
-  if(subEl) subEl.innerHTML = '<b>'+(spellName||'Arcane sigil')+'</b> calls for an Instability Check — roll <b>1d6</b>.';
-  // reset
-  titleEl.textContent=''; textEl.textContent=''; effEl.innerHTML='';
-  contBtn.style.display='none';
-  die.className='surge-die rolling'; die.textContent='?';
-  ov.classList.add('open');
-  let ticks=0;
-  const spin=setInterval(function(){
-    die.textContent = 1 + Math.floor(Math.random()*6);
-    if(++ticks>=14){
-      clearInterval(spin);
-      die.textContent = roll;
-      die.className='surge-die';
-      die.style.color = outcome.color || '#c0c0f0';
-      die.style.borderColor = outcome.color || '#404080';
-      titleEl.textContent = outcome.title || 'Surge';
-      titleEl.style.color = outcome.color || '#c0c0f0';
-      textEl.textContent = outcome.text || '';
-      // effect pills
-      let pills='';
-      if(outcome.ins && outcome.ins>0) pills += '<span class="surge-effect-pill ins">+'+outcome.ins+' Instability</span>';
-      if(outcome.rp && outcome.rp>0)   pills += '<span class="surge-effect-pill rp">+'+outcome.rp+' Resonance</span>';
-      if(!pills) pills = '<span class="surge-effect-pill none">No instability gained</span>';
-      effEl.innerHTML = pills;
-      contBtn.style.display='inline-block';
-    }
-  }, 55);
-}
-function closeArcaneSurge(){
-  const ov = document.getElementById('surgeOverlay');
-  if(ov) ov.classList.remove('open');
 }
 
 // ─── Element ↔ Damage type maps ───────────────────────────
@@ -17721,6 +17580,31 @@ function getKnownSigilCount(cls, level){
   return known;
 }
 
+// Renders a visible 1d6 Arcane Surge reference table for a sigil that defines one.
+function buildArcaneSurgeTableHtml(scale){
+  if(!Array.isArray(scale)) return '';
+  let rows = '';
+  for(let i=1;i<=6;i++){
+    const e = scale[i];
+    if(!e) continue;
+    const col = e.color || '#a0a0e0';
+    const tags = (e.ins>0 || e.rp>0)
+      ? `<span style="margin-left:6px;font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.5px;color:var(--txt-dim);white-space:nowrap;">${e.ins>0?'+'+e.ins+' INS':''}${(e.ins>0&&e.rp>0)?' · ':''}${e.rp>0?'+'+e.rp+' RP':''}</span>`
+      : `<span style="margin-left:6px;font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.5px;color:var(--txt-dim);white-space:nowrap;">no INS</span>`;
+    rows += `<div style="display:grid;grid-template-columns:20px 1fr;gap:8px;align-items:start;padding:5px 0;border-top:1px solid rgba(80,80,140,.18);">
+      <div style="font-family:'Cinzel',serif;font-size:11px;font-weight:700;text-align:center;color:${col};border:1px solid ${col};border-radius:4px;line-height:18px;">${i}</div>
+      <div>
+        <span style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:${col};">${e.title}</span>${tags}
+        <div style="font-family:'EB Garamond',serif;font-size:11.5px;line-height:1.45;color:var(--txt-lbl);margin-top:1px;">${e.text}</div>
+      </div>
+    </div>`;
+  }
+  return `<div style="margin-top:9px;background:rgba(80,80,140,.07);border:1px solid #404080;border-radius:5px;padding:8px 11px;">
+    <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;color:#a0a0e0;margin-bottom:1px;">⚡ Arcane Surge — Roll 1d6 on Cast</div>
+    ${rows}
+  </div>`;
+}
+
 function buildSigilRefCard(sig, isKnown, showState){
   const aff = SIG_AFF_STYLE[sig.aff] || SIG_AFF_STYLE['Common'];
   const opacity = (!showState || isKnown) ? '1' : '0.42';
@@ -17738,6 +17622,7 @@ function buildSigilRefCard(sig, isKnown, showState){
         ${knownBadge}${lockBadge}
       </div>
       <div style="font-family:'EB Garamond',serif;font-size:13px;color:var(--txt-lbl);line-height:1.55;">${sig.effect}</div>
+      ${sig.insScale ? buildArcaneSurgeTableHtml(sig.insScale) : ''}
       <div class="sig-cast-row" style="margin-top:8px;padding-top:8px;">
         <span class="sig-cast-rc-lbl">${sig.rc > 0 ? `Costs ${sig.rc} RC${sig.ip>0?' · +'+sig.ip+' INS':''}` : 'At-Will — no RP cost'}</span>
         <button type="button" class="sig-cast-btn${sig.rc===0?' rc-free':''}" onclick="castSigilByRC(${sig.rc||0},${sig.ip||0},'${sig.name.replace(/'/g,"\\'")}','${sig.aff}',null)">⟳ Cast</button>
@@ -30781,19 +30666,6 @@ function copyReport(){
         </div>
     </div>
 
-    <!-- ═══════════ ARCANE SURGE (1d6 Instability Check) ═══════════ -->
-    <div id="surgeOverlay" class="surge-overlay" onclick="if(event.target===this)closeArcaneSurge()">
-        <div class="surge-modal">
-            <div class="surge-title">Arcane Instability Check</div>
-            <div class="surge-sub" id="surgeSub">The raw Vein answers — roll <b>1d6</b>.</div>
-            <div class="surge-die" id="surgeDie">?</div>
-            <div class="surge-outcome-title" id="surgeOutcomeTitle"></div>
-            <div class="surge-outcome-text" id="surgeOutcomeText"></div>
-            <div class="surge-effects" id="surgeEffects"></div>
-            <button type="button" class="surge-continue-btn" id="surgeContinueBtn" onclick="closeArcaneSurge()" style="display:none">✦ Continue</button>
-        </div>
-    </div>
-
     <!-- ═══════════ DM / KEEPER PANEL — V4.8 OVERHAUL ═══════════ -->
     <div class="dm-overlay" id="dmOverlay" onclick="if(event.target===this)closeDMPanel()">
         <div class="dm-modal" style="max-width:980px;width:96vw">
@@ -34616,10 +34488,7 @@ document.addEventListener('click', function(e){
     var msg = (name || 'Sigil') + ' cast';
     if(rc > 0) msg += ' — −' + rc + ' RP';
     if(ip > 0) msg += ' · +' + ip + ' Instability';
-    var arcD6 = window.__arcaneD6Last || 0;
-    if(arcD6 > 0) msg += ' · Arcane Surge (1d6 = ' + arcD6 + ')';
     if(typeof showToast === 'function') showToast(msg);
-    window.__arcaneD6Last = 0;
     return result;
   };
 })();
