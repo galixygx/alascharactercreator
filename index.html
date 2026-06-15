@@ -11708,6 +11708,16 @@ const SIGIL_COMPENDIUM = {
     {name:'Unravel',rc:8,ip:4,aff:'Chaos',ct:'Action',effect:'Target one magical effect. DC 20 check using creator\'s casting mod or end immediately.'},
     {name:'Void Collapse',rc:12,ip:5,aff:'Chaos',ct:'Action',effect:'40-ft radius implosion. 10d10 force (CON half). All STR save or pulled to center. Caster Instability check required.'},
   ],
+  'Arcane':[
+    {name:'Raw Bolt',rc:0,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'Ranged attack (60 ft). 1d10 force damage. Scales 2d10/3d10/4d10 at L5/11/17. ⚠ Unstable: roll 1d6 Instability on cast.'},
+    {name:'Arc Spark',rc:0,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'Touch or 15 ft. 1d8 force, and the target sheds no light-based concealment until end of your next turn. ⚠ Unstable: roll 1d6 Instability on cast.'},
+    {name:'Resonant Shield',rc:2,ip:0,aff:'Arcane',d6ins:true,ct:'Reaction',effect:'When hit: +1d6 + INT to AC against the triggering attack, possibly turning a hit into a miss. ⚠ Unstable: roll 1d6 Instability on cast.'},
+    {name:'Unwoven Strike',rc:3,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'Ranged (90 ft). 3d8 force, ignores resistance to non-magical damage. CON save or target loses its reaction. ⚠ Unstable: roll 1d6 Instability on cast.'},
+    {name:'Null Field',rc:3,ip:0,aff:'Arcane',d6ins:false,ct:'Action',effect:'10-ft radius for 1 min. The raw Vein is held still here — no Instability is rolled for Arcane sigils cast wholly within the field. A rare moment of order. (Stabilizing — no 1d6 roll.)'},
+    {name:'Surge Lance',rc:4,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'120-ft line, 5 ft wide. 5d8 force (DEX half). On a failed save, target is pushed 10 ft. ⚠ Unstable: roll 1d6 Instability on cast.'},
+    {name:'Splinter the Weave',rc:6,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'30-ft radius. 6d8 force (DEX half). Each creature that fails rolls on the Wild Surge table (DM). ⚠ Unstable: roll 1d6 Instability on cast — Arcane raw energy at full bloom.'},
+    {name:'Origin Cascade',rc:9,ip:0,aff:'Arcane',d6ins:true,ct:'Action',effect:'40-ft radius. 9d8 force (CON half). The Six Sigils briefly re-converge: choose Fire, Water, Air, Earth, Light, or Shadow — half the damage becomes that type and applies its rider. ⚠ Unstable: roll 1d6 Instability on cast.'},
+  ],
 };
 
 // ── CLASS SIGIL POOLS (PHB p.26–43) ────────────────────────────────────
@@ -11743,7 +11753,7 @@ const CLASS_SIGILS = {
   'Sigil-Touched Adept':{
     desc:'Born with the Vein already open inside them. Access sigils from your Origin affinity pool and the full Alas compendium. Cantrip-tier Origin sigils cost 0 RC. INT is your casting ability.',
     spAb:'INT', knowAtStart:null, learnSchedule:[], isOriginBased:true,
-    origins:{'Light':'Lightborn (Light / Amethyst)','Nature':'Vein-Born (Nature / Emerald)','Water':'Tideblood (Water / Sapphire)','Air':'Storm-Kissed (Air / Diamond)','Fire':'Ember-Touched (Fire / Ruby)','Chaos':'Void-Kissed (Chaos / Obsidian)'},
+    origins:{'Arcane':'Arcane-Born (Raw Vein / The Original Source — Unstable)','Light':'Lightborn (Light / Amethyst)','Nature':'Vein-Born (Nature / Emerald)','Water':'Tideblood (Water / Sapphire)','Air':'Storm-Kissed (Air / Diamond)','Fire':'Ember-Touched (Fire / Ruby)','Chaos':'Void-Kissed (Chaos / Obsidian)'},
     sigils:[]
   },
   'Pactbound Broker':{
@@ -15404,6 +15414,38 @@ function castSigilByRC(rc, ip, name, aff, card){
     updateScarTiers();
   }
 
+  // ── ARCANE RAW-ENERGY INSTABILITY (1d6 roll) ──────────────────────────────
+  // Arcane is the Original Source, split into the Six Sigils. What remains is
+  // raw, unstable energy — so most Arcane sigils force a 1d6 Instability roll
+  // on cast. Sigils flagged d6ins:false (e.g. stabilizing fields) are exempt.
+  let arcaneD6 = 0;
+  if(aff === 'Arcane'){
+    const arcEntry = (SIGIL_COMPENDIUM['Arcane']||[]).find(function(s){ return s.name === name; });
+    const rolls = !arcEntry || arcEntry.d6ins !== false; // default: roll unless explicitly exempt
+    if(rolls){
+      arcaneD6 = 1 + Math.floor(Math.random()*6);
+      const rawInsA = (state.instability||0) + arcaneD6;
+      if(rawInsA > 7){
+        state.instability = 7;
+        const ovfA = rawInsA - 7;
+        state.corruption = Math.min(10, (state.corruption||0) + ovfA);
+        const corValElA = document.getElementById('corVal');
+        const corStateElA = document.getElementById('corState');
+        if(corValElA) corValElA.textContent = state.corruption;
+        if(corStateElA) corStateElA.textContent = getTrackerState(state.corruption, COR_STATES);
+      } else {
+        state.instability = rawInsA;
+      }
+      const insValElA = document.getElementById('insVal');
+      const insStateElA = document.getElementById('insState');
+      if(insValElA) insValElA.textContent = state.instability;
+      if(insStateElA) insStateElA.textContent = getTrackerState(state.instability, INS_STATES);
+      updateScarTiers();
+      showToast('⚠ Arcane surge — rolled 1d6 = +' + arcaneD6 + ' Instability (raw energy)');
+    }
+  }
+  window.__arcaneD6Last = arcaneD6; // expose for the U05 cast-toast wrapper
+
   // Mark daily-use slot as spent (custom sigil cards only)
   if(card && rc > 0){
     const dailyBtn = card.querySelector('.sig-avail-btn[data-spent]');
@@ -15418,6 +15460,7 @@ function castSigilByRC(rc, ip, name, aff, card){
   const parts = [];
   if(rc > 0) parts.push(`−${rc} RC`); else parts.push('At-Will');
   if(totalIns > 0) parts.push(`+${totalIns} INS`);
+  if(arcaneD6 > 0) parts.push(`+${arcaneD6} INS (1d6 Arcane)`);
   showToast(`${name} cast — ${parts.join(' · ')}`);
 
   saveAll();
@@ -17553,6 +17596,13 @@ function buildClassSigilDisplay(){
     html += `</select>`;
     if(origin){
       html += `<div style="font-family:'EB Garamond',serif;font-size:11px;font-style:italic;color:var(--txt-dim);margin-top:7px;">Cantrip-tier ${origin} sigils cost 0 RC. The full ${origin} affinity compendium is shown below.</div>`;
+      if(origin === 'Arcane'){
+        html += `<div style="margin-top:9px;padding:9px 11px;background:rgba(80,80,140,.12);border:1px solid #404080;border-left:3px solid #a0a0e0;border-radius:4px;font-family:'EB Garamond',serif;font-size:12px;line-height:1.55;color:#b8b8e0;">
+          <span style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:#a0a0e0;text-transform:uppercase;display:block;margin-bottom:4px;">⚠ Raw Energy — The Original Source</span>
+          Arcane is the original source of all magic. When it split into the <em>Six Sigils</em> (Fire, Water, Air, Earth, Light, Shadow), the Resonance left behind became raw, unbound energy. Every Arcane-Born carries that instability inside them.<br><br>
+          <b style="color:#c0c0f0;">On casting most Arcane sigils you roll 1d6 and add the result to your Instability</b> — the surge is automatic and unavoidable. Only rare stabilizing sigils (marked “no 1d6 roll”) are exempt. Watch your Instability track closely; it overflows into Corruption at 7.
+        </div>`;
+      }
     }
     html += `</div>`;
     if(origin && SIGIL_COMPENDIUM[origin]){
@@ -34376,7 +34426,10 @@ document.addEventListener('click', function(e){
     var msg = (name || 'Sigil') + ' cast';
     if(rc > 0) msg += ' — −' + rc + ' RP';
     if(ip > 0) msg += ' · +' + ip + ' Instability';
+    var arcD6 = window.__arcaneD6Last || 0;
+    if(arcD6 > 0) msg += ' · +' + arcD6 + ' Instability (1d6 Arcane)';
     if(typeof showToast === 'function') showToast(msg);
+    window.__arcaneD6Last = 0;
     return result;
   };
 })();
