@@ -17620,6 +17620,7 @@ const SIG_AFF_STYLE = {
   'Force':{bg:'rgba(61,214,219,.12)',border:'rgba(61,214,219,.4)',color:'var(--res)'},
   'Arcane':{bg:'rgba(80,80,140,.13)',border:'#404080',color:'#a0a0e0'},
   'Resonance':{bg:'rgba(61,214,219,.1)',border:'#1a6070',color:'#3dd6db'},
+  'Physical':{bg:'rgba(160,160,180,.1)',border:'#5a5a70',color:'#b0b0c0'},
   'Common':{bg:'rgba(80,80,100,.12)',border:'#383858',color:'#9090b8'},
 };
 
@@ -17638,10 +17639,16 @@ const UNIVERSAL_RESONANCE_SIGILS = {
 // "Non Elemental" grants pure-Resonance 0 RC sigils AND makes every sigil in the
 // character's class list cost 0 RC (freeAll).
 const SIGIL_ADAPTATIONS = {
-  'Non Elemental':{label:'Non-Elemental (Pure Resonance — your entire Sigil List costs 0 RC)',freeAll:true,sigils:[
+  'Non Elemental':{label:'Non-Elemental (Physical Resonance)',freeAll:true,sigils:[
     {name:'Null Pulse',rc:0,ip:0,aff:'Resonance',ct:'Action',effect:'Ranged 30 ft. 1d6 pure-Resonance force damage — no elemental type, so nothing resists or absorbs it.'},
     {name:'Resonance Sight',rc:0,ip:0,aff:'Resonance',ct:'Action',effect:'For 1 minute, you perceive the Resonance Pools and Instability of creatures within 30 ft, and you can tell at a glance whether an object holds stored Resonance.'},
     {name:'Equalize',rc:0,ip:0,aff:'Resonance',ct:'Reaction',effect:'When a minor elemental effect (a flame, a frost patch, a static charge) forms within 10 ft, you may flatten it back to neutral Resonance, suppressing it until the end of your next turn.'},
+  ]},
+  'Non Resonance User':{label:'Non-Resonance User (Physical Combat — no magic, no Resonance)',noMagic:true,sigils:[
+    {name:'Power Strike',rc:0,ip:0,aff:'Physical',ct:'Action',effect:'Make a weapon or unarmed attack with +2 to the damage roll. A purely physical technique — uses no Resonance.'},
+    {name:'Guard Stance',rc:0,ip:0,aff:'Physical',ct:'Bonus Action',effect:'Set yourself: +2 AC until the start of your next turn. No Resonance used.'},
+    {name:'Disarming Blow',rc:0,ip:0,aff:'Physical',ct:'Action',effect:'On a successful attack, the target must make a STR save or drop one held item of your choice. No Resonance used.'},
+    {name:'Grapple & Throw',rc:0,ip:0,aff:'Physical',ct:'Action',effect:'Hand-to-hand: contest STR (Athletics) against an adjacent creature to grab it; on a win you may move it 5 ft or throw it prone. No Resonance used.'},
   ]},
   'Fire':{label:'Ember Adaptation (Fire)',sigils:[
     {name:'Ember Flick',rc:0,ip:0,aff:'Fire',ct:'Action',effect:'Ranged 30 ft. 1d6 fire damage, or ignite an unattended flammable object.'},
@@ -17755,8 +17762,10 @@ function buildClassSigilDisplay(){
 
   // ── SIGIL-ADAPTATION (all classes except Sigil-Touched) ───────────────────────
   const freeAll = (!cs.isOriginBased && state.sigilAdaptation === 'Non Elemental');
+  const noMagic = (!cs.isOriginBased && SIGIL_ADAPTATIONS[state.sigilAdaptation] && SIGIL_ADAPTATIONS[state.sigilAdaptation].noMagic);
   if(!cs.isOriginBased){
     const adapt = state.sigilAdaptation || '';
+    const adaptData = SIGIL_ADAPTATIONS[adapt];
     html += `<div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:4px;padding:12px 14px;margin-bottom:14px;">`;
     html += `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;margin-bottom:7px;">Sigil-Adaptation — the Resonance you start with</div>`;
     html += `<select class="fld-sel" style="width:100%;" onchange="state.sigilAdaptation=this.value;_debouncedSave();buildClassSigilDisplay();">`;
@@ -17765,20 +17774,29 @@ function buildClassSigilDisplay(){
       html += `<option value="${k}"${adapt===k?' selected':''}>${v.label}</option>`;
     });
     html += `</select>`;
-    if(adapt && SIGIL_ADAPTATIONS[adapt]){
-      if(SIGIL_ADAPTATIONS[adapt].freeAll){
+    if(adaptData){
+      if(adaptData.noMagic){
+        html += `<div style="margin-top:9px;padding:9px 11px;background:rgba(160,160,180,.08);border:1px solid #5a5a70;border-left:3px solid #b0b0c0;border-radius:4px;font-family:'EB Garamond',serif;font-size:12px;line-height:1.55;color:var(--txt-lbl);">
+          <span style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:#c0c0d0;text-transform:uppercase;display:block;margin-bottom:4px;">Non-Resonance User</span>
+          You produce and use no Resonance — you have <b style="color:#d0d0e0;">no magic sigils at all.</b> Instead you fight with the hand-to-hand and weapon techniques shown here. These cost no Resonance, because they neither produce nor consume it.</div>`;
+      } else if(adaptData.freeAll){
         html += `<div style="margin-top:9px;padding:9px 11px;background:rgba(61,214,219,.08);border:1px solid #1a6070;border-left:3px solid var(--res);border-radius:4px;font-family:'EB Garamond',serif;font-size:12px;line-height:1.55;color:var(--txt-lbl);">
-          <span style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:var(--res);text-transform:uppercase;display:block;margin-bottom:4px;">Non-Elemental Resonance</span>
+          <span style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:var(--res);text-transform:uppercase;display:block;margin-bottom:4px;">Non-Elemental (Physical Resonance)</span>
           You channel raw, untyped Resonance rather than any single element. <b style="color:#90e0e4;">Every sigil in your class list below costs 0 RC.</b> You also gain the pure-Resonance sigils shown here.</div>`;
       } else {
         html += `<div style="font-family:'EB Garamond',serif;font-size:11px;font-style:italic;color:var(--txt-dim);margin-top:7px;">Your ${adapt} adaptation grants the unique 0 RC sigils shown below.</div>`;
       }
     }
     html += `</div>`;
-    if(adapt && SIGIL_ADAPTATIONS[adapt]){
-      html += `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--res);text-transform:uppercase;margin:4px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(61,214,219,.2);">${adapt} Adaptation Sigils — 0 RC</div>`;
-      SIGIL_ADAPTATIONS[adapt].sigils.forEach(sig => { html += buildSigilRefCard(sig, true, false); });
-      html += `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--bdr-g);">Class Sigil List — ${cls}</div>`;
+    if(adaptData){
+      const listHdr = adaptData.noMagic ? 'Physical Combat Skills — No Resonance' : (adapt + ' Adaptation Sigils — 0 RC');
+      const hdrColor = adaptData.noMagic ? '#b0b0c0' : 'var(--res)';
+      const hdrBorder = adaptData.noMagic ? 'rgba(160,160,180,.25)' : 'rgba(61,214,219,.2)';
+      html += `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:${hdrColor};text-transform:uppercase;margin:4px 0 8px;padding-bottom:6px;border-bottom:1px solid ${hdrBorder};">${listHdr}</div>`;
+      adaptData.sigils.forEach(sig => { html += buildSigilRefCard(sig, true, false); });
+      if(!adaptData.noMagic){
+        html += `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--bdr-g);">Class Sigil List — ${cls}</div>`;
+      }
     } else {
       html += `<div class="racial-skills-empty">Choose your Sigil-Adaptation above to set your starting Resonance type.</div>`;
     }
@@ -17812,6 +17830,9 @@ function buildClassSigilDisplay(){
       html += '<div class="racial-skills-empty">Choose your Sigil Origin above to load your affinity spell pool.</div>';
     }
 
+  } else if(noMagic){
+    // Non-Resonance User — no class sigils at all; combat skills shown above.
+    html += `<div class="racial-skills-empty" style="font-style:italic;">As a Non-Resonance User you wield no Class Sigils — your ${cls} training expresses itself through the physical combat skills above. You still gain all non-sigil class features in the Skills tab.</div>`;
   } else if(cs.knowAtStart !== null){
     // Classes with discrete selectable known sigils
     const maxKnown = getKnownSigilCount(cls, level);
@@ -17877,14 +17898,16 @@ function buildClassSigilDisplay(){
     cs.sigils.forEach(sig => { html += buildSigilRefCard(freeAll ? {...sig, rc:0} : sig, true, false); });
   }
 
-  // ── Universal Resonance Sigils — granted to every class ───────────────────────
-  html += `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--res);text-transform:uppercase;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(61,214,219,.2);">Universal Resonance Sigils</div>`;
-  html += `<div style="font-family:'EB Garamond',serif;font-size:11.5px;font-style:italic;color:var(--txt-dim);margin-bottom:10px;">Baseline 0 RC Resonance techniques known to every caster, regardless of class or origin.</div>`;
-  html += buildSigilRefCard(UNIVERSAL_RESONANCE_SIGILS.emittance, true, false);
-  if(cls === 'Sigil-Touched Adept'){
-    html += buildSigilRefCard(UNIVERSAL_RESONANCE_SIGILS.drain, true, false);
-  } else {
-    html += buildSigilRefCard(UNIVERSAL_RESONANCE_SIGILS.leech, true, false);
+  // ── Universal Resonance Sigils — granted to every caster (not Non-Resonance Users) ──
+  if(!noMagic){
+    html += `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--res);text-transform:uppercase;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(61,214,219,.2);">Universal Resonance Sigils</div>`;
+    html += `<div style="font-family:'EB Garamond',serif;font-size:11.5px;font-style:italic;color:var(--txt-dim);margin-bottom:10px;">Baseline 0 RC Resonance techniques known to every caster, regardless of class or origin.</div>`;
+    html += buildSigilRefCard(UNIVERSAL_RESONANCE_SIGILS.emittance, true, false);
+    if(cls === 'Sigil-Touched Adept'){
+      html += buildSigilRefCard(UNIVERSAL_RESONANCE_SIGILS.drain, true, false);
+    } else {
+      html += buildSigilRefCard(UNIVERSAL_RESONANCE_SIGILS.leech, true, false);
+    }
   }
 
   panel.innerHTML = html;
