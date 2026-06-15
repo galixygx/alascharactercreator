@@ -17619,7 +17619,17 @@ const SIG_AFF_STYLE = {
   'Chaos':{bg:'rgba(120,60,160,.13)',border:'#582870',color:'#c070e0'},
   'Force':{bg:'rgba(61,214,219,.12)',border:'rgba(61,214,219,.4)',color:'var(--res)'},
   'Arcane':{bg:'rgba(80,80,140,.13)',border:'#404080',color:'#a0a0e0'},
+  'Resonance':{bg:'rgba(61,214,219,.1)',border:'#1a6070',color:'#3dd6db'},
   'Common':{bg:'rgba(80,80,100,.12)',border:'#383858',color:'#9090b8'},
+};
+
+// ── UNIVERSAL RESONANCE SIGILS (available to every caster) ──────────────────────
+// Resonance Emittance is granted to ALL classes. Resonance Leech is granted to
+// every class EXCEPT Sigil-Touched Adept, which instead receives Resonance Drain.
+const UNIVERSAL_RESONANCE_SIGILS = {
+  emittance:{name:'Resonance Emittance',rc:0,ip:0,aff:'Resonance',ct:'Action',effect:'You emit Resonance to either Radiate, Transfer, or Propel Resonance in any direction up to 120 ft. If you allow this emittance to continue for longer than 1 hour, you subtract 2d6 Resonance from your pool.'},
+  leech:{name:'Resonance Leech',rc:0,ip:0,aff:'Resonance',ct:'Action · Concentration',effect:'You begin to drain the Resonance of a creature or object within 5 ft. Concentrate for 1 minute to drain 2d6 Resonance. You must make a DC 12 Wisdom save or suffer 2d8 damage of that Resonance type.'},
+  drain:{name:'Resonance Drain',rc:0,ip:0,aff:'Resonance',ct:'Action · Concentration',effect:'You begin to drain the Resonance of a creature or object within 10 ft. Concentrate for 1 minute to drain 2d8 Resonance. You must make a DC 12 Wisdom save or suffer 2d6 damage of that Resonance type.'},
 };
 
 function getKnownSigilCount(cls, level){
@@ -17785,6 +17795,16 @@ function buildClassSigilDisplay(){
   } else {
     // Ability-based classes — all shown as active reference
     cs.sigils.forEach(sig => { html += buildSigilRefCard(sig, true, false); });
+  }
+
+  // ── Universal Resonance Sigils — granted to every class ───────────────────────
+  html += `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--res);text-transform:uppercase;margin:18px 0 8px;padding-bottom:6px;border-bottom:1px solid rgba(61,214,219,.2);">Universal Resonance Sigils</div>`;
+  html += `<div style="font-family:'EB Garamond',serif;font-size:11.5px;font-style:italic;color:var(--txt-dim);margin-bottom:10px;">Baseline 0 RC Resonance techniques known to every caster, regardless of class or origin.</div>`;
+  html += buildSigilRefCard(UNIVERSAL_RESONANCE_SIGILS.emittance, true, false);
+  if(cls === 'Sigil-Touched Adept'){
+    html += buildSigilRefCard(UNIVERSAL_RESONANCE_SIGILS.drain, true, false);
+  } else {
+    html += buildSigilRefCard(UNIVERSAL_RESONANCE_SIGILS.leech, true, false);
   }
 
   panel.innerHTML = html;
