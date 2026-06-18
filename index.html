@@ -10330,9 +10330,13 @@
                     </div>
 
                     <!-- Custom / Additional Sigils -->
-                    <div class="sec-hdr" style="margin-top:22px">Custom &amp; Additional Sigils</div>
-                    <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:14px;">
-                        Add sigils learned through play, Magical Secrets, Arc-Type unlocks, or other sources. Fire Sigils +1 Instability. Chaos Sigils +2 Instability + Corruption risk.
+                    <div style="display:flex;align-items:flex-end;gap:8px;margin-top:22px;">
+                      <div class="sec-hdr" style="margin-top:0;margin-bottom:0;flex:1;">Custom &amp; Additional Sigils</div>
+                      <button onclick="_sigilsCollapseAll(true)"  class="add-btn" style="padding:3px 9px;font-size:7px;letter-spacing:1px;border-color:rgba(255,255,255,.15);color:var(--txt-dim);white-space:nowrap;margin-bottom:7px;" title="Collapse all spell cards">▼ Collapse All</button>
+                      <button onclick="_sigilsCollapseAll(false)" class="add-btn" style="padding:3px 9px;font-size:7px;letter-spacing:1px;border-color:rgba(255,255,255,.15);color:var(--txt-dim);white-space:nowrap;margin-bottom:7px;" title="Expand all spell cards">▲ Expand All</button>
+                    </div>
+                    <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:14px;margin-top:12px;">
+                        Add sigils learned through play, Magical Secrets, Arc-Type unlocks, or other sources. Fire Sigils +1 Instability. Chaos Sigils +2 Instability + Corruption risk. Click any spell card to expand or collapse it.
                     </div>
                     <div class="card-list" id="sigilsList"></div>
                     <div style="display:flex;align-items:center;gap:10px;margin-top:10px;">
@@ -15786,8 +15790,30 @@ function addSpell(data){
     durSubHTML = `<div class="sp-dur-sub"></div>`;
   }
 
+  const _isNew  = !data.name;
+  const _iAff   = data.aff || 'Common';
+  const _iLvl   = parseInt(data.spellLevel||1);
+  const _iRc    = data.rc !== undefined ? data.rc : 2;
+  const _iCt    = data.ct || 'Action';
+  const _iDie   = data.dmgDie || 'none';
+  const _iCnt   = data.dmgCount || '1';
+  const _iTyp   = data.dmgType || '';
+  const _nm     = _isNew ? '(unnamed spell)' : (data.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
   card.innerHTML = `
     <button class="c-remove" onclick="_animRemoveCard(this,()=>saveCards('sigilsList','sigils'))">×</button>
+    <div class="sigil-card-header" onclick="_sigilToggleCollapse(this.closest('.item-card'))">
+      <span class="sigil-card-chevron">${_isNew ? '▼' : '▶'}</span>
+      <span class="sigil-card-name${_isNew ? ' unnamed' : ''}">${_nm}</span>
+      <div class="sigil-card-tags">
+        <span class="sigil-tag aff-${_iAff}">${_iAff}</span>
+        <span class="sigil-tag lvl-tag">${_iLvl===0?'Cantrip':'Lv '+_iLvl}</span>
+        <span class="sigil-tag rc-tag">RC ${_iRc}</span>
+        ${_iCt!=='Action'?`<span class="sigil-tag ct-tag">${_iCt}</span>`:''}
+        ${_iDie!=='none'?`<span class="sigil-tag dmg-tag">${_iCnt}${_iDie}${_iTyp?' '+_iTyp:''}</span>`:''}
+      </div>
+    </div>
+    <div class="sigil-card-body">
 
     <!-- Row 1: Identity -->
     <div class="c-row" style="grid-template-columns:2fr 1fr 80px 80px 80px">
@@ -16039,7 +16065,10 @@ function addSpell(data){
       <button type="button" class="sig-avail-btn" style="background:rgba(61,214,219,.06);border-color:rgba(61,214,219,.35);color:rgba(61,214,219,.75);" onclick="duplicateSpell(this.closest('.item-card'))">⧉ Dupe</button>
     </div>
     <div class="sig-atwill" style="display:none;font-family:'Cinzel',serif;font-size:7px;color:var(--res);letter-spacing:1px;">AT-WILL (RC 0)</div>
+    </div><!-- /.sigil-card-body -->
   `;
+
+  if(!_isNew) card.classList.add('sigil-collapsed');
 
   // restore element and dmgType selects from saved data
   const elemSel  = card.querySelector('.sp-elem-sel');
@@ -20498,6 +20527,7 @@ function saveCards(listId, stateKey){
     items.push(d);
   });
   state[stateKey]=items;
+  if(listId==='sigilsList') _sigilSyncAllHeaders();
   updateCalcs();
   const __cs=document.getElementById('combatSpeed');
   const __sb=document.getElementById('charSpeed');
@@ -26747,6 +26777,7 @@ function loadCharacterFile(input){
       document.getElementById('corState').textContent=getTrackerState(state.corruption||0,COR_STATES);
       updateBar('hp');updateBar('rp');updateRpState();
       (state.sigils||[]).forEach(d=>addSigil(d));
+      _sigilSyncAllHeaders();
       (state.sets||[]).forEach(d=>addSet(d));
       (state.features||[]).forEach(d=>addFeature(d));
       (state.abilities||[]).forEach(d=>addAbility(d));
@@ -27220,6 +27251,7 @@ window.addEventListener('load', function(){
   updateBar('hp'); updateBar('rp'); updateRpState();
   // Restore all card lists
   (state.sigils||[]).forEach(d => addSigil(d));
+  _sigilSyncAllHeaders();
   (state.sets||[]).forEach(d => addSet(d));
   (state.features||[]).forEach(d => addFeature(d));
   (state.abilities||[]).forEach(d => addAbility(d));
@@ -29380,6 +29412,7 @@ function _loadStateObject(loaded){
   if(document.getElementById('corState')) document.getElementById('corState').textContent=getTrackerState(state.corruption||0,COR_STATES);
   updateBar('hp');updateBar('rp');updateRpState();
   (state.sigils||[]).forEach(d=>addSigil(d));
+  _sigilSyncAllHeaders();
   (state.sets||[]).forEach(d=>addSet(d));
   (state.features||[]).forEach(d=>addFeature(d));
   (state.abilities||[]).forEach(d=>addAbility(d));
@@ -29742,11 +29775,60 @@ function duplicateSpell(card){
   showToast('"' + src.name + '" duplicated.');
 }
 
+// ── Sigil card collapsible helpers ───────────────────────
+function _sigilToggleCollapse(card){
+  const collapsed = card.classList.toggle('sigil-collapsed');
+  const chev = card.querySelector('.sigil-card-chevron');
+  if(chev) chev.textContent = collapsed ? '▶' : '▼';
+}
+
+function _sigilSyncHeader(card){
+  const hdr = card.querySelector('.sigil-card-header');
+  if(!hdr) return;
+  const nameEl = hdr.querySelector('.sigil-card-name');
+  const tagsEl = hdr.querySelector('.sigil-card-tags');
+  if(!nameEl || !tagsEl) return;
+
+  const name  = (card.querySelectorAll('.c-inp')[0]||{}).value || '';
+  const aff   = (card.querySelector('.c-sel')||{}).value || 'Common';
+  const lvl   = parseInt(card.dataset.spellLevel||'1') || 0;
+  const rc    = (card.querySelector('.sig-rc-inp')||{}).value ?? '2';
+  const ct    = (card.querySelector('.sp-ct-sel')||{}).value || 'Action';
+  const die   = card.dataset.dmgDie || 'none';
+  const cnt   = card.dataset.dmgCount || '1';
+  const typ   = card.dataset.dmgType || '';
+
+  nameEl.textContent = name || '(unnamed spell)';
+  nameEl.classList.toggle('unnamed', !name);
+
+  let tags = `<span class="sigil-tag aff-${aff}">${aff}</span>`;
+  tags += `<span class="sigil-tag lvl-tag">${lvl===0?'Cantrip':'Lv '+lvl}</span>`;
+  tags += `<span class="sigil-tag rc-tag">RC ${rc}</span>`;
+  if(ct && ct !== 'Action') tags += `<span class="sigil-tag ct-tag">${ct}</span>`;
+  if(die && die !== 'none') tags += `<span class="sigil-tag dmg-tag">${cnt}${die}${typ?' '+typ:''}</span>`;
+  tagsEl.innerHTML = tags;
+}
+
+function _sigilSyncAllHeaders(){
+  document.querySelectorAll('#sigilsList .item-card').forEach(_sigilSyncHeader);
+}
+
+function _sigilsCollapseAll(collapse){
+  document.querySelectorAll('#sigilsList .item-card').forEach(function(card){
+    card.classList.toggle('sigil-collapsed', collapse);
+    const chev = card.querySelector('.sigil-card-chevron');
+    if(chev) chev.textContent = collapse ? '▶' : '▼';
+    _sigilSyncHeader(card);
+  });
+}
+// ─────────────────────────────────────────────────────────
+
 function spellUpdateAffColor(sel){
   const card = sel.closest('.item-card');
   if(!card) return;
   const _AC={Light:'#e8d070',Nature:'#7cd46a',Water:'#50b8e0',Air:'#b0d8f0',Fire:'#e07040',Chaos:'#e050a0',Common:'#a0a0b8'};
   card.style.borderLeft = '3px solid ' + (_AC[sel.value]||'#7878a0');
+  _sigilSyncHeader(card);
   saveCards('sigilsList','sigils');
 }
 
@@ -34534,6 +34616,65 @@ function kpInjectConditionsIntoCards(){
 }
 .res-adj-btn:hover { background: rgba(255,255,255,.12); border-color: var(--gold-d); color: var(--gold); }
 .res-adj-btn.dmg:hover { border-color: var(--cor); color: var(--cor); }
+
+/* ── Sigil Card Collapsible Headers ─────────────────────── */
+.sigil-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 2px 28px 10px 0;
+  user-select: none;
+  min-height: 28px;
+}
+.sigil-card-header:hover .sigil-card-name { color: var(--gold); }
+.sigil-card-chevron {
+  font-size: 8px;
+  color: var(--txt-dim);
+  flex-shrink: 0;
+  transition: transform .18s;
+  width: 10px;
+  text-align: center;
+}
+.item-card.sigil-collapsed .sigil-card-chevron { transform: rotate(-90deg); }
+.sigil-card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  color: var(--gold-d);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color .15s;
+}
+.sigil-card-name.unnamed { color: var(--txt-dim); font-style: italic; font-weight: 400; }
+.sigil-card-tags { display: flex; flex-wrap: wrap; gap: 4px; flex-shrink: 0; }
+.sigil-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 7px;
+  letter-spacing: .6px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+  color: var(--txt-lbl);
+  white-space: nowrap;
+}
+.sigil-tag.aff-Light  { border-color:rgba(232,208,112,.4); color:#e8d070; background:rgba(232,208,112,.07); }
+.sigil-tag.aff-Nature { border-color:rgba(124,212,106,.4); color:#7cd46a; background:rgba(124,212,106,.07); }
+.sigil-tag.aff-Water  { border-color:rgba(80,184,224,.4);  color:#50b8e0; background:rgba(80,184,224,.07); }
+.sigil-tag.aff-Air    { border-color:rgba(176,216,240,.4); color:#b0d8f0; background:rgba(176,216,240,.07); }
+.sigil-tag.aff-Fire   { border-color:rgba(224,112,64,.4);  color:#e07040; background:rgba(224,112,64,.07); }
+.sigil-tag.aff-Chaos  { border-color:rgba(224,80,160,.4);  color:#e050a0; background:rgba(224,80,160,.07); }
+.sigil-tag.aff-Common { border-color:rgba(160,160,184,.35); color:#b0b0c8; background:rgba(160,160,184,.07); }
+.sigil-tag.rc-tag  { border-color:rgba(201,162,39,.3); color:var(--gold-d); background:rgba(201,162,39,.06); }
+.sigil-tag.ct-tag  { border-color:rgba(100,180,255,.25); color:rgba(140,200,255,.85); background:rgba(100,180,255,.05); }
+.sigil-tag.dmg-tag { border-color:rgba(255,120,60,.3); color:rgba(255,150,80,.9); background:rgba(255,120,60,.05); }
+.item-card.sigil-collapsed .sigil-card-body { display: none; }
+.item-card.sigil-collapsed .sigil-card-header { padding-bottom: 2px; }
 
 /* U04 — Delete confirmation highlight (brief flash on removal) */
 .card-removing {
