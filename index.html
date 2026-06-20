@@ -3119,6 +3119,181 @@
             margin-top: 6px;
         }
 
+        /* ─── BOUNTY BOARD ─── */
+        .bounty-board-section {
+            background: rgba(40,24,8,.55);
+            border: 2px solid rgba(160,100,30,.5);
+            border-radius: 6px;
+            padding: 14px;
+            margin: 14px 0;
+            position: relative;
+        }
+        .bounty-board-section::before {
+            content: '';
+            position: absolute;
+            inset: 4px;
+            border: 1px solid rgba(160,100,30,.18);
+            border-radius: 4px;
+            pointer-events: none;
+        }
+        .bounty-board-hdr {
+            font-family: 'Cinzel Decorative',serif;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: #c8843a;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .bounty-board-sub {
+            font-family: 'EB Garamond',serif;
+            font-size: 11px;
+            font-style: italic;
+            color: rgba(180,130,60,.6);
+            text-align: center;
+            margin-bottom: 14px;
+        }
+        .bounty-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 10px;
+        }
+        .bounty-grid.universal-grid {
+            grid-template-columns: repeat(4, 1fr);
+            margin-bottom: 14px;
+        }
+        @media (max-width: 700px) {
+            .bounty-grid.universal-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .wanted-poster {
+            background: linear-gradient(160deg, #f5e8c0 0%, #e8d49a 60%, #d4b870 100%);
+            border: 2px solid #8b6914;
+            border-radius: 3px;
+            padding: 8px 6px 10px;
+            position: relative;
+            box-shadow: 2px 2px 6px rgba(0,0,0,.5), inset 0 0 12px rgba(0,0,0,.08);
+            text-align: center;
+            cursor: pointer;
+            transition: transform .15s, box-shadow .15s;
+        }
+        .wanted-poster:hover {
+            transform: translateY(-2px);
+            box-shadow: 3px 4px 10px rgba(0,0,0,.6), inset 0 0 12px rgba(0,0,0,.08);
+        }
+        .wanted-poster.mega { border-color: #6b1010; box-shadow: 0 0 0 1px rgba(160,30,30,.3), 2px 2px 8px rgba(0,0,0,.6); }
+        .wanted-top {
+            font-family: 'Cinzel Decorative',serif;
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: #6b1010;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .wanted-silhouette {
+            width: 100%;
+            height: 70px;
+            background: rgba(0,0,0,.15);
+            border: 1px solid rgba(0,0,0,.2);
+            border-radius: 2px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: rgba(0,0,0,.25);
+            letter-spacing: 0;
+        }
+        .wanted-name {
+            font-family: 'Cinzel',serif;
+            font-size: 9.5px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #1a0a00;
+            text-transform: uppercase;
+            line-height: 1.2;
+            margin-bottom: 3px;
+        }
+        .wanted-alias {
+            font-family: 'EB Garamond',serif;
+            font-size: 9px;
+            font-style: italic;
+            color: rgba(50,25,0,.6);
+            margin-bottom: 6px;
+        }
+        .wanted-crimes {
+            font-family: 'EB Garamond',serif;
+            font-size: 9px;
+            color: rgba(30,10,0,.7);
+            line-height: 1.35;
+            margin-bottom: 8px;
+            text-align: left;
+            padding: 0 2px;
+        }
+        .wanted-reward {
+            font-family: 'Cinzel',serif;
+            font-size: 7.5px;
+            letter-spacing: 1px;
+            color: #1a0a00;
+            text-transform: uppercase;
+            border-top: 1px solid rgba(0,0,0,.2);
+            padding-top: 5px;
+        }
+        .wanted-reward strong { font-size: 10px; color: #6b1010; letter-spacing: .5px; }
+        .wanted-doa {
+            display: inline-block;
+            margin-top: 4px;
+            font-family: 'Cinzel',serif;
+            font-size: 7px;
+            letter-spacing: 2px;
+            color: #fff;
+            background: #6b1010;
+            padding: 2px 7px;
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+        .rotating-bounty {
+            background: rgba(255,255,255,.04);
+            border: 1px solid rgba(160,100,30,.3);
+            border-left: 3px solid rgba(160,100,30,.6);
+            border-radius: 4px;
+            padding: 8px 10px;
+            text-align: left;
+        }
+        .rb-name {
+            font-family: 'Cinzel',serif;
+            font-size: 8.5px;
+            letter-spacing: 1px;
+            color: #c8843a;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        .rb-desc {
+            font-family: 'EB Garamond',serif;
+            font-size: 11.5px;
+            color: rgba(200,180,140,.8);
+            line-height: 1.4;
+            margin-bottom: 4px;
+        }
+        .rb-reward {
+            font-family: 'Cinzel',serif;
+            font-size: 7.5px;
+            letter-spacing: .5px;
+            color: var(--gold-d);
+        }
+        .bb-divider {
+            border: none;
+            border-top: 1px solid rgba(160,100,30,.3);
+            margin: 10px 0;
+        }
+        .bb-rotating-hdr {
+            font-family: 'Cinzel',serif;
+            font-size: 7.5px;
+            letter-spacing: 2px;
+            color: rgba(180,130,60,.7);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
         .district-block {
             margin-bottom: 14px;
         }
@@ -13307,6 +13482,119 @@ const SHOP_RARE_POOLS = {
   ],
 };
 
+// ═══════════════════════════════════════════════════
+// BOUNTY BOARD DATA
+// ═══════════════════════════════════════════════════
+const BOUNTY_BOARD = {
+  // ── Four universal wanted posters — pinned to EVERY board ──
+  universal:[
+    {
+      name:'Aetherios',
+      alias:'"The Unravelling Voice"',
+      icon:'👁',
+      crimes:'Destabilization of three Karanthian Vein convergences. Suspected architect of the Second Veil Rupture. Direct involvement in the disappearance of the Celestial Records from the Grand Archive. Responsible for the Corruption event at the Eldorian Coast — 14 confirmed casualties.',
+      reward:50000000,
+      status:'DEAD OR ALIVE',
+      notes:'Extremely dangerous. Demonstrated ability to unmake resonance structures at range. Do not engage alone. Alert the nearest Circlewarden station immediately.'
+    },
+    {
+      name:'Sylvenor',
+      alias:'"The Hollow Crown"',
+      icon:'🌑',
+      crimes:'Corruption of the Silkwood Vein node. Mass conversion of wildlife to corrupted beasts (approx. 400 sq. mi. affected). Murder of two Circlewarden Wardens and one Alorian Council envoy. Suspected orchestration of the Ashroot Plague.',
+      reward:50000000,
+      status:'DEAD OR ALIVE',
+      notes:'Nature Sigil affinity — extreme level. All plant life within 60 ft. considered hostile. Reports indicate ability to inhabit corrupted root networks. Approach only in groups of six or more.'
+    },
+    {
+      name:'Apophis',
+      alias:'"The Coiling Dark" / "The Unending"',
+      icon:'🐍',
+      crimes:'Infiltration and subversion of no fewer than four faction councils. Theft of the Null Stone from the Crystal Exchange. Confirmed connection to the Dead Lands expansion event of three years prior. Believed responsible for the erasure of the Stoneheart historical archive.',
+      reward:50000000,
+      status:'DEAD OR ALIVE',
+      notes:'Shapeshifter. May appear in any form. No magical detection method confirmed reliable. Psychological manipulation is their primary weapon. Isolation from party members before engagement is likely.'
+    },
+    {
+      name:'Atlas',
+      alias:'"The Weight That Remains"',
+      icon:'⚖',
+      crimes:'Theft of three Worldscar artifacts of Class-I historical significance. Destruction of the Resonance Observatory at Skyhaven. Assassinations of two Glass Market Directors and one Drakonian Council member. Confirmed Chaos Sigil usage at Tier IV or above.',
+      reward:50000000,
+      status:'DEAD OR ALIVE',
+      notes:'Former Oathbearer — oath status unknown. Extremely high physical resilience. Intelligence suggests they are seeking something beneath the Dead Lands boundary. Do not pursue into corrupted territory without Circlewarden escort.'
+    }
+  ],
+
+  // ── Rotating city-specific bounties ──
+  rotating:{
+    'Aloria (Tech-Metropolis)':[
+      {name:'Calder Moss',alias:'"The Ledger Ghost"',reward:12000,desc:'Former Glass Market accountant. Embezzled 340,000 GP across six hidden accounts. Forged Alorian Council seals. Last seen in the Undercity Market Node. Carries falsified merchant credentials bearing Lady Verana Crolt\'s seal.'},
+      {name:'Unnamed — Codename: "Ironthread"',alias:'Unknown',reward:25000,desc:'Operating within the Iron Register district. Selling counterfeit Vein-tempered weapons to militia personnel. Counterfeits have caused two combat fatalities from blade failure. Race: Unknown. May be operating under multiple identities.'},
+      {name:'Sera Vant',alias:'None',reward:8000,desc:'Unlicensed Sigil-Touched caster operating without Obsidian Collegium registration. Repeated use of Water Sigil in densely populated areas — three civilians injured. Considered a danger to herself and surrounding area. Approach with a registered Circlewarden.'},
+    ],
+    'Roken Guldorad (Ember Forge)':[
+      {name:'Brix Haldurn',alias:'"The Slaghand"',reward:18000,desc:'Ember Forge Dwarf. Stole a shipment of Vein-resonant ore certified for Gem Court delivery. Ore has not been recovered. Believed to be offloading material to unlicensed forgers in the outer settlements. Considered armed with Forge-grade equipment.'},
+      {name:'Unknown — Description Only',alias:'"The Cooling Agent"',reward:30000,desc:'Suspected saboteur. Three Ember Forge blast chambers have been tampered with over the last two months — cooling agents introduced to active chambers. One death. Suspect is internal. No known identity. Anyone with information should contact the Forge Council directly, not local enforcement.'},
+      {name:'Tessara Keln',alias:'None',reward:7500,desc:'Unauthorized gem assessment and resale. Operating a shadow certification service undercutting Maeve Collier\'s Glass Market credentials. Her certifications are fraudulent. Buyers who purchased certified gems from her may apply for partial reimbursement through the Crystal Exchange.'},
+    ],
+    'Roax (Clock-Tower City)':[
+      {name:'Aldric the Unbound',alias:'"The Missing Page"',reward:20000,desc:'Former Sage\'s Guild archivist. Removed seventeen restricted texts from the Roax Archive without authorization. Believed to be selling historical intelligence to competing factions. Knowledge of Clock-Tower maintenance access makes him particularly dangerous to infrastructure.'},
+      {name:'Maris Orlen',alias:'None',reward:14000,desc:'Information broker operating without a Guild license. Her intelligence network has compromised two active Veilrunner operations. Sources suggest she maintains a dead-drop system within the Clock-Tower\'s public observation decks. Approach only when off-duty hours confirm she is not surrounded by watchers.'},
+      {name:'The Pale Circuit',alias:'Collective — members unknown',reward:45000,desc:'An unlicensed magical device distribution ring. Distributing modified Nethymir constructs stripped of safety governors. Seven injuries in the Gear District. Members unknown. Reward is per confirmed arrest of any member. Total reward uncapped.'},
+    ],
+    'Eldoria (Port City)':[
+      {name:'Captain Vorryn Dask',alias:'"The Lacquered Sail"',reward:22000,desc:'Drakonian pirate captain operating in Eldorian coastal waters. Responsible for the seizure of four Merchants Guild vessels. Cargo unrecovered. Last seen anchoring in the hidden coves south of the Obsidian Spire — approach requires naval escort.'},
+      {name:'Lysa Thorn',alias:'"The Tide-Fence"',reward:16000,desc:'Runs a contraband smuggling operation through the Eldorian docks. Specializes in moving restricted Chaos Sigil materials without Glass Market certification. Crew size unknown. Has bribed at least two dock inspection officers — their identities are being investigated separately.'},
+      {name:'Unnamed Drakonian — Burned Scales Pattern',alias:'"The Hollow Eye"',reward:35000,desc:'Linked to the disappearance of three Drakonian Council messengers over six months. Physical description: burned scale pattern across right side of face, blue-gray eye coloring. Suspected connection to a faction that is not publicly acknowledged. Approach with extreme caution.'},
+    ],
+    'The Arena of Ascension':[
+      {name:'Gavan Kretch',alias:'"The Honest Odds"',reward:9000,desc:'Arena match-fixer with confirmed ties to three bribed fighters. Has corrupted the purity of eleven sanctioned bouts. Arena Council demands discreet recovery — public exposure of the fixing scandal would damage gate revenue. Bring him in quietly.'},
+      {name:'Unknown Fighter — Registration Alias "Stone Tide"',alias:'Stone Tide',reward:19000,desc:'Competing under a falsified registration. Suspected use of Chaos Sigil enhancement during bouts — three opponents suffered Corruption symptoms post-fight. Has won eight consecutive matches. Capture or confirm identity during next registered fight.'},
+    ],
+    'Karanthia (Celestial City)':[
+      {name:'The Archivist — No Other Name Known',alias:'Unknown',reward:40000,desc:'Has accessed the sealed Celestial Records vaults on three separate occasions without triggering standard wards. Method unknown. Removed items from the pre-Fracturing period. The Celestial Council considers this the highest-priority open investigation and is offering the posted reward in addition to any spiritual commendation they can still provide.'},
+      {name:'Eryn Vol',alias:'"The Doubter"',reward:11000,desc:'Former Reliquary Priest expelled for heretical conduct — specifically, public declarations that the gods did not leave but were removed. Her sermons have destabilized two congregations. Considered more dangerous as a speaker than as a fighter. Arrest warrants issued in the name of the Council of Custodians.'},
+    ],
+    'Nethymir (Citadel of Infinite Convergence)':[
+      {name:'Construct Unit — Designation 7-KADE',alias:'Self-designated "Kadence"',reward:28000,desc:'A Nethymir construct that has escaped its operational bounds and appears to have self-modified. Demonstrated awareness of its own bounty — has sent two written responses to the Citadel indicating it intends to negotiate. Citadel response is that constructs do not negotiate. Deactivation is the objective.'},
+      {name:'Miran Delt',alias:'"The Data Hand"',reward:17000,desc:'Exfiltrating Nethymir research data to outside parties. Seventeen classified projects compromised. Her access credentials were revoked six weeks ago — she is still accessing internal systems via a method not yet identified. Technology Consortium is offering supplemental reward for identification of the access method.'},
+    ],
+    'Lyx (Village)':[
+      {name:'Old Ferren',alias:'"The Grave-Tallier"',reward:3500,desc:'Village elder turned curse-merchant. Selling what he claims are "Vein-touched luck stones" that appear to transfer misfortune to others. Three villagers have filed serious injury reports linked to purchasers of his goods. Small bounty — large local problem.'},
+      {name:'The Wandering Merchant',alias:'Description: tall, grey cloak, no face visible',reward:5000,desc:'Has passed through Lyx three times. Each visit results in the disappearance of one animal and one object of sentimental value from a different household. No violence observed. No motive established. Keeper Eraldis wants them identified before they return.'},
+    ],
+    'Skyhaven Mountain':[
+      {name:'Keth Varun',alias:'"The Groundwalker"',reward:13000,desc:'Former Skyweaver Council member. Exiled for unauthorized sale of Storm Dragon access coordinates to the Drakonian Council. The access coordinates led to an incident that is classified but resulted in structural damage to the northern observation post. Location: believed to be sheltering in the lower mountain passes.'},
+      {name:'Wind Cult of the Unbound Peak — Leadership Trio',alias:'Known as "The Three Gusts"',reward:21000,desc:'A cult operating from a concealed position somewhere on the Thin Sheet range. Recruiting aggressively among mountain travelers. Have sabotaged two Skyweaver navigation stations. Individual identities unconfirmed — bounty is per confirmed member, cumulative.'},
+    ],
+    'Paw Islands (Felicity Isle)':[
+      {name:'Captain Mirra Ashpaws',alias:'"The Sunken Smile"',reward:14000,desc:'Felicity Isle pirate operating under a Felicity Isle banner while running raids on neighboring merchant routes. Has bribed her way through two Island Council inspections. Crew of approximately thirty. Known to anchor at the Drowned Reef — unmarked on public charts.'},
+      {name:'Unknown — The Reef Collector',alias:'Unknown',reward:9500,desc:'Has been systematically harvesting protected reef fauna and selling specimens off-island. The Island Council considers this an ecological crime. The ecological impact is real — two spawning routes have been disrupted. Description: wears a deep-sea diving apparatus modified for extended use. No face has been seen.'},
+    ],
+    'Silkwood Forest':[
+      {name:'Davan Ilthe',alias:'"The Silk Poacher"',reward:11000,desc:'Commercial harvesting of Silkwood fauna without Circlewarden permit. Has taken at least forty specimens — the exact number is difficult to establish because he also destroys the tracking markers. Two forest wardens have been assaulted. He is armed and has demonstrated use of snare traps.'},
+      {name:'The Corrupted Grove Tender',alias:'Former Circlewarden — name expunged',reward:29000,desc:'A former Circlewarden who appears to have deliberately accelerated Corruption within a one-mile radius of the eastern grove. Method suggests insider knowledge of Vein suppression techniques. The act has destabilized a previously stable ecosystem node. The Circlewarden order is deeply invested in recovery and capture.'},
+    ],
+    'Dunesong Desert':[
+      {name:'Rashan Vel',alias:'"The Second Dune"',reward:16000,desc:'Caravan raider operating along the Dunesong trade routes. Has hit nine caravans over fourteen months. Tactics suggest former Merchants Guild knowledge. Uses the desert\'s heat haze as cover and strikes at the hour when navigators are most disoriented. Estimated crew of twelve.'},
+      {name:'The Sandveil Covenant — High Priest',alias:'"The Voice Beneath the Dune"',reward:33000,desc:'A desert cult that has been converting captured caravan travelers. Their theology centers on the idea that Apophis is a liberator rather than a threat. Three converted members have been recovered — psychologically, recovery has been slow. High Priest identity unknown. Dunesong Elders consider this the most serious domestic threat currently active.'},
+    ],
+    'Thin Sheet Mountains':[
+      {name:'Gorda Blackvein',alias:'"The Mine-Killer"',reward:15000,desc:'Sabotaging independent mining operations — collapsing shafts, poisoning water supplies used by smaller operations. Believed to be working for a competitor who wants the mineral rights. Identity suspected but unconfirmed. Mountain guild will supply supplemental intelligence to registered bounty hunters.'},
+      {name:'Exiled Goliath — Carries Broken Kar\'Run Oath Mark',alias:'Oath-name stripped',reward:8000,desc:'A Goliath elder stripped of their Kar\'Run oath name for an unspecified act of permanent-category dishonesty. Now operating as a mercenary enforcer in the lower passes — available to whoever pays. Considered extremely dangerous. The Goliath communities are offering this bounty themselves and prefer capture for their own processes.'},
+    ],
+    'Stoneheart (Dwarf Realm)':[
+      {name:'Thrak the Empty',alias:'"The Vault Whisperer"',reward:24000,desc:'Has bypassed four separate Stoneheart vault security systems over six months. Nothing has been taken — which is more alarming to the Stoneheart Council than theft would be. Thrak appears to be cataloguing something. Deep Compact security considers this reconnaissance for a larger operation.'},
+      {name:'Unknown — Vein Poisoner',alias:'Unknown',reward:40000,desc:'A deliberate Vein poisoning event has been traced to a single point of entry in the Stoneheart tunnel network. The Vein Confluence — the most sacred site in Stoneheart — showed contamination signs for eleven days before Circlewardens cleared it. The perpetrator has not been identified. This is the highest priority open case in Stoneheart history.'},
+    ],
+    'Threshold Point (Dead Lands Border)':[
+      {name:'Edris Fane',alias:'"The Crossing Merchant"',reward:20000,desc:'Selling unauthorized passage through the Dead Lands boundary — bypassing Circlewarden checkpoints. At least six parties have crossed using her routes. Two have not returned. The Circlewarden order holds her responsible for those deaths regardless of whether travelers were informed of the risk.'},
+      {name:'Unknown — Corruption Trafficker',alias:'"The Hollow Dealer"',reward:50000,desc:'Trading in Corruption-tainted materials from the Dead Lands interior. The materials are being sold as "power gems" to uninformed buyers outside the border region. At least three buyers have developed Corruption symptoms. This bounty matches the Aetherios reward tier — the Circlewarden order considers the trafficking network that dangerous.'},
+    ],
+  }
+};
+
 // ─── RARE POOL PRICE ADJUSTMENTS BY SHOP CATEGORY ─────────────────────────
 // Applied multiplicatively ON TOP of location priceMultiplier
 const SHOP_RARE_PRICE_MOD = {
@@ -18724,6 +19012,47 @@ function buildPlacesSidebar(){
   });
 }
 
+function buildBountyBoard(locationId){
+  const rotating = (BOUNTY_BOARD.rotating||{})[locationId] || [];
+  let h = `<div class="bounty-board-section">`;
+  h += `<div class="bounty-board-hdr">⚑ Bounty Board</div>`;
+  h += `<div class="bounty-board-sub">Posted by order of the Alorian Council, the Circlewarden Order, and local enforcement. All bounties legally enforceable.</div>`;
+
+  // Universal wanted posters
+  h += `<div class="bounty-grid universal-grid">`;
+  BOUNTY_BOARD.universal.forEach(function(b){
+    h += `<div class="wanted-poster mega" title="${b.name} — ${b.alias}">`;
+    h += `<div class="wanted-top">✦ Wanted ✦</div>`;
+    h += `<div class="wanted-silhouette">${b.icon}</div>`;
+    h += `<div class="wanted-name">${b.name}</div>`;
+    h += `<div class="wanted-alias">${b.alias}</div>`;
+    h += `<div class="wanted-crimes">${b.crimes.length > 140 ? b.crimes.slice(0,140)+'…' : b.crimes}</div>`;
+    h += `<div class="wanted-reward">Reward<br><strong>${Number(b.reward).toLocaleString()} GP</strong></div>`;
+    h += `<div><span class="wanted-doa">${b.status}</span></div>`;
+    h += `</div>`;
+  });
+  h += `</div>`;
+
+  // Rotating local bounties
+  if(rotating.length){
+    h += `<hr class="bb-divider">`;
+    h += `<div class="bb-rotating-hdr">⟳ Local Bounties — Rotating</div>`;
+    h += `<div class="bounty-grid" style="grid-template-columns:1fr 1fr;">`;
+    rotating.forEach(function(b){
+      h += `<div class="rotating-bounty">`;
+      h += `<div class="rb-name">${b.name}</div>`;
+      if(b.alias && b.alias !== 'Unknown') h += `<div class="wanted-alias" style="margin-bottom:4px;">${b.alias}</div>`;
+      h += `<div class="rb-desc">${b.desc}</div>`;
+      h += `<div class="rb-reward">Reward: ${Number(b.reward).toLocaleString()} GP</div>`;
+      h += `</div>`;
+    });
+    h += `</div>`;
+  }
+
+  h += `</div>`;
+  return h;
+}
+
 function buildPlaceContent(){
   const panel = document.getElementById('placeContent');
   if(!panel || !currentPlace || !PLACES_DATA[currentPlace]) {
@@ -18753,6 +19082,9 @@ function buildPlaceContent(){
       html += `</div>`;
     });
   }
+
+  // Bounty Board
+  html += buildBountyBoard(currentPlace);
 
   // Districts & Shops
   (loc.districts||[]).forEach((district, di) => {
