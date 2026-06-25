@@ -8493,6 +8493,54 @@
         }
         .attuned-sigil-panel.visible { display: block; }
 
+        /* ─── ATTUNED SIGIL MULTI-SELECT TOGGLES ─── */
+        .attuned-sigil-toggles {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .ast-btn {
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.10);
+            border-radius: 4px;
+            color: var(--txt-dim);
+            font-family: 'Cinzel',serif;
+            font-size: 6.5px;
+            letter-spacing: .8px;
+            padding: 6px 2px 5px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all .15s;
+            line-height: 1.6;
+            text-align: center;
+        }
+        .ast-btn:hover {
+            border-color: var(--ast-col, var(--gold-d));
+            color: var(--ast-col, var(--gold-d));
+        }
+        .ast-btn.attuned {
+            border: 2px solid var(--ast-col, var(--gold));
+            color: var(--ast-col, var(--gold));
+            font-weight: 700;
+            box-shadow: 0 0 6px rgba(255,255,255,.06);
+        }
+        .ast-icon { font-size: 12px; display: block; margin-bottom: 2px; }
+        .ast-panel-card {
+            background: rgba(201,162,39,.04);
+            border: 1px solid var(--sigil-col, var(--bdr-g));
+            border-radius: 6px;
+            padding: 10px 11px;
+            margin-bottom: 8px;
+        }
+        .attuned-sigil-count {
+            font-family: 'Cinzel',serif;
+            font-size: 7px;
+            letter-spacing: 1px;
+            color: var(--txt-dim);
+            margin-left: 6px;
+        }
+
         /* ─── ATTUNED SIGIL SPELL ITEMS ─── */
         .sigil-spell-form {
             margin-top: 8px;
@@ -10209,16 +10257,15 @@
                 </div>
                 <div class="attuned-sigil-wrap">
                     <div class="fld">
-                        <span class="fld-lbl">Attuned Sigil</span>
-                        <select id="attunedSigil" class="fld-sel" onchange="onAttunedSigilChange()" style="width:100%">
-                            <option value="">— None —</option>
-                            <option value="chaos">Chaos · Obsidian</option>
-                            <option value="nature">Nature · Emerald</option>
-                            <option value="water">Water · Sapphire</option>
-                            <option value="air">Air · Celestite</option>
-                            <option value="fire">Fire · Ruby</option>
-                            <option value="light">Light · Amethyst</option>
-                        </select>
+                        <span class="fld-lbl">Attuned Sigils <span class="attuned-sigil-count" id="attunedSigilCount"></span></span>
+                        <div class="attuned-sigil-toggles" id="attunedSigilToggles">
+                            <button type="button" class="ast-btn" data-sigil="light"  style="--ast-col:#b478ff" onclick="toggleAttunedSigil('light')"><span class="ast-icon">✦</span>Light</button>
+                            <button type="button" class="ast-btn" data-sigil="nature" style="--ast-col:#40c060" onclick="toggleAttunedSigil('nature')"><span class="ast-icon">✤</span>Nature</button>
+                            <button type="button" class="ast-btn" data-sigil="water"  style="--ast-col:#288cff" onclick="toggleAttunedSigil('water')"><span class="ast-icon">〈〉</span>Water</button>
+                            <button type="button" class="ast-btn" data-sigil="air"    style="--ast-col:#90c8f8" onclick="toggleAttunedSigil('air')"><span class="ast-icon">◇</span>Air</button>
+                            <button type="button" class="ast-btn" data-sigil="fire"   style="--ast-col:#ff5028" onclick="toggleAttunedSigil('fire')"><span class="ast-icon">🜂</span>Fire</button>
+                            <button type="button" class="ast-btn" data-sigil="chaos"  style="--ast-col:#9d55ff" onclick="toggleAttunedSigil('chaos')"><span class="ast-icon">◼</span>Chaos</button>
+                        </div>
                     </div>
                     <div class="attuned-sigil-panel" id="attunedSigilPanel"></div>
                 </div>
@@ -26997,7 +27044,10 @@ function restoreSimpleInputs(){
   const initModEl=document.getElementById('combatInitMod'); if(initModEl) initModEl.value=state.initMod||0;
   // Restore alternate movement speeds
   ['swimSpeed','flySpeed','climbSpeed','burrowSpeed'].forEach(id=>{const el=document.getElementById(id);if(el&&state[id]!==undefined)el.value=state[id];});
-  const asSel = document.getElementById('attunedSigil'); if(asSel){ asSel.value = state.attunedSigil||''; renderAttunedSigilPanel(state.attunedSigil||''); }
+  // Restore attuned sigils (multi-select)
+  _getAttunedSigils(); // runs migration from legacy attunedSigil → attunedSigils[]
+  renderAttunedSigilToggles();
+  renderAttunedSigilPanels();
   // Restore race-specific sub-selectors
   const blSel=document.getElementById('beastkinLineage');
   if(blSel && state.beastkinLineage) blSel.value=state.beastkinLineage;
@@ -27785,75 +27835,156 @@ const ATTUNED_SIGIL_MAP = {
   light:  { idx: 5, col: '#b478ff', name: 'Light · Amethyst',  school: 'Light',  rcBonus: 1, sigilRollBonus: 3 },
 };
 
-function onAttunedSigilChange() {
-  const sel = document.getElementById('attunedSigil');
-  if(!sel) return;
-  const val = sel.value;
-  if(state) { state.attunedSigil = val; state.attunedSigilSpells = state.attunedSigilSpells || []; saveAll(); }
-  renderAttunedSigilPanel(val);
+// ── Multi-attunement helpers ────────────────────────────────
+function _hexToRgba(hex, a){
+  const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${a})`;
 }
 
-function renderAttunedSigilPanel(val) {
+function _getAttunedSigils(){
+  if(!state) return [];
+  // Migrate legacy single-sigil into new array
+  if(!state.attunedSigils){
+    state.attunedSigils = state.attunedSigil ? [state.attunedSigil] : [];
+  }
+  return state.attunedSigils;
+}
+
+function _getAttunedSpellsForSigil(key){
+  if(!state) return [];
+  state.attunedSigilSpellsMap = state.attunedSigilSpellsMap || {};
+  // Migrate legacy flat array to first sigil
+  if(!state.attunedSigilSpellsMap[key] && key === (state.attunedSigils||[])[0] && (state.attunedSigilSpells||[]).length){
+    state.attunedSigilSpellsMap[key] = state.attunedSigilSpells;
+    state.attunedSigilSpells = [];
+  }
+  return state.attunedSigilSpellsMap[key] || [];
+}
+
+function toggleAttunedSigil(key){
+  if(!state) return;
+  const active = _getAttunedSigils();
+  const idx = active.indexOf(key);
+  if(idx >= 0) active.splice(idx, 1);
+  else          active.push(key);
+  state.attunedSigils = active;
+  state.attunedSigil  = active[0] || '';  // backward compat
+  saveAll();
+  renderAttunedSigilToggles();
+  renderAttunedSigilPanels();
+}
+
+function renderAttunedSigilToggles(){
+  const active = _getAttunedSigils();
+  document.querySelectorAll('.ast-btn').forEach(function(btn){
+    const key  = btn.dataset.sigil;
+    const meta = ATTUNED_SIGIL_MAP[key];
+    const on   = active.includes(key);
+    btn.classList.toggle('attuned', on);
+    btn.style.background = on && meta ? _hexToRgba(meta.col, 0.14) : '';
+  });
+  const countEl = document.getElementById('attunedSigilCount');
+  if(countEl){
+    const n = active.length;
+    countEl.textContent = n === 0 ? '— none' : (n === 1 ? '1 attuned' : n + ' attuned');
+  }
+}
+
+function renderAttunedSigilPanels(){
   const panel = document.getElementById('attunedSigilPanel');
   if(!panel) return;
-  if(!val || val === '') { panel.classList.remove('visible'); panel.innerHTML = ''; return; }
-  const meta = ATTUNED_SIGIL_MAP[val];
-  const gem  = typeof GEM_LORE_DATA !== 'undefined' ? GEM_LORE_DATA[meta.idx] : null;
-  panel.style.setProperty('--sigil-col', meta.col);
-  const powers = gem ? gem.powers : [];
-  const desc   = gem ? gem.alignment.substring(0, 220) + '…' : '';
-  const spells = (state && state.attunedSigilSpells) ? state.attunedSigilSpells : [];
-  panel.innerHTML = `
-    <div class="attuned-sigil-name" style="font-family:'Cinzel Decorative',serif;font-size:13px;font-weight:700;color:${meta.col};margin-bottom:8px;text-shadow:0 0 12px ${meta.col}40;">${meta.name}</div>
-    <div style="background:rgba(0,0,0,0.35);border:1px solid ${meta.col}30;border-left:3px solid ${meta.col};border-radius:6px;padding:10px 13px;margin-bottom:10px;">
-      <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:${meta.col};opacity:.7;text-transform:uppercase;margin-bottom:5px;">Sigil Description</div>
-      <div style="font-family:'EB Garamond',serif;font-size:13px;font-style:italic;color:var(--txt);line-height:1.6;">${desc}</div>
-    </div>
-    <div style="background:rgba(0,0,0,0.25);border:1px solid ${meta.col}25;border-radius:5px;padding:9px 12px;margin-bottom:10px;">
-      <div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:${meta.col};text-transform:uppercase;margin-bottom:7px;">Sigil Bonuses &amp; Abilities</div>
-      ${powers.map(p=>`<div style="font-size:11px;color:var(--txt);padding:3px 0 3px 8px;border-left:2px solid ${meta.col}50;margin-bottom:4px;line-height:1.4;">${p}</div>`).join('')}
-    </div>`;
+  const active = _getAttunedSigils();
+  if(!active.length){ panel.classList.remove('visible'); panel.innerHTML = ''; return; }
   panel.classList.add('visible');
-}
-
-function renderAttunedSpellItems(spells, meta) {
-  if(!spells || spells.length === 0) return '<div style="font-size:10px;color:var(--txt-dim);padding:3px 0">No sigil spells added yet.</div>';
-  return spells.map((sp, i) => {
-    const adjRC = Math.max(0, (parseInt(sp.rc)||0) - (meta.rcBonus||0));
-    const bonus = meta.sigilRollBonus ? `+${meta.sigilRollBonus} to roll` : meta.sigilDCBonus ? `+${meta.sigilDCBonus} DC` : meta.noInstabilityOnCast ? 'No Instability' : meta.maxDamageFirst ? 'Max dmg first die' : '';
-    return `<div class="sigil-spell-item">
-      <div><div class="sigil-spell-name">${sp.name}</div><div style="font-size:10px;color:var(--txt-dim)">${sp.effect||''}</div>${bonus?`<div class="sigil-spell-bonus">${bonus} (Sigil Attuned)</div>`:''}</div>
-      <div style="text-align:right;flex-shrink:0"><div style="font-size:10px;color:var(--txt-dim)">RC ${adjRC}${adjRC!==(parseInt(sp.rc)||0)?` <span style="text-decoration:line-through;opacity:.5">${sp.rc}</span>`:''}</div><span class="sigil-spell-del" onclick="removeAttunedSigilSpell(${i})">✕</span></div>
+  panel.innerHTML = active.map(function(val){
+    const meta = ATTUNED_SIGIL_MAP[val];
+    if(!meta) return '';
+    const gem    = typeof GEM_LORE_DATA !== 'undefined' ? GEM_LORE_DATA[meta.idx] : null;
+    const powers = gem ? gem.powers : [];
+    const desc   = gem ? gem.alignment.substring(0, 220) + '…' : '';
+    const spells = _getAttunedSpellsForSigil(val);
+    return `<div class="ast-panel-card" style="--sigil-col:${meta.col};border-color:${meta.col}45;">
+      <div class="attuned-sigil-name" style="font-family:'Cinzel Decorative',serif;font-size:12px;font-weight:700;color:${meta.col};margin-bottom:8px;text-shadow:0 0 10px ${meta.col}40;">${meta.name}</div>
+      <div style="background:rgba(0,0,0,.35);border:1px solid ${meta.col}30;border-left:3px solid ${meta.col};border-radius:5px;padding:8px 11px;margin-bottom:8px;">
+        <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:${meta.col};opacity:.7;text-transform:uppercase;margin-bottom:4px;">Sigil Description</div>
+        <div style="font-family:'EB Garamond',serif;font-size:12.5px;font-style:italic;color:var(--txt);line-height:1.6;">${desc}</div>
+      </div>
+      <div style="background:rgba(0,0,0,.22);border:1px solid ${meta.col}20;border-radius:5px;padding:7px 10px;margin-bottom:8px;">
+        <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:${meta.col};text-transform:uppercase;margin-bottom:5px;">Sigil Bonuses &amp; Abilities</div>
+        ${powers.map(p=>`<div style="font-size:11px;color:var(--txt);padding:2px 0 2px 7px;border-left:2px solid ${meta.col}50;margin-bottom:3px;line-height:1.4;">${p}</div>`).join('')}
+      </div>
+      <div class="sigil-spells-list">${renderAttunedSpellItems(spells, meta, val)}</div>
+      <button type="button" class="add-btn" style="border-color:${meta.col}55;color:${meta.col};font-size:7px;padding:4px 10px;margin-top:6px;" onclick="toggleSigilSpellForm('${val}')">+ Add Sigil Spell</button>
+      <div class="sigil-spell-form" id="sigilSpellForm_${val}">
+        <input id="sigilSpellName_${val}" class="c-inp" placeholder="Spell name…" style="margin-bottom:5px;width:100%;box-sizing:border-box;">
+        <div style="display:grid;grid-template-columns:70px 1fr;gap:5px;margin-bottom:5px;">
+          <input id="sigilSpellRC_${val}" class="c-inp" type="number" min="0" value="2" placeholder="RC">
+          <input id="sigilSpellEffect_${val}" class="c-inp" placeholder="Effect / notes…">
+        </div>
+        <button type="button" class="add-btn" style="border-color:${meta.col}50;color:${meta.col};font-size:7px;padding:3px 10px;" onclick="addAttunedSigilSpell('${val}')">Add</button>
+      </div>
     </div>`;
   }).join('');
 }
 
-function toggleSigilSpellForm() {
-  const f = document.getElementById('sigilSpellForm');
+// Kept as a compat shim for any remaining callers
+function renderAttunedSigilPanel(val){
+  if(val !== undefined && state){
+    // Legacy single-selection: update active list to just this value
+    state.attunedSigils = val ? [val] : [];
+    state.attunedSigil  = val || '';
+  }
+  renderAttunedSigilToggles();
+  renderAttunedSigilPanels();
+}
+
+function onAttunedSigilChange(){ renderAttunedSigilToggles(); renderAttunedSigilPanels(); }
+
+function renderAttunedSpellItems(spells, meta, key){
+  if(!spells || spells.length === 0) return '<div style="font-size:10px;color:var(--txt-dim);padding:3px 0">No sigil spells added yet.</div>';
+  return spells.map(function(sp, i){
+    const adjRC = Math.max(0, (parseInt(sp.rc)||0) - (meta.rcBonus||0));
+    const bonus = meta.sigilRollBonus ? `+${meta.sigilRollBonus} to roll` : meta.sigilDCBonus ? `+${meta.sigilDCBonus} DC` : meta.noInstabilityOnCast ? 'No Instability' : meta.maxDamageFirst ? 'Max dmg first die' : '';
+    return `<div class="sigil-spell-item">
+      <div><div class="sigil-spell-name">${sp.name}</div><div style="font-size:10px;color:var(--txt-dim)">${sp.effect||''}</div>${bonus?`<div class="sigil-spell-bonus">${bonus} (Sigil Attuned)</div>`:''}</div>
+      <div style="text-align:right;flex-shrink:0"><div style="font-size:10px;color:var(--txt-dim)">RC ${adjRC}${adjRC!==(parseInt(sp.rc)||0)?` <span style="text-decoration:line-through;opacity:.5">${sp.rc}</span>`:''}</div><span class="sigil-spell-del" onclick="removeAttunedSigilSpell('${key}',${i})">✕</span></div>
+    </div>`;
+  }).join('');
+}
+
+function toggleSigilSpellForm(key){
+  const f = document.getElementById('sigilSpellForm_' + key);
   if(f) f.classList.toggle('open');
 }
 
-function addAttunedSigilSpell() {
-  const name   = (document.getElementById('sigilSpellName')||{}).value||'';
-  const rc     = (document.getElementById('sigilSpellRC')||{}).value||'0';
-  const effect = (document.getElementById('sigilSpellEffect')||{}).value||'';
-  if(!name.trim()) { showToast('Enter a spell name.'); return; }
+function addAttunedSigilSpell(key){
+  const nameEl = document.getElementById('sigilSpellName_' + key);
+  const rcEl   = document.getElementById('sigilSpellRC_'   + key);
+  const effEl  = document.getElementById('sigilSpellEffect_' + key);
+  const name   = (nameEl||{}).value || '';
+  const rc     = (rcEl||{}).value   || '0';
+  const effect = (effEl||{}).value  || '';
+  if(!name.trim()){ showToast('Enter a spell name.'); return; }
   if(!state) return;
-  state.attunedSigilSpells = state.attunedSigilSpells || [];
-  state.attunedSigilSpells.push({ name: name.trim(), rc, effect: effect.trim() });
+  state.attunedSigilSpellsMap = state.attunedSigilSpellsMap || {};
+  state.attunedSigilSpellsMap[key] = state.attunedSigilSpellsMap[key] || [];
+  state.attunedSigilSpellsMap[key].push({ name: name.trim(), rc, effect: effect.trim() });
   saveAll();
-  const form = document.getElementById('sigilSpellForm');
-  if(form) { form.classList.remove('open'); }
-  ['sigilSpellName','sigilSpellRC','sigilSpellEffect'].forEach(id=>{ const el=document.getElementById(id); if(el)el.value=''; });
-  renderAttunedSigilPanel(state.attunedSigil||'');
+  const form = document.getElementById('sigilSpellForm_' + key);
+  if(form) form.classList.remove('open');
+  if(nameEl) nameEl.value = '';
+  if(rcEl)   rcEl.value   = '2';
+  if(effEl)  effEl.value  = '';
+  renderAttunedSigilPanels();
   showToast('Sigil Spell added.');
 }
 
-function removeAttunedSigilSpell(i) {
-  if(!state||!state.attunedSigilSpells) return;
-  state.attunedSigilSpells.splice(i,1);
+function removeAttunedSigilSpell(key, i){
+  if(!state) return;
+  state.attunedSigilSpellsMap = state.attunedSigilSpellsMap || {};
+  if(state.attunedSigilSpellsMap[key]) state.attunedSigilSpellsMap[key].splice(i, 1);
   saveAll();
-  renderAttunedSigilPanel(state.attunedSigil||'');
+  renderAttunedSigilPanels();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -29789,7 +29920,7 @@ function _loadStateObject(loaded){
   // Restore companion biome display if tab was previously opened
   if(companionsBuilt) _refreshAllCompCards();
   // Restore attuned sigil panel
-  if(typeof renderAttunedSigilPanel === 'function') renderAttunedSigilPanel(state.attunedSigil||'');
+  _getAttunedSigils(); renderAttunedSigilToggles(); renderAttunedSigilPanels();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -35427,10 +35558,20 @@ function _autoFocusNewCard(listId){
   });
 })();
 
-/* ── U21: Attuned sigil selector tooltip ────────────────────── */
+/* ── U21: Attuned sigil toggle tooltips ─────────────────────── */
 (function(){
-  var sel = document.getElementById('attunedSigil');
-  if(sel && !sel.title) sel.title = 'Attuned Sigil — your chosen gemstone alignment. Grants bonus scaling when matched to your Sigil school. Drakonian: must match bloodline affinity for +3 Resonance Pool bonus.';
+  var tips = {
+    light:  'Light · Amethyst — +3 to Sigil attack rolls. Drakonian: must match bloodline for +3 Resonance Pool bonus.',
+    nature: 'Nature · Emerald — −1 RC on all Nature Sigils.',
+    water:  'Water · Sapphire — −1 RC, no Instability on cast.',
+    air:    'Air · Celestite  — −1 RC, +2 to Sigil save DC.',
+    fire:   'Fire · Ruby      — −1 RC, maximize first damage die.',
+    chaos:  'Chaos · Obsidian — −1 RC, +1 Instability per session.'
+  };
+  document.querySelectorAll('.ast-btn').forEach(function(btn){
+    var key = btn.dataset.sigil;
+    if(tips[key] && !btn.title) btn.title = tips[key];
+  });
 })();
 
 /* ── U23: Copy character stats to clipboard ─────────────────── */
