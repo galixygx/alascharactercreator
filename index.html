@@ -8493,6 +8493,149 @@
         }
         .attuned-sigil-panel.visible { display: block; }
 
+        /* ─── SIGIL CAST TRACKER ─── */
+        .sct-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .sct-card {
+            background: var(--surf);
+            border: 1px solid var(--bdr);
+            border-top: 3px solid var(--sct-col, var(--bdr-g));
+            border-radius: 5px;
+            padding: 10px 8px 8px;
+        }
+        .sct-name {
+            font-family: 'Cinzel',serif;
+            font-size: 7.5px;
+            letter-spacing: 1.5px;
+            color: var(--sct-col, var(--gold-d));
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+        .sct-stage-lbl {
+            font-family: 'EB Garamond',serif;
+            font-size: 10px;
+            font-style: italic;
+            color: var(--txt-dim);
+            margin-bottom: 7px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .sct-stage-lbl.active { color: var(--sct-col, var(--gold-d)); font-weight: 700; }
+        .sct-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            margin-bottom: 7px;
+        }
+        .sct-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid var(--bdr-g);
+            background: rgba(255,255,255,.04);
+            color: var(--txt-dim);
+            font-size: 15px;
+            line-height: 1;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .13s;
+            flex-shrink: 0;
+            user-select: none;
+        }
+        .sct-btn:hover { border-color: var(--sct-col); color: var(--sct-col); background: rgba(255,255,255,.07); }
+        .sct-btn:active { transform: scale(.9); }
+        .sct-count {
+            font-family: 'Cinzel',serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--sct-col, var(--gold));
+            min-width: 44px;
+            text-align: center;
+            line-height: 1;
+            cursor: pointer;
+            border-bottom: 1px dashed transparent;
+            transition: border-color .15s;
+        }
+        .sct-count:hover { border-color: var(--sct-col, var(--gold-d)); }
+        .sct-count-inp {
+            font-family: 'Cinzel',serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--sct-col, var(--gold));
+            width: 56px;
+            text-align: center;
+            background: rgba(0,0,0,.3);
+            border: 1px solid var(--sct-col, var(--gold-d));
+            border-radius: 3px;
+            outline: none;
+        }
+        .sct-bar-track {
+            height: 4px;
+            background: rgba(255,255,255,.07);
+            border-radius: 2px;
+            overflow: visible;
+            position: relative;
+            margin-bottom: 5px;
+        }
+        .sct-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            background: var(--sct-col, var(--gold));
+            transition: width .3s;
+            min-width: 0;
+        }
+        .sct-milestones {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .sct-dot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .sct-dot-ring {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(255,255,255,.2);
+            background: transparent;
+            transition: all .2s;
+        }
+        .sct-dot.hit .sct-dot-ring {
+            border-color: var(--sct-col, var(--gold));
+            background: var(--sct-col, var(--gold));
+        }
+        .sct-dot.current .sct-dot-ring {
+            border-color: var(--sct-col, var(--gold));
+            background: transparent;
+            box-shadow: 0 0 4px var(--sct-col, var(--gold));
+        }
+        .sct-dot-n {
+            font-family: 'Cinzel',serif;
+            font-size: 5.5px;
+            color: var(--txt-dim);
+            letter-spacing: 0;
+        }
+        .sct-dot.hit .sct-dot-n, .sct-dot.current .sct-dot-n { color: var(--sct-col, var(--gold-d)); }
+        .sct-next {
+            font-family: 'EB Garamond',serif;
+            font-size: 9.5px;
+            font-style: italic;
+            color: var(--txt-dim);
+            text-align: center;
+        }
+        .sct-next.maxed { color: var(--sct-col, var(--gold-d)); font-style: normal; font-weight: 700; font-family: 'Cinzel',serif; font-size: 8px; letter-spacing: 1px; }
+
         /* ─── ATTUNED SIGIL MULTI-SELECT TOGGLES ─── */
         .attuned-sigil-toggles {
             display: grid;
@@ -10574,6 +10717,13 @@
                     </div>
                     <div class="card-list" id="activeEffectsList"></div>
                     <button class="add-btn" onclick="addActiveEffect()" style="border-color:rgba(160,96,224,.5);color:#a060e0;">+ Add Effect</button>
+
+                    <!-- ─── SIGIL CAST TRACKER ─── -->
+                    <div class="sec-hdr" style="margin-top:28px;">Sigil Cast Tracker</div>
+                    <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:14px;">
+                        Track every sigil cast by school. Totals drive Affinity Stage progression — Stage I unlocks at 8 casts, Stage II at 25, III at 60, IV at 120, V at 250 (plus narrative conditions confirmed by the Keeper). Click any count to type a number directly.
+                    </div>
+                    <div class="sct-grid" id="sigilCastTracker"></div>
 
                     <!-- ─── SIGIL AFFINITY STAGE REFERENCE ─── -->
                     <div class="sec-hdr" style="margin-top:28px;">Sigil Affinity Stages</div>
@@ -27160,6 +27310,7 @@ function loadCharacterFile(input){
       updateBar('hp');updateBar('rp');updateRpState();
       (state.sigils||[]).forEach(d=>addSigil(d));
       _sigilSyncAllHeaders();
+      renderSigilCastTracker();
       (state.sets||[]).forEach(d=>addSet(d));
       (state.features||[]).forEach(d=>addFeature(d));
       (state.abilities||[]).forEach(d=>addAbility(d));
@@ -27634,6 +27785,7 @@ window.addEventListener('load', function(){
   // Restore all card lists
   (state.sigils||[]).forEach(d => addSigil(d));
   _sigilSyncAllHeaders();
+  renderSigilCastTracker();
   (state.sets||[]).forEach(d => addSet(d));
   (state.features||[]).forEach(d => addFeature(d));
   (state.abilities||[]).forEach(d => addAbility(d));
@@ -29876,6 +30028,7 @@ function _loadStateObject(loaded){
   updateBar('hp');updateBar('rp');updateRpState();
   (state.sigils||[]).forEach(d=>addSigil(d));
   _sigilSyncAllHeaders();
+  renderSigilCastTracker();
   (state.sets||[]).forEach(d=>addSet(d));
   (state.features||[]).forEach(d=>addFeature(d));
   (state.abilities||[]).forEach(d=>addAbility(d));
@@ -35758,6 +35911,138 @@ function _autoFocusNewCard(listId){
 /* ════════════════════════════════════════════════════════════
    SIGIL AFFINITY STAGES — PHB Part V-B
    ════════════════════════════════════════════════════════════ */
+// ═══════════════════════════════════════════════════
+// SIGIL CAST TRACKER
+// ═══════════════════════════════════════════════════
+const _SCT_SIGILS = [
+  { key:'fire',   name:'Fire',   col:'#c82030', icon:'🜂', idx:0 },
+  { key:'water',  name:'Water',  col:'#3080c0', icon:'🜄', idx:1 },
+  { key:'air',    name:'Air',    col:'#4db8ff', icon:'🜁', idx:2 },
+  { key:'nature', name:'Nature', col:'#40c060', icon:'✤',  idx:3 },
+  { key:'light',  name:'Light',  col:'#b478ff', icon:'✦',  idx:4 },
+  { key:'chaos',  name:'Chaos',  col:'#9040d0', icon:'◼',  idx:5 },
+];
+const _SCT_THRESH = [8, 25, 60, 120, 250];
+const _SCT_NUMERALS = ['I','II','III','IV','V'];
+
+let _sctHoldTimer = null;
+let _sctHoldInterval = null;
+
+function _sctStage(n){
+  let s = 0;
+  for(let i = 0; i < _SCT_THRESH.length; i++){ if(n >= _SCT_THRESH[i]) s = i+1; else break; }
+  return s;
+}
+
+function _sctBarPct(n){
+  const next = _SCT_THRESH.find(t => n < t);
+  if(next === undefined) return 100;
+  const prev = _SCT_THRESH.slice().reverse().find(t => n >= t);
+  const start = prev !== undefined ? prev : 0;
+  return Math.min(100, Math.round(((n - start) / (next - start)) * 100));
+}
+
+function adjustSigilCast(key, delta){
+  if(!state) return;
+  state.sigilCasts = state.sigilCasts || {};
+  state.sigilCasts[key] = Math.max(0, (state.sigilCasts[key] || 0) + delta);
+  saveAll();
+  renderSigilCastTracker();
+}
+
+function _sctStartHold(key, delta){
+  _sctClearHold();
+  _sctHoldTimer = setTimeout(function(){
+    _sctHoldInterval = setInterval(function(){ adjustSigilCast(key, delta); }, 80);
+  }, 400);
+}
+
+function _sctClearHold(){
+  clearTimeout(_sctHoldTimer);
+  clearInterval(_sctHoldInterval);
+  _sctHoldTimer = _sctHoldInterval = null;
+}
+
+function _sctInlineEdit(key, countEl){
+  const cur = (state && state.sigilCasts && state.sigilCasts[key]) || 0;
+  const inp = document.createElement('input');
+  inp.type = 'number';
+  inp.min  = '0';
+  inp.value = cur;
+  inp.className = 'sct-count-inp';
+  countEl.replaceWith(inp);
+  inp.focus();
+  inp.select();
+  function commit(){
+    const v = Math.max(0, parseInt(inp.value) || 0);
+    if(!state) return;
+    state.sigilCasts = state.sigilCasts || {};
+    state.sigilCasts[key] = v;
+    saveAll();
+    renderSigilCastTracker();
+  }
+  inp.addEventListener('blur', commit);
+  inp.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); commit(); }
+    if(e.key === 'Escape'){ renderSigilCastTracker(); }
+  });
+}
+
+function renderSigilCastTracker(){
+  const panel = document.getElementById('sigilCastTracker');
+  if(!panel) return;
+  const casts = (state && state.sigilCasts) ? state.sigilCasts : {};
+
+  panel.innerHTML = _SCT_SIGILS.map(function(s){
+    const n      = casts[s.key] || 0;
+    const stage  = _sctStage(n);
+    const pct    = _sctBarPct(n);
+    const maxed  = stage === _SCT_THRESH.length;
+    const sad    = typeof SIGIL_AFFINITY_DATA !== 'undefined' ? SIGIL_AFFINITY_DATA[s.idx] : null;
+    const stageName = (stage > 0 && sad) ? sad.stages[stage-1].name : null;
+    const stageLabel = stage > 0 ? ('§'+_SCT_NUMERALS[stage-1]+' — '+(stageName||'')) : 'No stage yet';
+    const nextThresh = _SCT_THRESH.find(t => n < t);
+    const nextStage  = _SCT_NUMERALS[stage] || '';
+    const nextMsg = maxed
+      ? 'STAGE V — EMBODIED'
+      : `→ Stage ${nextStage} at ${nextThresh} casts (${nextThresh - n} remaining)`;
+
+    const dots = _SCT_THRESH.map(function(t, i){
+      const hit  = n >= t;
+      const cur  = !hit && (i === stage);
+      return `<div class="sct-dot${hit?' hit':cur?' current':''}">
+        <div class="sct-dot-ring"></div>
+        <div class="sct-dot-n">${t}</div>
+      </div>`;
+    }).join('');
+
+    return `<div class="sct-card" style="--sct-col:${s.col};">
+      <div class="sct-name">${s.icon} ${s.name}</div>
+      <div class="sct-stage-lbl${stage>0?' active':''}">${stageLabel}</div>
+      <div class="sct-controls">
+        <button class="sct-btn"
+          onclick="adjustSigilCast('${s.key}',-1)"
+          onmousedown="_sctStartHold('${s.key}',-1)"
+          onmouseup="_sctClearHold()" onmouseleave="_sctClearHold()"
+          ontouchstart="_sctStartHold('${s.key}',-1)" ontouchend="_sctClearHold()"
+          title="Remove 1 cast (hold to fast-subtract)">−</button>
+        <div class="sct-count" onclick="_sctInlineEdit('${s.key}',this)" title="Click to type a number">${n}</div>
+        <button class="sct-btn"
+          onclick="adjustSigilCast('${s.key}',1)"
+          onmousedown="_sctStartHold('${s.key}',1)"
+          onmouseup="_sctClearHold()" onmouseleave="_sctClearHold()"
+          ontouchstart="_sctStartHold('${s.key}',1)" ontouchend="_sctClearHold()"
+          title="Add 1 cast (hold to fast-add)">+</button>
+      </div>
+      <div class="sct-bar-track">
+        <div class="sct-bar-fill" style="width:${pct}%;${maxed?'background:linear-gradient(90deg,'+s.col+',#fff8)':''}"></div>
+      </div>
+      <div class="sct-milestones">${dots}</div>
+      <div class="sct-next${maxed?' maxed':''}">${nextMsg}</div>
+    </div>`;
+  }).join('');
+}
+
 const SIGIL_AFFINITY_DATA = [
   {
     name:'Fire', gem:'Ruby', color:'#c82030', gemColor:'#c82030',
@@ -36026,7 +36311,7 @@ function toggleSasBlock(idx){
   if(typeof _origShow === 'function'){
     window.showTab = function(id, btn){
       _origShow.apply(this, arguments);
-      if(id === 'sigils') setTimeout(buildSigilAffinityPanel, 80);
+      if(id === 'sigils'){ setTimeout(buildSigilAffinityPanel, 80); renderSigilCastTracker(); }
     };
   }
   // Also build on DOMContentLoaded in case Sigils tab is default
