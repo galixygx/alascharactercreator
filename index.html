@@ -681,7 +681,6 @@
 
         /* ─── Tab Dropdown ─── */
         .tab-dropdown-wrap {
-            position: relative;
             display: flex;
             align-items: stretch;
         }
@@ -692,22 +691,21 @@
             transition: transform .18s;
             opacity: .6;
         }
-        .tab-dropdown-wrap.open .tab-dropdown-chevron { transform: rotate(180deg); opacity: 1; }
+        .tab-dropdown-btn-open .tab-dropdown-chevron { transform: rotate(180deg); opacity: 1; }
+        /* The menu uses position:fixed so it escapes the tab-bar overflow:auto clip */
         .tab-dropdown-menu {
-            position: absolute;
-            top: calc(100% + 1px);
-            left: 0;
-            min-width: 150px;
+            position: fixed;
+            min-width: 160px;
             background: var(--surf2);
             border: 1px solid var(--bdr-g);
             border-top: 2px solid var(--gold-d);
-            border-radius: 0 0 5px 5px;
-            box-shadow: 0 8px 20px rgba(0,0,0,.5);
-            z-index: 1000;
-            display: none;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 10px 28px rgba(0,0,0,.55);
+            z-index: 9999;
             padding: 4px 0;
+            display: none;
         }
-        .tab-dropdown-wrap.open .tab-dropdown-menu { display: block; }
+        .tab-dropdown-menu.open { display: block; }
         .tab-drop-item {
             display: block;
             width: 100%;
@@ -718,14 +716,14 @@
             font-size: 9px;
             letter-spacing: 1.5px;
             color: var(--txt-dim);
-            padding: 9px 14px;
+            padding: 10px 16px;
             cursor: pointer;
             text-transform: uppercase;
             transition: all .12s;
             white-space: nowrap;
         }
-        .tab-drop-item:hover { color: var(--txt); background: rgba(255,255,255,.04); }
-        .tab-drop-item.active { color: var(--gold); background: rgba(201,162,39,.07); }
+        .tab-drop-item:hover { color: var(--txt); background: rgba(255,255,255,.05); }
+        .tab-drop-item.active { color: var(--gold); background: rgba(201,162,39,.09); }
 
         .tab-content {
             flex: 1;
@@ -17982,78 +17980,103 @@ function filterCompendium(q){
 
 // Init craft tab on tab switch
 
-// ── Tab Dropdown (Sheets menu) ───────────────────────────
+// ═══════════════════════════════════════════════════
+// TAB DROPDOWN — "Sheets" grouped menu
+// Root cause of prior breakage: position:absolute menus are clipped by
+// the tab-bar's overflow-x:auto. Fixed by using position:fixed and
+// computing coordinates from getBoundingClientRect() at open time.
+// ═══════════════════════════════════════════════════
 const _DROP_TAB_IDS = new Set(['skills','sigils','abilities','inventory','world','companions','gems','places']);
 
-// Universal tab navigator — works for direct buttons AND dropdown items.
-// Use this everywhere instead of showTab(..., querySelector('.tab-btn[onclick*=...]')).
+function _tabDropOpen(){
+  const btn  = document.getElementById('tabDropdownBtn');
+  const menu = document.getElementById('tabDropMenu');
+  if(!btn || !menu) return;
+  const rect = btn.getBoundingClientRect();
+  menu.style.top  = rect.bottom + 'px';
+  menu.style.left = rect.left   + 'px';
+  menu.classList.add('open');
+  btn.classList.add('tab-dropdown-btn-open');
+  btn.setAttribute('aria-expanded','true');
+}
+
+function _tabDropClose(){
+  const menu = document.getElementById('tabDropMenu');
+  const btn  = document.getElementById('tabDropdownBtn');
+  if(menu) menu.classList.remove('open');
+  if(btn){ btn.classList.remove('tab-dropdown-btn-open'); btn.setAttribute('aria-expanded','false'); }
+}
+
+function _tabDropToggle(){
+  const menu = document.getElementById('tabDropMenu');
+  if(menu && menu.classList.contains('open')) _tabDropClose();
+  else _tabDropOpen();
+}
+
+function _tabDropSelect(id, label, itemBtn){
+  _tabDropClose();
+  // Mark selected item
+  document.querySelectorAll('.tab-drop-item').forEach(b=>b.classList.remove('active'));
+  if(itemBtn) itemBtn.classList.add('active');
+  // Update button label to show current selection
+  const lbl = document.getElementById('tabDropLabel');
+  if(lbl) lbl.textContent = label || id;
+  // Mark the dropdown trigger button as active (gold underline)
+  const dropBtn = document.getElementById('tabDropdownBtn');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  if(dropBtn) dropBtn.classList.add('active');
+  // Switch the panel
+  showTab(id, null);
+}
+
+// Called from within showTab() to keep dropdown UI in sync with any navigation
+function _tabDropSyncActive(id){
+  const lbl    = document.getElementById('tabDropLabel');
+  const dropBtn = document.getElementById('tabDropdownBtn');
+  if(_DROP_TAB_IDS.has(id)){
+    // A grouped tab is now active
+    const item = document.querySelector('.tab-drop-item[data-drop-id="'+id+'"]');
+    document.querySelectorAll('.tab-drop-item').forEach(b=>b.classList.remove('active'));
+    if(item){
+      item.classList.add('active');
+      if(lbl) lbl.textContent = item.textContent.trim();
+    }
+    if(dropBtn) dropBtn.classList.add('active');
+  } else {
+    // A standalone tab is active — reset dropdown appearance
+    document.querySelectorAll('.tab-drop-item').forEach(b=>b.classList.remove('active'));
+    if(lbl) lbl.textContent = '📚 Sheets';
+    if(dropBtn) dropBtn.classList.remove('active');
+  }
+}
+
+// Universal tab navigator — handles both grouped (dropdown) and standalone tabs.
 function _navigateToTab(id){
   if(!id) return;
-  // Grouped tabs live in the dropdown
-  const item = document.querySelector('.tab-drop-item[data-drop-id="'+id+'"]');
-  if(item){
-    _tabDropSelect(id, item.textContent.trim(), item);
+  if(_DROP_TAB_IDS.has(id)){
+    const item = document.querySelector('.tab-drop-item[data-drop-id="'+id+'"]');
+    const label = item ? item.textContent.trim() : id;
+    _tabDropSelect(id, label, item);
     return;
   }
-  // Direct standalone tab buttons (Attributes, Notes, VTT, Report, Agent Alas)
   const btn = document.querySelector('.tab-btn[onclick*="\''+id+'\'"]');
   showTab(id, btn || null);
 }
 
-function _tabDropToggle(){
-  const wrap = document.getElementById('tabDropdownWrap');
-  if(!wrap) return;
-  const open = wrap.classList.toggle('open');
-  const btn  = document.getElementById('tabDropdownBtn');
-  if(btn) btn.setAttribute('aria-expanded', open);
-}
-
-function _tabDropSelect(id, label, itemBtn){
-  const wrap = document.getElementById('tabDropdownWrap');
-  if(wrap) wrap.classList.remove('open');
-  const dropBtn = document.getElementById('tabDropdownBtn');
-  if(dropBtn) dropBtn.setAttribute('aria-expanded', 'false');
-  // Update dropdown button label
-  const lbl = document.getElementById('tabDropLabel');
-  if(lbl) lbl.textContent = label;
-  // Mark the clicked item active, clear others
-  document.querySelectorAll('.tab-drop-item').forEach(b=>b.classList.remove('active'));
-  if(itemBtn) itemBtn.classList.add('active');
-  // Delegate to showTab (pass dropBtn so it gets the .active class)
-  showTab(id, dropBtn);
-}
-
-function _tabDropSyncActive(id){
-  // Called by showTab — keeps the dropdown label/items in sync
-  const lbl = document.getElementById('tabDropLabel');
-  const wrap = document.getElementById('tabDropdownWrap');
-  if(!_DROP_TAB_IDS.has(id)){
-    // A non-dropdown tab was selected — clear dropdown active state
-    if(lbl) lbl.textContent = '📚 Sheets';
-    document.querySelectorAll('.tab-drop-item').forEach(b=>b.classList.remove('active'));
-    if(wrap) wrap.querySelector('#tabDropdownBtn')?.classList.remove('active');
-    return;
-  }
-  // A dropdown tab — keep the button active
-  const item = document.querySelector(`.tab-drop-item[data-drop-id="${id}"]`);
-  document.querySelectorAll('.tab-drop-item').forEach(b=>b.classList.remove('active'));
-  if(item){
-    item.classList.add('active');
-    if(lbl) lbl.textContent = item.textContent.trim();
-  }
-}
-
-// Close on outside click
+// Close on any outside click
 document.addEventListener('click', function(e){
-  if(!e.target.closest('#tabDropdownWrap')){
-    const wrap = document.getElementById('tabDropdownWrap');
-    if(wrap && wrap.classList.contains('open')){
-      wrap.classList.remove('open');
-      const btn = document.getElementById('tabDropdownBtn');
-      if(btn) btn.setAttribute('aria-expanded','false');
-    }
-  }
-}, true);
+  const menu = document.getElementById('tabDropMenu');
+  if(!menu || !menu.classList.contains('open')) return;
+  const btn  = document.getElementById('tabDropdownBtn');
+  if(btn && (btn === e.target || btn.contains(e.target))) return;
+  if(menu.contains(e.target)) return;
+  _tabDropClose();
+}, false);
+
+// Close on Escape
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape') _tabDropClose();
+}, false);
 // ─────────────────────────────────────────────────────────
 
 function showTab(id,btn){
