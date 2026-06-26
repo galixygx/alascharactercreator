@@ -16128,7 +16128,7 @@ function castSigilByRC(rc, ip, name, aff, card){
           rpBonus: parseInt(card.dataset.aeRp)||0,
           instabilityBonus: parseInt(card.dataset.aeIns)||0,
         });
-        showTab('sigils', document.querySelector('.tab-btn[onclick*="sigils"]'));
+        _navigateToTab('sigils');
       }
     }
     // Fallback to compendium effect text
@@ -17984,6 +17984,21 @@ function filterCompendium(q){
 
 // ── Tab Dropdown (Sheets menu) ───────────────────────────
 const _DROP_TAB_IDS = new Set(['skills','sigils','abilities','inventory','world','companions','gems','places']);
+
+// Universal tab navigator — works for direct buttons AND dropdown items.
+// Use this everywhere instead of showTab(..., querySelector('.tab-btn[onclick*=...]')).
+function _navigateToTab(id){
+  if(!id) return;
+  // Grouped tabs live in the dropdown
+  const item = document.querySelector('.tab-drop-item[data-drop-id="'+id+'"]');
+  if(item){
+    _tabDropSelect(id, item.textContent.trim(), item);
+    return;
+  }
+  // Direct standalone tab buttons (Attributes, Notes, VTT, Report, Agent Alas)
+  const btn = document.querySelector('.tab-btn[onclick*="\''+id+'\'"]');
+  showTab(id, btn || null);
+}
 
 function _tabDropToggle(){
   const wrap = document.getElementById('tabDropdownWrap');
@@ -34130,8 +34145,7 @@ document.addEventListener('keydown',function(e){
   var idx=e.key==='0'?9:parseInt(e.key)-1;
   if(idx>=0&&idx<_TAB_IDS.length){
     e.preventDefault();
-    var btn=document.querySelectorAll('.tab-btn')[idx]||null;
-    if(typeof showTab==='function') showTab(_TAB_IDS[idx],btn);
+    if(typeof _navigateToTab==='function') _navigateToTab(_TAB_IDS[idx]);
   }
 });
 
@@ -35904,8 +35918,7 @@ function _autoFocusNewCard(listId){
   var saved = ''; try{ saved = sessionStorage.getItem(SK)||''; }catch(e){}
   if(saved && saved !== 'attributes'){
     setTimeout(function(){
-      var btn = document.querySelector('.tab-btn[onclick*="showTab(\''+saved+'\'"]');
-      if(btn) btn.click();
+      if(typeof _navigateToTab==='function') _navigateToTab(saved);
     }, 300);
   }
 })();
@@ -36877,8 +36890,9 @@ document.addEventListener('keydown', function(e){
   }
   // Alt+1–9,0 — switch tabs by index
   if(e.altKey && /^[0-9]$/.test(e.key)){
-    var btn = document.querySelector('.tab-btn[data-tab-index="'+e.key+'"]');
-    if(btn){ e.preventDefault(); btn.click(); btn.scrollIntoView({behavior:'smooth',inline:'nearest'}); }
+    var _altTabMap = {'1':'attributes','2':'skills','3':'sigils','4':'abilities','5':'inventory','6':'world','7':'companions','8':'gems','9':'places','0':'notes'};
+    var _altId = _altTabMap[e.key];
+    if(_altId){ e.preventDefault(); if(typeof _navigateToTab==='function') _navigateToTab(_altId); }
   }
 }, false);
 
