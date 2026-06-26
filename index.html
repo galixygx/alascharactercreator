@@ -19507,171 +19507,396 @@ function buildPlaceContent(){
 // { name, aff, rc, ip, ct, range, dur, effect, notes }
 // Populate this object after the button is live — the user will provide spells.
 const SIGIL_COMPENDIUM_DATA = {
-  // 'Sigil-Touched Adept': [ { name:'...', aff:'Light', rc:2, ip:0, ct:'Action', range:'30 ft.', dur:'Instant', effect:'...', notes:'' }, ... ],
-  // 'Legionnaire Ascendant': [ ... ],
+  'Sigil-Touched Adept': [
+    // ── LEVEL 0 CANTRIPS ──────────────────────────────────────────────
+    {name:'Sigil Flicker',aff:'Arcane',rc:0,ip:0,ct:'Free Action (1/turn)',range:'30 ft',dur:'Instant',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Rebounds — you take -1 to your next roll instead.','Normal effect.','Normal effect.','Normal effect.','Normal effect.','Strong pulse — target suffers disadvantage instead of −1.']),
+     effect:'A loose fragment of your Sigil misfires, causing a brief flicker in the structure of whatever you target. Cause a small object, surface, or held item to flicker, blur, distort, or briefly phase. Against a creature: target takes −1 to its next attack roll or perception-based roll.\n\nUnstable (1d6): 1 rebounds on you; 2–5 normal; 6 imposes disadvantage instead of −1.',
+     notes:'Trace Cost: 0 RC. Visual: the object or edge blurs for a split second, as though reality briefly lost its grip on it.'},
+
+    {name:'Arcane Static',aff:'Arcane',rc:0,ip:0,ct:'Action',range:'20 ft',dur:'Until start of your next turn',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Static echoes back — affects you as well.','Normal effect.','Normal effect.','Normal effect.','Normal effect.','Static spike — target also takes −2 to its next roll.']),
+     effect:'Release a burst of raw magical interference. One creature within range hears distorted whispers, ringing, or layered voices and cannot benefit from advantage on perception checks until the start of your next turn.\n\nUnstable (1d6): 1–2 echoes back and affects you too; 3–5 normal; 6 target also takes −2 to next roll.',
+     notes:'Trace Cost: 0 RC. Visual: the target clutches their head as impossible voices scrape across their hearing.'},
+
+    {name:'Minor Tear',aff:'Arcane',rc:0,ip:0,ct:'Action',range:'25 ft',dur:'Instant',spellLevel:0,dmgDie:'d4',dmgCount:'1',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Tear collapses too early — deals no damage.','Normal effect.','Normal effect.','Normal effect.','Normal effect.','Lingering split — target takes +1 Arcane damage at start of its next turn.']),
+     effect:'Create a tiny rip in space that opens and closes around your target in a razor-thin instant. Deal 1d4 Arcane damage to one target.\n\nUnstable (1d6): 1 collapses — no damage; 2–5 normal; 6 lingering split (+1 Arcane at start of target\'s next turn).',
+     notes:'Trace Cost: 0 RC. Visual: a narrow fracture appears across the target, flashing with pale sigil-light before sealing shut.'},
+
+    {name:'Sigil Trace',aff:'Arcane',rc:0,ip:0,ct:'Action',range:'40 ft',dur:'Instant',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['False reading — information is distorted or partially misleading.','False reading — information is distorted or partially misleading.','Normal effect.','Normal effect.','Normal effect.','Overread — gain extra detail but suffer disadvantage on next action from sensory overload.']),
+     effect:'Your Sigil hums in response to nearby magic. Detect recent magical use, faint enchantment residue, hidden runic markings, or arcane disturbances in a chosen area or on an object within range.\n\nUnstable (1d6): 1–2 false/distorted reading; 3–5 normal; 6 overread — extra detail but disadvantage on next action.',
+     notes:'Trace Cost: 0 RC. Visual: the caster narrows their eyes and sees fading lines of spellwork crawling across surfaces.'},
+
+    {name:'Pulse Step',aff:'Arcane',rc:0,ip:0,ct:'Bonus Action',range:'Self',dur:'Instant',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Stumble on arrival — cannot take reactions until your next turn.','Normal effect.','Normal effect.','Normal effect.','Normal effect.','Double pulse — move an additional 5 ft.']),
+     effect:'A small burst of Sigil force jolts you a short distance through a half-formed phase skip. Move yourself up to 5 ft to an unoccupied space you can see. Does not provoke opportunity attacks.\n\nUnstable (1d6): 1 stumble — no reactions until next turn; 2–5 normal; 6 double pulse (+5 ft).',
+     notes:'Trace Cost: 0 RC. Visual: a quick sidestep becomes a blink-like hop through luminous static.'},
+
+    {name:'Arcane Drip',aff:'Arcane',rc:0,ip:0,ct:'Action',range:'15 ft',dur:'Until removed',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Residue spreads farther than intended.','Residue spreads farther than intended.','Normal effect.','Normal effect.','Normal effect.','Reactive stain — next creature to touch the marked area takes 1 Arcane damage.']),
+     effect:'Your Sigil leaks visible magical residue that clings to surfaces like liquid light. Coat a small area, object, or path with glowing arcane residue that emits dim light and marks touched surfaces or movement through the area.\n\nUnstable (1d6): 1–2 spreads farther than intended; 3–5 normal; 6 reactive stain (1 Arcane to first toucher).',
+     notes:'Trace Cost: 0 RC. Visual: a doorway glows with runes, footprints become luminous, objects tagged for tracking.'},
+
+    {name:'Echo Fragment',aff:'Arcane',rc:0,ip:0,ct:'Reaction or Action',range:'20 ft',dur:'Until start of your next turn',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Echo glitches and fails.','Normal effect.','Normal effect.','Normal effect.','Normal effect.','Split image — two attackers instead of one are affected before your next turn.']),
+     effect:'Create a brief illusionary echo of yourself or another creature within range. The echo imposes disadvantage on one attack made against you before the start of your next turn.\n\nUnstable (1d6): 1 glitches and fails; 2–5 normal; 6 split image — two attackers affected.',
+     notes:'Trace Cost: 0 RC. Visual: a blade passes through a false outline of your body while the real you twists aside.'},
+
+    {name:'Resonance Tap',aff:'Arcane',rc:0,ip:0,ct:'Action',range:'Touch',dur:'Instant',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Emotional backlash — suffer a brief alien sensation and take −1 to next roll.','Emotional backlash — suffer a brief alien sensation and take −1 to next roll.','Normal effect.','Normal effect.','Normal effect.','Deep read — receive one extra hidden impression or detail.']),
+     effect:'By touching an object and letting your Sigil resonate against it, you feel the strongest recent imprint left upon it. Learn the last strong emotional, magical, or significant interaction connected to the object.\n\nUnstable (1d6): 1–2 emotional backlash (−1 next roll); 3–5 normal; 6 deep read (extra detail).',
+     notes:'Trace Cost: 0 RC. A blade may reveal fear, a locket grief, a rune-stone the echo of a spell cast upon it.'},
+
+    {name:'Arcane Nudge',aff:'Arcane',rc:0,ip:0,ct:'Action',range:'15 ft',dur:'Instant',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Force slips — object moves unpredictably.','Normal effect.','Normal effect.','Normal effect.','Normal effect.','Strong shove — affect a slightly heavier object or briefly stagger a creature (no damage).']),
+     effect:'A controlled pulse of raw force pushes or pulls a nearby object with more instinct than discipline. Move one small unattended object up to 10 ft (push, pull, slide, tilt, or lift within reason).\n\nUnstable (1d6): 1 slips unpredictably; 2–5 normal; 6 strong shove (heavier object or stagger creature).',
+     notes:'Trace Cost: 0 RC. Knock a key from a hook, slide a vial across a table, shove open a half-latched drawer.'},
+
+    {name:'Sigil Whisper',aff:'Arcane',rc:0,ip:0,ct:'Action',range:'25 ft',dur:'1 turn',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Whisper rebounds — you hear the intrusive thought instead.','Normal effect.','Normal effect.','Normal effect.','Normal effect.','Lingering murmur — penalty lasts 2 turns instead of 1.']),
+     effect:'Your Sigil leaks a thought that is not quite your own into the mind of another creature. Deliver a short whisper, emotion, or intrusive fragment of thought. Target takes −1 to its next mental roll, perception roll, or concentration check.\n\nUnstable (1d6): 1 rebounds on you; 2–5 normal; 6 lingering murmur (penalty lasts 2 turns).',
+     notes:'Trace Cost: 0 RC. The target suddenly hears "behind you," "run," or another fragment that breaks focus for a moment.'},
+
+    // ── LEVEL 1 SPELLS ───────────────────────────────────────────────
+    {name:'Fractured Pulse',aff:'Arcane',rc:2,ip:1,ct:'Action',range:'60 ft',dur:'Instant',spellLevel:1,dmgDie:'d8',dmgCount:'2',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Arcane backlash — you suffer 1d4 Arcane damage.','Arcane backlash — you suffer 1d4 Arcane damage.','Stable release — no additional effect.','Stable release — no additional effect.','Overfracture — a third nearby creature within 10 ft of the original target takes 1d4 Arcane damage.','Overfracture — a third nearby creature within 10 ft of the original target takes 1d4 Arcane damage.']),
+     effect:'Tear a shard of raw arcane force from your Sigil and launch it at one target (2d8 Arcane). After striking, the spell fractures — one additional creature within 10 ft of the original target takes 1d6 Arcane damage.\n\nUnstable (1d6): 1–2 backlash (you take 1d4 Arcane); 3–4 stable; 5–6 overfracture (third creature takes 1d4).',
+     notes:'Visual: a jagged beam of broken violet-white energy rips through the air, striking one target before splintering into nearby enemies.'},
+
+    {name:'Sigil Drift',aff:'Arcane',rc:2,ip:0,ct:'Bonus Action',range:'Self',dur:'Until start of your next turn',spellLevel:1,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Phase failure — reappear off-balance, disadvantage on next attack roll.','Clean shift — no additional effect.','Clean shift — no additional effect.','Clean shift — no additional effect.','Clean shift — no additional effect.','Phase echo — lingering afterimage: first attack against you before next turn automatically misses.']),
+     effect:'Your body partially loses cohesion as your Sigil destabilizes your physical form. Instantly reposition up to 15 ft to an unoccupied space you can see — does not provoke opportunity attacks. If you moved ≥ 10 ft, attacks against you have disadvantage until start of your next turn.\n\nUnstable (1d6): 1 phase failure (disadvantage on next attack); 2–5 clean shift; 6 phase echo (first attack auto-misses).',
+     notes:'Visual: your body stretches into layered trails of luminous runic geometry before snapping back together at the new position.'},
+
+    {name:'Arcane Spill',aff:'Arcane',rc:3,ip:1,ct:'Action',range:'30 ft',dur:'2 turns',spellLevel:1,dmgDie:'d6',dmgCount:'1',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Field expansion — radius increases to 15 ft, may affect you if too close.','Field expansion — radius increases to 15 ft, may affect you if too close.','Normal behavior.','Normal behavior.','Normal behavior.','Condensed chaos — damage increases to 2d6/player level until end of first round.']),
+     effect:'Fail — or choose not — to contain your Sigil. Raw magic pours into a 10 ft radius zone at a point within range (2 turns). Any creature entering or starting its turn there takes 1d6/player level Arcane damage. Spells cast inside: roll 1d4 — 1 fizzles; 2–3 normal; 4 gains +1 damage die.\n\nUnstable (1d6): 1–2 field expands to 15 ft; 3–5 normal; 6 condensed chaos (2d6/lvl until end of round).',
+     notes:'Visual: the ground splits with luminous sigil-patterns as raw arcane fluid seeps through, snapping and hissing with unstable energy.'},
+
+    // ── LEVEL 2 SPELLS ───────────────────────────────────────────────
+    {name:'Shatterline Surge',aff:'Arcane',rc:4,ip:1,ct:'Action',range:'60 ft (30 ft line, 5 ft wide)',dur:'Until start of your next turn',spellLevel:2,dmgDie:'d8',dmgCount:'3',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Backlash rupture — line erupts beneath you too: take 2d6 Arcane damage.','Fracture instability — line becomes jagged, randomly shifts 5 ft left or right at midpoint.','Fracture instability — line becomes jagged, randomly shifts 5 ft left or right at midpoint.','Normal effect.','Normal effect.','Cascading split — a second smaller line (15 ft, 2d6) branches off.']),
+     effect:'Drag your Sigil violently across reality, carving a 30 ft × 5 ft glowing fracture line through space. All creatures in the line make a DEX save — fail: 3d8 Arcane damage; success: half. The fracture lingers (until start of next turn): crossing it deals 1d6 Arcane.\n\nUnstable (1d6): 1 backlash (you take 2d6); 2–3 jagged shift ±5 ft; 4–5 normal; 6 second 15 ft branch (2d6).',
+     notes:'Visual: a searing line of broken sigil-light burns through reality, fragments of space peeling upward like shattered glass.'},
+
+    {name:'Sigil Overwrite',aff:'Arcane',rc:4,ip:1,ct:'Action',range:'40 ft',dur:'Until end of next turn',spellLevel:2,dmgDie:'d6',dmgCount:'1',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Reversal — you partially overwrite yourself: disadvantage on your next roll.','Bleed-through — effect also hits a nearby ally or creature (Keeper chooses).','Bleed-through — effect also hits a nearby ally or creature (Keeper chooses).','Normal effect.','Normal effect.','Full overwrite — target locked: cannot take reactions and speed becomes 0 until next turn.']),
+     effect:'Force your Sigil\'s pattern over another creature\'s essence. Target makes a WIS or CON save — fail: suppress one active magical effect OR impose disadvantage on all rolls until end of next turn; on success: 1d6 Arcane damage from resisting. If concentrating on a spell and fails: automatically fails concentration.\n\nUnstable (1d6): 1 reversal (you); 2–3 bleed-through (nearby); 4–5 normal; 6 full overwrite (speed 0, no reactions).',
+     notes:'Visual: the target body glitches into angular sigil-lines, as if reality is trying to redraw them incorrectly.'},
+
+    {name:'Arcane Collapse Field',aff:'Arcane',rc:5,ip:2,ct:'Action',range:'30 ft (15 ft radius)',dur:'2 turns',spellLevel:2,dmgDie:'d6',dmgCount:'2',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Collapse spike — field implodes: all creatures (incl. you if inside) take +2d6 immediately.','Unstable gravity — creatures pulled 5 ft toward center at start of turn.','Unstable gravity — creatures pulled 5 ft toward center at start of turn.','Normal effect.','Normal effect.','Crushing core — creatures within 5 ft of center take +1d6 additional damage.']),
+     effect:'Destabilize a section of space (15 ft radius, 2 turns). In the field: movement halved; creatures starting turns take 2d6 Arcane; leaving requires a STR save (fail: remain); ranged attacks through field suffer −2 to hit.\n\nUnstable (1d6): 1 collapse spike (+2d6 all); 2–3 pulled 5 ft to center; 4–5 normal; 6 crushing core (+1d6 within 5 ft).',
+     notes:'Visual: the air bends like heat distortion, pulling debris and light inward toward a dim, pulsing sigil core.'},
+
+    {name:'Resonant Beacon',aff:'Arcane',rc:3,ip:0,ct:'Action',range:'60 ft',dur:'1 minute (Concentration)',spellLevel:2,dmgDie:'d4',dmgCount:'1',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:false,
+     unstableTable:JSON.stringify(['','','','','','']),
+     effect:'Create a floating Sigil Beacon (5 ft radius) at a point within range. While active: +1 Spell Save DC and +1 Spell Attack Rolls. Each turn choose one: reveal all magical effects within 20 ft, OR detect all non-native-plane creatures within 20 ft. Enemies within 10 ft take 1d4 Arcane at start of their turn. If sustained full duration: receive a brief GM impression (image, feeling, symbol, or sound). The beacon is detectable across planes.',
+     notes:'Flavor: You are no longer searching. You are announcing yourself.'},
+
+    {name:'Fracture Response',aff:'Arcane',rc:2,ip:0,ct:'Reaction (when targeted by attack or spell)',range:'Self (15 ft burst)',dur:'Instant',spellLevel:2,dmgDie:'d6',dmgCount:'2',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:false,
+     unstableTable:JSON.stringify(['','','','','','']),
+     effect:'When targeted by an attack or spell, reduce incoming damage by 1d10 + casting modifier, then release a burst: all creatures within 15 ft make a WIS save — fail: 2d6 Arcane damage + disadvantage on next attack/spell; success: half damage only. You also know which creature in the area has the highest magical potency. If damage reduced to 0: you hear a distinct response (word, tone, or whisper).',
+     notes:'Flavor: Something tried to harm you. Something else answered.'},
+
+    {name:'Impossible Refinement',aff:'Arcane',rc:3,ip:0,ct:'Bonus Action',range:'Self',dur:'1 minute (Concentration)',spellLevel:2,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Magic Scar — gain 1 Magic Scar when you maximize a die on a 1.','Normal when maximizing.','Normal when maximizing.','Normal when maximizing.','Normal when maximizing.','Normal when maximizing.']),
+     effect:'Force your magic into unnatural precision. For the duration: +1 Spell Save DC, +1 Spell Attack Rolls. Once per turn when dealing damage with a spell: treat one damage die as its maximum value. Once during the duration: reroll all damage dice of one spell. Drawback: each time you maximize a die, roll 1d6 — on a 1, gain 1 Magic Scar. When spell ends: brief sense of being evaluated. Greatly increases chance of attracting attention from your creator — or something mimicking them.',
+     notes:'Flavor: Perfection is not natural. That does not stop you from reaching for it.'},
+
+    // ── LEVEL 3 SPELLS ───────────────────────────────────────────────
+    {name:'Recorded Existence',aff:'Arcane',rc:4,ip:0,ct:'Reaction (when you take damage)',range:'Self',dur:'Resolves at end of your next turn',spellLevel:3,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Arcane',
+     unstableMagic:false,
+     unstableTable:JSON.stringify(['','','','','','']),
+     effect:'Instead of resisting harm, allow reality to "record" you — then restore that version. When you take damage, store your current HP, position, and condition state. You still take the damage normally. At the end of your next turn: HP returns to recorded value, position resets, all conditions gained after recording are removed. Does NOT restore if killed outright. Does NOT remove Magic Scars. Creatures who saw you snap back make a WIS save — fail: disadvantage on next roll.',
+     notes:'Flavor: If perfection exists — then this moment wasn\'t it.'},
+
+    {name:'False Creation',aff:'Arcane',rc:4,ip:0,ct:'Action',range:'30 ft',dur:'1 minute',spellLevel:3,dmgDie:'d6',dmgCount:'2',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Entity hesitates — loses its action this turn.','Normal.','Normal.','Normal.','Normal.','Entity acts independently — Keeper controls it this turn.']),
+     effect:'Replicate the act of creation itself — poorly, imperfectly, but convincingly. Create a False Entity (HP 20, AC 13, Speed 30 ft, acts on your turn). Attacks: +5 to hit, 1d8 Arcane. Can MIMIC the appearance of any creature you\'ve seen. On destruction: all creatures within 10 ft take 2d6 Arcane damage. Instability: at start of its turns roll 1d6 — 1 hesitates (loses action); 6 acts independently (Keeper controls). Other created beings may recognize it as "wrong."',
+     notes:'Flavor: You try to do what was done to you. It almost works.'},
+
+    {name:'Unanswered Void',aff:'Arcane',rc:3,ip:1,ct:'Action',range:'60 ft (20 ft radius)',dur:'1 round',spellLevel:3,dmgDie:'d8',dmgCount:'2',dmgType:'Psychic',element:'Arcane',
+     unstableMagic:false,
+     unstableTable:JSON.stringify(['','','','','','']),
+     effect:'Impose a moment where nothing responds — no magic, no force, no answer. 20 ft radius zone at a point within range (1 round). Inside: spells cannot be cast, magical effects suppressed, reactions cannot be taken, creatures cannot gain advantage or disadvantage. Voices distort or fail on attempt to speak or cast. When zone collapses: all creatures inside take 2d8 Psychic damage. You are immune to the silence effect. Repeated use may attract entities that exist outside normal magic systems.',
+     notes:'Flavor: You asked for an answer. This time — nothing answered at all.'},
+
+    // ── LEVEL 4 SPELLS ───────────────────────────────────────────────
+    {name:'Creator\'s Judgment',aff:'Arcane',rc:5,ip:2,ct:'Action',range:'60 ft',dur:'Instant (Mark: 1 minute)',spellLevel:4,dmgDie:'d8',dmgCount:'6',dmgType:'Arcane or Radiant',element:'Arcane',
+     unstableMagic:false,
+     unstableTable:JSON.stringify(['','','','','','']),
+     effect:'Call upon the idea of your creator — not for guidance, but for judgment. One creature within range makes a CHA save — fail: 6d8 Radiant or Arcane damage (your choice) + Marked for 1 minute; success: half damage, not Marked. MARKED: once per turn when the target is hit by a spell, it takes +1d8 additional damage. If target drops to 0 HP: a faint "approval" or "denial" is felt (Keeper decides).',
+     notes:'Flavor: You do not know your creator. But something knows how to judge.'},
+
+    {name:'Sigil Eruption',aff:'Arcane',rc:5,ip:2,ct:'Action',range:'90 ft (20 ft radius)',dur:'Instant (ground unstable 1 round)',spellLevel:4,dmgDie:'d10',dmgCount:'5',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:false,
+     unstableTable:JSON.stringify(['','','','','','']),
+     effect:'Force hidden sigils beneath reality to rupture violently. All creatures in the 20 ft radius area make a DEX save — fail: 5d10 Arcane damage + knocked prone; success: half, not prone. The ground becomes unstable for 1 round: movement halved, creatures moving through take 1d6 damage. Illusions and invisibility within the area are immediately revealed.',
+     notes:'Flavor: Reality is not smooth. You just split it open.'},
+
+    {name:'Final Signal',aff:'Arcane',rc:5,ip:2,ct:'Action',range:'120 ft (line, 5 ft wide)',dur:'Instant',spellLevel:4,dmgDie:'d12',dmgCount:'4',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Gain 1 Magic Scar — and you hear something respond clearly for the first time.','Normal.','Normal.','Normal.','Normal.','Normal.']),
+     effect:'Release everything — every attempt, every call, every unanswered question — into a single devastating signal. All creatures in a 120 ft line (5 ft wide) make a CON save — fail: 4d12 Arcane damage + Silenced until end of next turn (cannot cast spells); success: half, no silence. Creatures reduced below half HP: pushed 15 ft away. After casting roll 1d6 — on 1: gain 1 Magic Scar and hear something respond clearly for the first time.',
+     notes:'Flavor: If they won\'t answer — you will make them hear you.'},
+
+    // ── LEVEL 5 SPELLS ───────────────────────────────────────────────
+    {name:'Starve the Heavens',aff:'Arcane',rc:7,ip:3,ct:'Action',range:'120 ft (30 ft radius sphere)',dur:'Instant (lingering 1 round)',spellLevel:5,dmgDie:'d8',dmgCount:'8',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:false,
+     unstableTable:JSON.stringify(['','','','','','']),
+     effect:'Violently consume ambient Arcane resonance in the area, then detonate it outward. All creatures in 30 ft radius make an INT save — fail: 8d8 Arcane damage, lose concentration, cannot regain Resonance or cast Level 3+ spells until end of next turn; success: half, maintain concentration. Lingering collapse (1 round): spell attacks within suffer −2 to hit, magical healing halved. Active magical constructs or summoned creatures take maximum damage.',
+     notes:'Flavor: You did not destroy the magic. You destroyed the space that allowed it to exist.'},
+
+    {name:'Fractal Annihilation',aff:'Arcane',rc:6,ip:3,ct:'Action',range:'90 ft',dur:'Instant',spellLevel:5,dmgDie:'d6',dmgCount:'10',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:false,
+     unstableTable:JSON.stringify(['','','','','','']),
+     effect:'Force a creature to exist in multiple unstable positions at once before violently collapsing every possibility into a single fatal point. Target makes a WIS save — fail: 10d6 Arcane damage + speed becomes 0 until end of next turn + cannot take reactions + arcane fractures ripple (creatures within 10 ft take 2d6 Arcane); success: half damage only. If concentrating on a spell: automatically fail concentration save.',
+     notes:'Visual: the target briefly duplicates into dozens of flickering versions before imploding inward. Flavor: For one impossible moment — every version of them dies together.'},
+
+    {name:'Impossibility Cascade',aff:'Arcane',rc:7,ip:3,ct:'Action',range:'150 ft (60 ft line)',dur:'Instant (Destabilized 2 turns)',spellLevel:5,dmgDie:'d4',dmgCount:'12',dmgType:'Arcane',element:'Arcane',
+     unstableMagic:true,
+     unstableTable:JSON.stringify(['Gain 1 Magic Scar after casting.','Normal.','Normal.','Normal.','Normal.','Normal.']),
+     effect:'Unleash an unstable Arcane equation reality cannot properly resolve. All creatures in 60 ft line make DEX save — fail: 12d4 Arcane + DESTABILIZED 2 turns; success: half. DESTABILIZED (roll 1d4 each turn): 1 lose reaction; 2 speed halved; 3 disadvantage on spell attacks + concentration; 4 take 2d4 Arcane. Non-magical objects in the line partially disintegrate. Illusions instantly collapse on contact. After casting: roll 1d6 — on 1: gain 1 Magic Scar.',
+     notes:'Flavor: Reality tried to solve the equation. Reality failed.'},
+  ],
+  // Future class compendiums are added here keyed by exact class name
 };
+
+const _SC_AFF_COLS = {Light:'#b478ff',Nature:'#40c060',Water:'#3080c0',Air:'#4db8ff',Fire:'#c82030',Chaos:'#9040d0',Arcane:'#a0a0e0',Resonance:'#c9a227',Physical:'#888'};
+let _scCurrentAff = 'All';
+let _scCurrentLvl = 'All';
 
 function openSigilCompendium(){
   const cls = (document.getElementById('charClass')||{}).value || '';
 
-  // Inject CSS once
   if(!document.getElementById('sigilCompCSS')){
-    const s = document.createElement('style');
-    s.id = 'sigilCompCSS';
-    s.textContent = `
-.sc-overlay{position:fixed;inset:0;z-index:14000;background:rgba(0,0,6,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;}
-.sc-modal{background:linear-gradient(145deg,rgba(10,10,28,.99),rgba(6,6,18,.99));border:1px solid rgba(201,162,39,.2);border-radius:10px;width:min(740px,95vw);max-height:86vh;display:flex;flex-direction:column;overflow:hidden;animation:scIn .22s ease;}
-@keyframes scIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
-.sc-hdr{padding:16px 20px 12px;border-bottom:1px solid rgba(201,162,39,.12);flex-shrink:0;display:flex;align-items:center;gap:12px;}
+    const s = document.createElement('style'); s.id='sigilCompCSS';
+    s.textContent=`
+.sc-overlay{position:fixed;inset:0;z-index:14000;background:rgba(0,0,6,.9);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;}
+.sc-modal{background:linear-gradient(145deg,rgba(10,10,28,.99),rgba(6,6,18,.99));border:1px solid rgba(201,162,39,.22);border-radius:10px;width:min(800px,96vw);max-height:88vh;display:flex;flex-direction:column;overflow:hidden;animation:scIn .2s ease;}
+@keyframes scIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.sc-hdr{padding:15px 20px 11px;border-bottom:1px solid rgba(201,162,39,.14);flex-shrink:0;display:flex;align-items:center;gap:12px;}
 .sc-title{font-family:'Cinzel Decorative',serif;font-size:13px;color:var(--gold);letter-spacing:1px;flex:1;}
-.sc-cls-tag{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:var(--txt-dim);text-transform:uppercase;padding:4px 10px;background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.2);border-radius:3px;}
+.sc-cls-tag,.sc-count-tag{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;padding:4px 10px;border-radius:3px;}
+.sc-cls-tag{color:var(--txt-dim);background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.2);}
+.sc-count-tag{color:rgba(201,162,39,.55);background:none;border:1px solid rgba(201,162,39,.15);}
 .sc-close{background:none;border:none;color:rgba(201,162,39,.4);font-size:20px;cursor:pointer;padding:2px 6px;line-height:1;}
 .sc-close:hover{color:var(--gold);}
-.sc-search-row{padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;display:flex;gap:8px;align-items:center;}
+.sc-filters{padding:8px 18px 0;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;}
+.sc-search-row{display:flex;gap:8px;align-items:center;margin-bottom:7px;}
 .sc-search{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.5px;padding:6px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:4px;color:var(--txt-main);flex:1;outline:none;}
-.sc-filter-row{display:flex;gap:5px;flex-wrap:wrap;}
-.sc-filter-pill{font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;padding:3px 9px;border-radius:3px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--txt-dim);cursor:pointer;text-transform:uppercase;transition:all .13s;}
-.sc-filter-pill.on{border-color:var(--gold-d);color:var(--gold);background:rgba(201,162,39,.1);}
+.sc-filter-group{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;align-items:center;}
+.sc-filter-lbl{font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;margin-right:2px;flex-shrink:0;}
+.sc-pill{font-family:'Cinzel',serif;font-size:7px;letter-spacing:.8px;padding:3px 9px;border-radius:3px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);color:var(--txt-dim);cursor:pointer;text-transform:uppercase;transition:all .12s;}
+.sc-pill:hover{border-color:rgba(201,162,39,.4);color:var(--gold-d);}
+.sc-pill.on{border-color:var(--gold-d);color:var(--gold);background:rgba(201,162,39,.1);}
+.sc-pill.lvl-on{border-color:#a0a0e0;color:#c0c0f0;background:rgba(160,160,224,.1);}
 .sc-body{padding:14px 18px;overflow-y:auto;flex:1;}
 .sc-empty{font-family:'EB Garamond',serif;font-size:14px;font-style:italic;color:var(--txt-dim);text-align:center;padding:40px 20px;line-height:1.7;}
-.sc-spell-card{background:var(--surf2);border:1px solid var(--bdr);border-left:3px solid var(--gold-d);border-radius:5px;padding:10px 13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;}
-.sc-spell-card:hover{border-color:var(--gold-d);background:rgba(201,162,39,.04);}
-.sc-spell-info{flex:1;min-width:0;}
-.sc-spell-name{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:1px;color:var(--gold);margin-bottom:3px;}
-.sc-spell-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;}
-.sc-tag{font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.8px;padding:2px 7px;border-radius:2px;border:1px solid rgba(255,255,255,.12);color:var(--txt-dim);background:rgba(255,255,255,.04);}
-.sc-spell-effect{font-family:'EB Garamond',serif;font-size:12px;color:rgba(200,200,220,.8);line-height:1.5;}
-.sc-add-btn{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;padding:7px 13px;background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.3);border-radius:4px;color:var(--gold-d);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
-.sc-add-btn:hover{background:rgba(201,162,39,.18);border-color:rgba(201,162,39,.6);color:var(--gold);}
-.sc-add-btn.added{border-color:rgba(61,214,219,.4);color:rgba(61,214,219,.8);background:rgba(61,214,219,.06);cursor:default;}
+.sc-lvl-hdr{font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;color:var(--gold-d);text-transform:uppercase;padding:10px 0 6px;border-bottom:1px solid rgba(201,162,39,.15);margin-bottom:8px;margin-top:4px;}
+.sc-lvl-hdr:first-child{margin-top:0;}
+.sc-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.07);border-left:3px solid var(--gold-d);border-radius:5px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;transition:background .13s;}
+.sc-card:hover{background:rgba(255,255,255,.04);}
+.sc-info{flex:1;min-width:0;}
+.sc-name{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:1px;color:var(--gold);margin-bottom:4px;}
+.sc-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:6px;}
+.sc-tag{font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.7px;padding:2px 7px;border-radius:2px;border:1px solid rgba(255,255,255,.1);color:var(--txt-dim);background:rgba(255,255,255,.03);}
+.sc-tag.instab{border-color:rgba(232,140,32,.4);color:rgba(232,140,32,.9);}
+.sc-tag.unstable{border-color:rgba(160,100,240,.4);color:rgba(180,130,255,.8);}
+.sc-effect{font-family:'EB Garamond',serif;font-size:12.5px;color:rgba(200,200,225,.8);line-height:1.55;white-space:pre-line;}
+.sc-add-btn{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;padding:8px 14px;background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.3);border-radius:4px;color:var(--gold-d);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;align-self:flex-start;}
+.sc-add-btn:hover{background:rgba(201,162,39,.18);border-color:var(--gold);color:var(--gold);}
+.sc-add-btn.added{border-color:rgba(61,214,219,.4);color:rgba(61,214,219,.85);background:rgba(61,214,219,.07);cursor:default;}
     `;
     document.head.appendChild(s);
   }
 
-  // Remove existing overlay
   const existing = document.getElementById('sigilCompOverlay');
   if(existing) existing.remove();
+  _scCurrentAff = 'All';
+  _scCurrentLvl = 'All';
 
   const spells = SIGIL_COMPENDIUM_DATA[cls] || [];
-  const AFF_COLS = {Light:'#b478ff',Nature:'#40c060',Water:'#3080c0',Air:'#4db8ff',Fire:'#c82030',Chaos:'#9040d0',Arcane:'#a0a0e0',Resonance:'#c9a227',Physical:'#888'};
+  const hasSpells = spells.length > 0;
+
+  // Determine which level pills to show
+  const levels = hasSpells ? [...new Set(spells.map(s=>s.spellLevel||0))].sort((a,b)=>a-b) : [];
+  const lvlLabels = {0:'Cantrip',1:'Level 1',2:'Level 2',3:'Level 3',4:'Level 4',5:'Level 5'};
 
   const overlay = document.createElement('div');
-  overlay.id = 'sigilCompOverlay';
-  overlay.className = 'sc-overlay';
-  overlay.onclick = function(e){ if(e.target === overlay) closeSigilCompendium(); };
+  overlay.id='sigilCompOverlay'; overlay.className='sc-overlay';
+  overlay.onclick=function(e){if(e.target===overlay)closeSigilCompendium();};
 
-  overlay.innerHTML = `
+  overlay.innerHTML=`
     <div class="sc-modal">
       <div class="sc-hdr">
-        <span style="font-size:18px;">📚</span>
+        <span style="font-size:18px">📚</span>
         <div class="sc-title">Sigil Compendium</div>
-        ${cls ? `<span class="sc-cls-tag">${cls}</span>` : ''}
+        ${cls?`<span class="sc-cls-tag">${cls}</span>`:''}
+        ${hasSpells?`<span class="sc-count-tag">${spells.length} spells</span>`:''}
         <button class="sc-close" onclick="closeSigilCompendium()">✕</button>
       </div>
-      <div class="sc-search-row">
-        <input class="sc-search" id="scSearchInput" placeholder="🔍 Search spells…" oninput="_scFilter()">
-        <div class="sc-filter-row" id="scFilterRow">
-          ${['All','Light','Nature','Water','Air','Fire','Chaos','Arcane','Resonance','Physical'].map(a =>
-            `<button class="sc-filter-pill${a==='All'?' on':''}" data-aff="${a}" onclick="_scSetFilter(this)">${a}</button>`
+      <div class="sc-filters">
+        <div class="sc-search-row">
+          <input class="sc-search" id="scSearchInput" placeholder="🔍 Search spells…" oninput="_scFilter()">
+        </div>
+        ${hasSpells?`
+        <div class="sc-filter-group">
+          <span class="sc-filter-lbl">Affinity</span>
+          ${['All','Arcane','Light','Nature','Water','Air','Fire','Chaos','Resonance','Physical'].map(a=>
+            `<button class="sc-pill${a==='All'?' on':''}" data-aff="${a}" onclick="_scSetFilter('aff',this)">${a}</button>`
           ).join('')}
         </div>
+        ${levels.length>1?`<div class="sc-filter-group">
+          <span class="sc-filter-lbl">Level</span>
+          <button class="sc-pill on" data-lvl="All" onclick="_scSetFilter('lvl',this)">All</button>
+          ${levels.map(l=>`<button class="sc-pill" data-lvl="${l}" onclick="_scSetFilter('lvl',this)">${lvlLabels[l]||'Lv '+l}</button>`).join('')}
+        </div>`:''}
+        `:''}
       </div>
       <div class="sc-body" id="scBody">
-        ${spells.length === 0
-          ? `<div class="sc-empty">
-              <div style="font-size:28px;margin-bottom:12px;">📜</div>
-              <strong style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--gold-d);display:block;margin-bottom:10px;">
-                ${cls ? cls + ' Compendium' : 'Sigil Compendium'}
-              </strong>
-              ${cls
-                ? `No compendium spells have been added for <em>${cls}</em> yet — they will appear here as the compendium is populated.`
-                : `Select a class in the sidebar to load compendium spells for your class.`
-              }
-            </div>`
-          : _scRenderSpells(spells, AFF_COLS)
-        }
+        ${hasSpells?_scRenderSpells(spells):`<div class="sc-empty">
+          <div style="font-size:28px;margin-bottom:12px">📜</div>
+          <strong style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--gold-d);display:block;margin-bottom:10px">
+            ${cls?cls+' Compendium':'Sigil Compendium'}
+          </strong>
+          ${cls
+            ?'No compendium spells have been added for <em>'+cls+'</em> yet — they will appear here as the compendium is populated.'
+            :'Select a class in the sidebar to load compendium spells for your class.'
+          }</div>`}
       </div>
     </div>`;
 
   document.body.appendChild(overlay);
-  const inp = document.getElementById('scSearchInput');
-  if(inp) setTimeout(()=>inp.focus(), 80);
+  const inp=document.getElementById('scSearchInput');
+  if(inp) setTimeout(()=>inp.focus(),80);
 }
 
-function _scRenderSpells(spells, AFF_COLS, search, aff){
-  const AFF_C = AFF_COLS || {Light:'#b478ff',Nature:'#40c060',Water:'#3080c0',Air:'#4db8ff',Fire:'#c82030',Chaos:'#9040d0',Arcane:'#a0a0e0',Resonance:'#c9a227',Physical:'#888'};
-  const q = (search||'').toLowerCase();
-  const filtered = spells.filter(function(sp){
-    if(aff && aff !== 'All' && sp.aff !== aff) return false;
-    if(q && !sp.name.toLowerCase().includes(q) && !(sp.effect||'').toLowerCase().includes(q)) return false;
+function _scRenderSpells(spells, search, affFilter, lvlFilter){
+  const q   = (search||'').toLowerCase();
+  const aff = affFilter || _scCurrentAff || 'All';
+  const lvl = lvlFilter !== undefined ? lvlFilter : (_scCurrentLvl||'All');
+
+  const filtered = (spells||[]).filter(function(sp){
+    if(aff !== 'All' && sp.aff !== aff) return false;
+    if(lvl !== 'All' && String(sp.spellLevel||0) !== String(lvl)) return false;
+    if(q){
+      const hay = ((sp.name||'')+(sp.effect||'')+(sp.aff||'')).toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
     return true;
   });
-  if(!filtered.length) return `<div class="sc-empty">No spells match your search.</div>`;
-  return filtered.map(function(sp, i){
-    const col = AFF_C[sp.aff] || 'var(--gold-d)';
-    return `<div class="sc-spell-card" style="border-left-color:${col};">
-      <div class="sc-spell-info">
-        <div class="sc-spell-name">${sp.name}</div>
-        <div class="sc-spell-tags">
-          <span class="sc-tag" style="border-color:${col}50;color:${col};">${sp.aff||'—'}</span>
+
+  if(!filtered.length) return `<div class="sc-empty" style="padding:20px 0">No spells match your search or filters.</div>`;
+
+  const lvlLabels = {0:'Cantrips — Level 0',1:'Level 1',2:'Level 2',3:'Level 3',4:'Level 4',5:'Level 5'};
+  let html = '';
+  let lastLvl = null;
+
+  filtered.forEach(function(sp, i){
+    const realIdx = (SIGIL_COMPENDIUM_DATA[(document.getElementById('charClass')||{}).value||'']||[]).indexOf(sp);
+    const col = _SC_AFF_COLS[sp.aff] || 'var(--gold-d)';
+    const lvlNum = sp.spellLevel !== undefined ? sp.spellLevel : 1;
+    const isCantrip = lvlNum === 0;
+    if(lvlNum !== lastLvl){
+      html += `<div class="sc-lvl-hdr">✦ ${lvlLabels[lvlNum]||'Level '+lvlNum}</div>`;
+      lastLvl = lvlNum;
+    }
+    html += `<div class="sc-card" style="border-left-color:${col};">
+      <div class="sc-info">
+        <div class="sc-name">${sp.name}</div>
+        <div class="sc-tags">
+          <span class="sc-tag" style="border-color:${col}50;color:${col};">${isCantrip?'Cantrip':'Lv '+lvlNum}</span>
+          <span class="sc-tag" style="border-color:${col}30;color:${col}80;">${sp.aff||'Arcane'}</span>
           <span class="sc-tag">RC ${sp.rc||0}</span>
-          ${parseInt(sp.ip||0)>0?`<span class="sc-tag" style="color:var(--ins);">+${sp.ip} Instability</span>`:''}
-          ${sp.ct?`<span class="sc-tag">${sp.ct}</span>`:''}
-          ${sp.range?`<span class="sc-tag">${sp.range}</span>`:''}
-          ${sp.dur?`<span class="sc-tag">${sp.dur}</span>`:''}
+          ${parseInt(sp.ip||0)>0?`<span class="sc-tag instab">+${sp.ip} Instability</span>`:''}
+          ${sp.unstableMagic?`<span class="sc-tag unstable">⚡ Unstable</span>`:''}
+          <span class="sc-tag">${sp.ct||'Action'}</span>
+          <span class="sc-tag">${sp.range||'—'}</span>
+          ${sp.dur&&sp.dur!=='Instant'?`<span class="sc-tag">${sp.dur}</span>`:''}
         </div>
-        <div class="sc-spell-effect">${sp.effect||''}</div>
+        <div class="sc-effect">${(sp.effect||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
       </div>
-      <button class="sc-add-btn" id="scAdd_${i}" onclick="_scAddSpell(${i},this)">+ Add to My Sigils</button>
+      <button class="sc-add-btn" id="scAdd_${realIdx>=0?realIdx:i}" onclick="_scAddSpell(${realIdx>=0?realIdx:i},this)">+ Add</button>
     </div>`;
-  }).join('');
+  });
+  return html;
 }
 
-let _scCurrentAff = 'All';
-
-function _scSetFilter(btn){
-  document.querySelectorAll('.sc-filter-pill').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
-  _scCurrentAff = btn.dataset.aff || 'All';
+function _scSetFilter(type, btn){
+  const group = btn.closest('.sc-filter-group');
+  if(group) group.querySelectorAll('.sc-pill').forEach(b=>b.classList.remove('on','lvl-on'));
+  if(type==='aff'){
+    btn.classList.add('on');
+    _scCurrentAff = btn.dataset.aff||'All';
+  } else {
+    btn.classList.add('lvl-on');
+    _scCurrentLvl = btn.dataset.lvl||'All';
+  }
   _scFilter();
 }
 
 function _scFilter(){
-  const cls   = (document.getElementById('charClass')||{}).value || '';
-  const spells = SIGIL_COMPENDIUM_DATA[cls] || [];
-  const q      = (document.getElementById('scSearchInput')||{}).value || '';
+  const cls   = (document.getElementById('charClass')||{}).value||'';
+  const spells = SIGIL_COMPENDIUM_DATA[cls]||[];
+  const q      = (document.getElementById('scSearchInput')||{}).value||'';
   const body   = document.getElementById('scBody');
-  if(body) body.innerHTML = _scRenderSpells(spells, null, q, _scCurrentAff);
+  if(body) body.innerHTML = _scRenderSpells(spells, q);
 }
 
 function _scAddSpell(idx, btn){
-  const cls = (document.getElementById('charClass')||{}).value || '';
-  const spells = SIGIL_COMPENDIUM_DATA[cls] || [];
+  const cls = (document.getElementById('charClass')||{}).value||'';
+  const spells = SIGIL_COMPENDIUM_DATA[cls]||[];
   const sp = spells[idx];
   if(!sp) return;
   addSpell({
-    name:    sp.name,
-    aff:     sp.aff,
-    rc:      sp.rc,
-    ip:      sp.ip || 0,
-    ct:      sp.ct || 'Action',
-    range:   sp.range || '30 ft.',
-    durType: sp.dur || 'Instant',
-    notes:   sp.notes || sp.effect || '',
-    dmgDie:  sp.dmgDie || 'none',
-    dmgCount:sp.dmgCount || '1',
-    dmgType: sp.dmgType || '',
-    element: sp.element || '',
-    spellLevel: sp.spellLevel || 1,
+    name:         sp.name,
+    aff:          sp.aff,
+    rc:           sp.rc,
+    ip:           sp.ip||0,
+    ct:           sp.ct||'Action',
+    range:        sp.range||'30 ft.',
+    durType:      sp.dur||'Instant',
+    notes:        (sp.notes||sp.effect||''),
+    dmgDie:       sp.dmgDie||'none',
+    dmgCount:     sp.dmgCount||'1',
+    dmgType:      sp.dmgType||'',
+    element:      sp.element||'',
+    spellLevel:   sp.spellLevel||0,
+    unstableMagic:sp.unstableMagic||false,
+    unstableTable:sp.unstableTable||'',
   });
   saveCards('sigilsList','sigils');
-  if(btn){ btn.textContent = '✓ Added'; btn.classList.add('added'); btn.disabled = true; }
-  showToast(sp.name + ' added to your sigils.');
+  if(btn){ btn.textContent='✓ Added'; btn.classList.add('added'); btn.disabled=true; }
+  showToast((sp.spellLevel===0?'Cantrip':'Level '+sp.spellLevel+' spell')+' "'+sp.name+'" added to your sigils.');
 }
 
 function closeSigilCompendium(){
-  const ov = document.getElementById('sigilCompOverlay');
-  if(ov) ov.remove();
+  const ov=document.getElementById('sigilCompOverlay');
+  if(ov)ov.remove();
 }
 
 const NPC_DIALOG_CSS = `
