@@ -679,6 +679,54 @@
                 border-bottom-color: var(--gold);
             }
 
+        /* ─── Tab Dropdown ─── */
+        .tab-dropdown-wrap {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+        }
+        .tab-dropdown-chevron {
+            display: inline-block;
+            margin-left: 4px;
+            font-size: 7px;
+            transition: transform .18s;
+            opacity: .6;
+        }
+        .tab-dropdown-wrap.open .tab-dropdown-chevron { transform: rotate(180deg); opacity: 1; }
+        .tab-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 1px);
+            left: 0;
+            min-width: 150px;
+            background: var(--surf2);
+            border: 1px solid var(--bdr-g);
+            border-top: 2px solid var(--gold-d);
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 8px 20px rgba(0,0,0,.5);
+            z-index: 1000;
+            display: none;
+            padding: 4px 0;
+        }
+        .tab-dropdown-wrap.open .tab-dropdown-menu { display: block; }
+        .tab-drop-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            color: var(--txt-dim);
+            padding: 9px 14px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all .12s;
+            white-space: nowrap;
+        }
+        .tab-drop-item:hover { color: var(--txt); background: rgba(255,255,255,.04); }
+        .tab-drop-item.active { color: var(--gold); background: rgba(201,162,39,.07); }
+
         .tab-content {
             flex: 1;
             overflow-y: auto;
@@ -10400,17 +10448,16 @@
                 </div>
                 <div class="attuned-sigil-wrap">
                     <div class="fld">
-                        <span class="fld-lbl">Attuned Sigils <span class="attuned-sigil-count" id="attunedSigilCount"></span></span>
+                        <span class="fld-lbl" style="display:flex;align-items:center;gap:6px;">Attuned Sigils <span class="attuned-sigil-count" id="attunedSigilCount"></span></span>
                         <div class="attuned-sigil-toggles" id="attunedSigilToggles">
-                            <button type="button" class="ast-btn" data-sigil="light"  style="--ast-col:#b478ff" onclick="toggleAttunedSigil('light')"><span class="ast-icon">✦</span>Light</button>
-                            <button type="button" class="ast-btn" data-sigil="nature" style="--ast-col:#40c060" onclick="toggleAttunedSigil('nature')"><span class="ast-icon">✤</span>Nature</button>
-                            <button type="button" class="ast-btn" data-sigil="water"  style="--ast-col:#288cff" onclick="toggleAttunedSigil('water')"><span class="ast-icon">〈〉</span>Water</button>
-                            <button type="button" class="ast-btn" data-sigil="air"    style="--ast-col:#90c8f8" onclick="toggleAttunedSigil('air')"><span class="ast-icon">◇</span>Air</button>
-                            <button type="button" class="ast-btn" data-sigil="fire"   style="--ast-col:#ff5028" onclick="toggleAttunedSigil('fire')"><span class="ast-icon">🜂</span>Fire</button>
-                            <button type="button" class="ast-btn" data-sigil="chaos"  style="--ast-col:#9d55ff" onclick="toggleAttunedSigil('chaos')"><span class="ast-icon">◼</span>Chaos</button>
+                            <button type="button" class="ast-btn" data-sigil="light"  style="--ast-col:#b478ff" onclick="toggleAttunedSigil('light')" title="Light · Amethyst"><span class="ast-icon">✦</span>Light</button>
+                            <button type="button" class="ast-btn" data-sigil="nature" style="--ast-col:#40c060" onclick="toggleAttunedSigil('nature')" title="Nature · Emerald"><span class="ast-icon">✤</span>Nature</button>
+                            <button type="button" class="ast-btn" data-sigil="water"  style="--ast-col:#288cff" onclick="toggleAttunedSigil('water')" title="Water · Sapphire"><span class="ast-icon">◈</span>Water</button>
+                            <button type="button" class="ast-btn" data-sigil="air"    style="--ast-col:#90c8f8" onclick="toggleAttunedSigil('air')" title="Air · Celestite"><span class="ast-icon">◇</span>Air</button>
+                            <button type="button" class="ast-btn" data-sigil="fire"   style="--ast-col:#ff5028" onclick="toggleAttunedSigil('fire')" title="Fire · Ruby"><span class="ast-icon">△</span>Fire</button>
+                            <button type="button" class="ast-btn" data-sigil="chaos"  style="--ast-col:#9d55ff" onclick="toggleAttunedSigil('chaos')" title="Chaos · Obsidian"><span class="ast-icon">◼</span>Chaos</button>
                         </div>
                     </div>
-                    <div class="attuned-sigil-panel" id="attunedSigilPanel"></div>
                 </div>
             </div>
 
@@ -10537,14 +10584,24 @@
         <main class="main-content">
             <nav class="tab-bar">
                 <button class="tab-btn active" onclick="showTab('attributes',this)" data-tab-index="1">⚡ Attributes</button>
-                <button class="tab-btn" onclick="showTab('skills',this)" data-tab-index="2">🎯 Skills</button>
-                <button class="tab-btn" onclick="showTab('sigils',this)" data-tab-index="3">✨ Sigils</button>
-                <button class="tab-btn" onclick="showTab('abilities',this)" data-tab-index="4">💥 Abilities</button>
-                <button class="tab-btn" onclick="showTab('inventory',this)" data-tab-index="5">🎒 Inventory</button>
-                <button class="tab-btn" onclick="showTab('world',this)" data-tab-index="6">📖 World</button>
-                <button class="tab-btn" onclick="showTab('companions',this)" data-tab-index="7">🐾 Creatures</button>
-                <button class="tab-btn" onclick="showTab('gems',this)" data-tab-index="8">💎 Gems</button>
-                <button class="tab-btn" onclick="showTab('places',this)" data-tab-index="9">🗺 Places</button>
+
+                <!-- ── Grouped sheet tabs in a dropdown ── -->
+                <div class="tab-dropdown-wrap" id="tabDropdownWrap">
+                  <button class="tab-btn" id="tabDropdownBtn" onclick="_tabDropToggle()" aria-haspopup="true" aria-expanded="false">
+                    <span id="tabDropLabel">📚 Sheets</span><span class="tab-dropdown-chevron">▼</span>
+                  </button>
+                  <div class="tab-dropdown-menu" id="tabDropMenu" role="menu">
+                    <button class="tab-drop-item" data-drop-id="skills"     onclick="_tabDropSelect('skills',    '✨ Skills',     this)">🎯 Skills</button>
+                    <button class="tab-drop-item" data-drop-id="sigils"     onclick="_tabDropSelect('sigils',    '✨ Sigils',     this)">✨ Sigils</button>
+                    <button class="tab-drop-item" data-drop-id="abilities"  onclick="_tabDropSelect('abilities', '💥 Abilities',  this)">💥 Abilities</button>
+                    <button class="tab-drop-item" data-drop-id="inventory"  onclick="_tabDropSelect('inventory', '🎒 Inventory',  this)">🎒 Inventory</button>
+                    <button class="tab-drop-item" data-drop-id="world"      onclick="_tabDropSelect('world',     '📖 World',      this)">📖 World</button>
+                    <button class="tab-drop-item" data-drop-id="companions" onclick="_tabDropSelect('companions','🐾 Creatures',  this)">🐾 Creatures</button>
+                    <button class="tab-drop-item" data-drop-id="gems"       onclick="_tabDropSelect('gems',      '💎 Gems',       this)">💎 Gems</button>
+                    <button class="tab-drop-item" data-drop-id="places"     onclick="_tabDropSelect('places',    '🗺 Places',     this)">🗺 Places</button>
+                  </div>
+                </div>
+
                 <button class="tab-btn" onclick="showTab('notes',this)" data-tab-index="0">📝 Notes</button>
                 <button class="tab-btn" onclick="showTab('vtt',this)">⚔ VTT</button>
                 <button class="tab-btn" onclick="showTab('report',this)">📋 Report</button>
@@ -10689,6 +10746,13 @@
 
                 <!-- ─── SIGILS ─── -->
                 <div class="tab-panel" id="tab-sigils">
+                    <!-- Sigil Compendium launcher -->
+                    <div style="display:flex;justify-content:flex-end;margin-bottom:14px;">
+                      <button onclick="openSigilCompendium()" style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.35);border-radius:4px;color:var(--gold-d);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:7px;" onmouseover="this.style.background='rgba(201,162,39,.16)';this.style.borderColor='rgba(201,162,39,.6)'" onmouseout="this.style.background='rgba(201,162,39,.08)';this.style.borderColor='rgba(201,162,39,.35)'">
+                        <span style="font-size:14px;">📚</span> Sigil Compendium
+                      </button>
+                    </div>
+
                     <!-- Class Sigil Pool -->
                     <div id="classSigilsDisplay">
                         <div class="racial-skills-empty">Select a Class in the sidebar to load your Class Sigil pool.</div>
@@ -17918,6 +17982,65 @@ function filterCompendium(q){
 
 // Init craft tab on tab switch
 
+// ── Tab Dropdown (Sheets menu) ───────────────────────────
+const _DROP_TAB_IDS = new Set(['skills','sigils','abilities','inventory','world','companions','gems','places']);
+
+function _tabDropToggle(){
+  const wrap = document.getElementById('tabDropdownWrap');
+  if(!wrap) return;
+  const open = wrap.classList.toggle('open');
+  const btn  = document.getElementById('tabDropdownBtn');
+  if(btn) btn.setAttribute('aria-expanded', open);
+}
+
+function _tabDropSelect(id, label, itemBtn){
+  const wrap = document.getElementById('tabDropdownWrap');
+  if(wrap) wrap.classList.remove('open');
+  const dropBtn = document.getElementById('tabDropdownBtn');
+  if(dropBtn) dropBtn.setAttribute('aria-expanded', 'false');
+  // Update dropdown button label
+  const lbl = document.getElementById('tabDropLabel');
+  if(lbl) lbl.textContent = label;
+  // Mark the clicked item active, clear others
+  document.querySelectorAll('.tab-drop-item').forEach(b=>b.classList.remove('active'));
+  if(itemBtn) itemBtn.classList.add('active');
+  // Delegate to showTab (pass dropBtn so it gets the .active class)
+  showTab(id, dropBtn);
+}
+
+function _tabDropSyncActive(id){
+  // Called by showTab — keeps the dropdown label/items in sync
+  const lbl = document.getElementById('tabDropLabel');
+  const wrap = document.getElementById('tabDropdownWrap');
+  if(!_DROP_TAB_IDS.has(id)){
+    // A non-dropdown tab was selected — clear dropdown active state
+    if(lbl) lbl.textContent = '📚 Sheets';
+    document.querySelectorAll('.tab-drop-item').forEach(b=>b.classList.remove('active'));
+    if(wrap) wrap.querySelector('#tabDropdownBtn')?.classList.remove('active');
+    return;
+  }
+  // A dropdown tab — keep the button active
+  const item = document.querySelector(`.tab-drop-item[data-drop-id="${id}"]`);
+  document.querySelectorAll('.tab-drop-item').forEach(b=>b.classList.remove('active'));
+  if(item){
+    item.classList.add('active');
+    if(lbl) lbl.textContent = item.textContent.trim();
+  }
+}
+
+// Close on outside click
+document.addEventListener('click', function(e){
+  if(!e.target.closest('#tabDropdownWrap')){
+    const wrap = document.getElementById('tabDropdownWrap');
+    if(wrap && wrap.classList.contains('open')){
+      wrap.classList.remove('open');
+      const btn = document.getElementById('tabDropdownBtn');
+      if(btn) btn.setAttribute('aria-expanded','false');
+    }
+  }
+}, true);
+// ─────────────────────────────────────────────────────────
+
 function showTab(id,btn){
   // Tab aliases — merged panels
   if(id==='craft') id='inventory';
@@ -17926,6 +18049,7 @@ function showTab(id,btn){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('tab-'+id).classList.add('active');
   if(btn) btn.classList.add('active');
+  _tabDropSyncActive(id);
   // VTT needs padding-free container
   const tc=document.querySelector('.tab-content');
   if(id==='vtt') tc.classList.add('vtt-active');
@@ -18259,6 +18383,38 @@ function buildSigilRefCard(sig, isKnown, showState){
     </div>`;
 }
 
+// Renders the 6 attunement toggle pills for embedding in classSigilsDisplay.
+// Uses the same state.attunedSigils array as the sidebar toggles.
+function _buildAttunementRow(){
+  const active = _getAttunedSigils();
+  const sigils = [
+    { key:'light',  label:'Light',  col:'#b478ff', icon:'✦' },
+    { key:'nature', label:'Nature', col:'#40c060', icon:'✤' },
+    { key:'water',  label:'Water',  col:'#3080c0', icon:'◈' },
+    { key:'air',    label:'Air',    col:'#4db8ff', icon:'◇' },
+    { key:'fire',   label:'Fire',   col:'#c82030', icon:'△' },
+    { key:'chaos',  label:'Chaos',  col:'#9040d0', icon:'◼' },
+  ];
+  const n = active.length;
+  const countLbl = n === 0 ? 'None attuned' : (n === 1 ? '1 sigil attuned' : n + ' sigils attuned');
+  let h = `<div style="margin-bottom:4px;">`;
+  h += `<div style="font-family:'Cinzel',serif;font-size:7px;letter-spacing:1.5px;color:var(--txt-dim);text-transform:uppercase;margin-bottom:6px;">Attunement · <span id="attunedSigilCountTab">${countLbl}</span></div>`;
+  h += `<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:5px;">`;
+  sigils.forEach(function(s){
+    const on = active.includes(s.key);
+    const bg = on ? _hexToRgba(s.col, 0.14) : '';
+    const border = on ? `2px solid ${s.col}` : '1px solid rgba(255,255,255,.1)';
+    const color  = on ? s.col : 'var(--txt-dim)';
+    const fw     = on ? '700' : '400';
+    h += `<button type="button"
+      style="background:${bg};border:${border};border-radius:4px;padding:5px 2px 4px;cursor:pointer;font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.8px;color:${color};text-transform:uppercase;text-align:center;line-height:1.5;font-weight:${fw};transition:all .13s;"
+      onclick="toggleAttunedSigil('${s.key}')" title="${s.label} Sigil attunement"
+    ><span style="display:block;font-size:11px;margin-bottom:1px;">${s.icon}</span>${s.label}</button>`;
+  });
+  h += `</div></div>`;
+  return h;
+}
+
 function buildClassSigilDisplay(){
   const cls = document.getElementById('charClass').value;
   const level = parseInt(document.getElementById('charLevel').value)||1;
@@ -18273,6 +18429,10 @@ function buildClassSigilDisplay(){
   const cs = CLASS_SIGILS[cls];
   let html = `<div style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:var(--gold);margin-bottom:10px;text-transform:uppercase;padding-bottom:6px;border-bottom:1px solid var(--bdr-g);">Class Sigil Pool — ${cls}</div>`;
   html += `<div style="font-family:'EB Garamond',serif;font-size:13px;font-style:italic;color:var(--txt-dim);margin-bottom:14px;">${cs.desc}</div>`;
+
+  // ── SIGIL ATTUNEMENT — for all classes ────────────────────────────────────
+  // (For isOriginBased classes this is embedded in the Sigil Origin box below)
+  if(!cs.isOriginBased){ html += _buildAttunementRow(); }
 
   // ── SIGIL-ADAPTATION (all classes except Sigil-Touched) ───────────────────────
   const freeAll = (!cs.isOriginBased && state.sigilAdaptation === 'Non Elemental');
@@ -18331,8 +18491,9 @@ function buildClassSigilDisplay(){
     // Sigil-Touched Adept — show origin selector
     const origin = state.sigilOrigin || '';
     html += `<div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:4px;padding:12px 14px;margin-bottom:14px;">`;
-    html += `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;margin-bottom:7px;">Sigil Origin — choose your affinity</div>`;
-    html += `<select class="fld-sel" style="width:100%;" onchange="state.sigilOrigin=this.value;_debouncedSave();buildClassSigilDisplay();">`;
+    html += `<div style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:2px;color:var(--gold-d);text-transform:uppercase;margin-bottom:7px;">Sigil Origin — choose your affinity and/or Attunement</div>`;
+    html += _buildAttunementRow();
+    html += `<select class="fld-sel" style="width:100%;margin-top:10px;" onchange="state.sigilOrigin=this.value;_debouncedSave();buildClassSigilDisplay();">`;
     html += `<option value="">— Select Sigil Origin —</option>`;
     Object.entries(cs.origins).forEach(([aff, label]) => {
       html += `<option value="${aff}"${origin===aff?' selected':''}>${label}</option>`;
@@ -19299,6 +19460,180 @@ function buildPlaceContent(){
   });
 
   panel.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════
+// SIGIL COMPENDIUM
+// ═══════════════════════════════════════════════════
+// Keyed by exact class name. Each entry is an array of spell objects:
+// { name, aff, rc, ip, ct, range, dur, effect, notes }
+// Populate this object after the button is live — the user will provide spells.
+const SIGIL_COMPENDIUM_DATA = {
+  // 'Sigil-Touched Adept': [ { name:'...', aff:'Light', rc:2, ip:0, ct:'Action', range:'30 ft.', dur:'Instant', effect:'...', notes:'' }, ... ],
+  // 'Legionnaire Ascendant': [ ... ],
+};
+
+function openSigilCompendium(){
+  const cls = (document.getElementById('charClass')||{}).value || '';
+
+  // Inject CSS once
+  if(!document.getElementById('sigilCompCSS')){
+    const s = document.createElement('style');
+    s.id = 'sigilCompCSS';
+    s.textContent = `
+.sc-overlay{position:fixed;inset:0;z-index:14000;background:rgba(0,0,6,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;}
+.sc-modal{background:linear-gradient(145deg,rgba(10,10,28,.99),rgba(6,6,18,.99));border:1px solid rgba(201,162,39,.2);border-radius:10px;width:min(740px,95vw);max-height:86vh;display:flex;flex-direction:column;overflow:hidden;animation:scIn .22s ease;}
+@keyframes scIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.sc-hdr{padding:16px 20px 12px;border-bottom:1px solid rgba(201,162,39,.12);flex-shrink:0;display:flex;align-items:center;gap:12px;}
+.sc-title{font-family:'Cinzel Decorative',serif;font-size:13px;color:var(--gold);letter-spacing:1px;flex:1;}
+.sc-cls-tag{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:var(--txt-dim);text-transform:uppercase;padding:4px 10px;background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.2);border-radius:3px;}
+.sc-close{background:none;border:none;color:rgba(201,162,39,.4);font-size:20px;cursor:pointer;padding:2px 6px;line-height:1;}
+.sc-close:hover{color:var(--gold);}
+.sc-search-row{padding:10px 18px;border-bottom:1px solid rgba(255,255,255,.05);flex-shrink:0;display:flex;gap:8px;align-items:center;}
+.sc-search{font-family:'Cinzel',serif;font-size:9px;letter-spacing:.5px;padding:6px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:4px;color:var(--txt-main);flex:1;outline:none;}
+.sc-filter-row{display:flex;gap:5px;flex-wrap:wrap;}
+.sc-filter-pill{font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;padding:3px 9px;border-radius:3px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--txt-dim);cursor:pointer;text-transform:uppercase;transition:all .13s;}
+.sc-filter-pill.on{border-color:var(--gold-d);color:var(--gold);background:rgba(201,162,39,.1);}
+.sc-body{padding:14px 18px;overflow-y:auto;flex:1;}
+.sc-empty{font-family:'EB Garamond',serif;font-size:14px;font-style:italic;color:var(--txt-dim);text-align:center;padding:40px 20px;line-height:1.7;}
+.sc-spell-card{background:var(--surf2);border:1px solid var(--bdr);border-left:3px solid var(--gold-d);border-radius:5px;padding:10px 13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:12px;}
+.sc-spell-card:hover{border-color:var(--gold-d);background:rgba(201,162,39,.04);}
+.sc-spell-info{flex:1;min-width:0;}
+.sc-spell-name{font-family:'Cinzel',serif;font-size:9.5px;letter-spacing:1px;color:var(--gold);margin-bottom:3px;}
+.sc-spell-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:5px;}
+.sc-tag{font-family:'Cinzel',serif;font-size:6.5px;letter-spacing:.8px;padding:2px 7px;border-radius:2px;border:1px solid rgba(255,255,255,.12);color:var(--txt-dim);background:rgba(255,255,255,.04);}
+.sc-spell-effect{font-family:'EB Garamond',serif;font-size:12px;color:rgba(200,200,220,.8);line-height:1.5;}
+.sc-add-btn{font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;padding:7px 13px;background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.3);border-radius:4px;color:var(--gold-d);cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.sc-add-btn:hover{background:rgba(201,162,39,.18);border-color:rgba(201,162,39,.6);color:var(--gold);}
+.sc-add-btn.added{border-color:rgba(61,214,219,.4);color:rgba(61,214,219,.8);background:rgba(61,214,219,.06);cursor:default;}
+    `;
+    document.head.appendChild(s);
+  }
+
+  // Remove existing overlay
+  const existing = document.getElementById('sigilCompOverlay');
+  if(existing) existing.remove();
+
+  const spells = SIGIL_COMPENDIUM_DATA[cls] || [];
+  const AFF_COLS = {Light:'#b478ff',Nature:'#40c060',Water:'#3080c0',Air:'#4db8ff',Fire:'#c82030',Chaos:'#9040d0',Arcane:'#a0a0e0',Resonance:'#c9a227',Physical:'#888'};
+
+  const overlay = document.createElement('div');
+  overlay.id = 'sigilCompOverlay';
+  overlay.className = 'sc-overlay';
+  overlay.onclick = function(e){ if(e.target === overlay) closeSigilCompendium(); };
+
+  overlay.innerHTML = `
+    <div class="sc-modal">
+      <div class="sc-hdr">
+        <span style="font-size:18px;">📚</span>
+        <div class="sc-title">Sigil Compendium</div>
+        ${cls ? `<span class="sc-cls-tag">${cls}</span>` : ''}
+        <button class="sc-close" onclick="closeSigilCompendium()">✕</button>
+      </div>
+      <div class="sc-search-row">
+        <input class="sc-search" id="scSearchInput" placeholder="🔍 Search spells…" oninput="_scFilter()">
+        <div class="sc-filter-row" id="scFilterRow">
+          ${['All','Light','Nature','Water','Air','Fire','Chaos','Arcane','Resonance','Physical'].map(a =>
+            `<button class="sc-filter-pill${a==='All'?' on':''}" data-aff="${a}" onclick="_scSetFilter(this)">${a}</button>`
+          ).join('')}
+        </div>
+      </div>
+      <div class="sc-body" id="scBody">
+        ${spells.length === 0
+          ? `<div class="sc-empty">
+              <div style="font-size:28px;margin-bottom:12px;">📜</div>
+              <strong style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:2px;color:var(--gold-d);display:block;margin-bottom:10px;">
+                ${cls ? cls + ' Compendium' : 'Sigil Compendium'}
+              </strong>
+              ${cls
+                ? `No compendium spells have been added for <em>${cls}</em> yet — they will appear here as the compendium is populated.`
+                : `Select a class in the sidebar to load compendium spells for your class.`
+              }
+            </div>`
+          : _scRenderSpells(spells, AFF_COLS)
+        }
+      </div>
+    </div>`;
+
+  document.body.appendChild(overlay);
+  const inp = document.getElementById('scSearchInput');
+  if(inp) setTimeout(()=>inp.focus(), 80);
+}
+
+function _scRenderSpells(spells, AFF_COLS, search, aff){
+  const AFF_C = AFF_COLS || {Light:'#b478ff',Nature:'#40c060',Water:'#3080c0',Air:'#4db8ff',Fire:'#c82030',Chaos:'#9040d0',Arcane:'#a0a0e0',Resonance:'#c9a227',Physical:'#888'};
+  const q = (search||'').toLowerCase();
+  const filtered = spells.filter(function(sp){
+    if(aff && aff !== 'All' && sp.aff !== aff) return false;
+    if(q && !sp.name.toLowerCase().includes(q) && !(sp.effect||'').toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if(!filtered.length) return `<div class="sc-empty">No spells match your search.</div>`;
+  return filtered.map(function(sp, i){
+    const col = AFF_C[sp.aff] || 'var(--gold-d)';
+    return `<div class="sc-spell-card" style="border-left-color:${col};">
+      <div class="sc-spell-info">
+        <div class="sc-spell-name">${sp.name}</div>
+        <div class="sc-spell-tags">
+          <span class="sc-tag" style="border-color:${col}50;color:${col};">${sp.aff||'—'}</span>
+          <span class="sc-tag">RC ${sp.rc||0}</span>
+          ${parseInt(sp.ip||0)>0?`<span class="sc-tag" style="color:var(--ins);">+${sp.ip} Instability</span>`:''}
+          ${sp.ct?`<span class="sc-tag">${sp.ct}</span>`:''}
+          ${sp.range?`<span class="sc-tag">${sp.range}</span>`:''}
+          ${sp.dur?`<span class="sc-tag">${sp.dur}</span>`:''}
+        </div>
+        <div class="sc-spell-effect">${sp.effect||''}</div>
+      </div>
+      <button class="sc-add-btn" id="scAdd_${i}" onclick="_scAddSpell(${i},this)">+ Add to My Sigils</button>
+    </div>`;
+  }).join('');
+}
+
+let _scCurrentAff = 'All';
+
+function _scSetFilter(btn){
+  document.querySelectorAll('.sc-filter-pill').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  _scCurrentAff = btn.dataset.aff || 'All';
+  _scFilter();
+}
+
+function _scFilter(){
+  const cls   = (document.getElementById('charClass')||{}).value || '';
+  const spells = SIGIL_COMPENDIUM_DATA[cls] || [];
+  const q      = (document.getElementById('scSearchInput')||{}).value || '';
+  const body   = document.getElementById('scBody');
+  if(body) body.innerHTML = _scRenderSpells(spells, null, q, _scCurrentAff);
+}
+
+function _scAddSpell(idx, btn){
+  const cls = (document.getElementById('charClass')||{}).value || '';
+  const spells = SIGIL_COMPENDIUM_DATA[cls] || [];
+  const sp = spells[idx];
+  if(!sp) return;
+  addSpell({
+    name:    sp.name,
+    aff:     sp.aff,
+    rc:      sp.rc,
+    ip:      sp.ip || 0,
+    ct:      sp.ct || 'Action',
+    range:   sp.range || '30 ft.',
+    durType: sp.dur || 'Instant',
+    notes:   sp.notes || sp.effect || '',
+    dmgDie:  sp.dmgDie || 'none',
+    dmgCount:sp.dmgCount || '1',
+    dmgType: sp.dmgType || '',
+    element: sp.element || '',
+    spellLevel: sp.spellLevel || 1,
+  });
+  saveCards('sigilsList','sigils');
+  if(btn){ btn.textContent = '✓ Added'; btn.classList.add('added'); btn.disabled = true; }
+  showToast(sp.name + ' added to your sigils.');
+}
+
+function closeSigilCompendium(){
+  const ov = document.getElementById('sigilCompOverlay');
+  if(ov) ov.remove();
 }
 
 const NPC_DIALOG_CSS = `
@@ -28043,40 +28378,12 @@ function renderAttunedSigilToggles(){
 }
 
 function renderAttunedSigilPanels(){
-  const panel = document.getElementById('attunedSigilPanel');
-  if(!panel) return;
-  const active = _getAttunedSigils();
-  if(!active.length){ panel.classList.remove('visible'); panel.innerHTML = ''; return; }
-  panel.classList.add('visible');
-  panel.innerHTML = active.map(function(val){
-    const meta = ATTUNED_SIGIL_MAP[val];
-    if(!meta) return '';
-    const gem    = typeof GEM_LORE_DATA !== 'undefined' ? GEM_LORE_DATA[meta.idx] : null;
-    const powers = gem ? gem.powers : [];
-    const desc   = gem ? gem.alignment.substring(0, 220) + '…' : '';
-    const spells = _getAttunedSpellsForSigil(val);
-    return `<div class="ast-panel-card" style="--sigil-col:${meta.col};border-color:${meta.col}45;">
-      <div class="attuned-sigil-name" style="font-family:'Cinzel Decorative',serif;font-size:12px;font-weight:700;color:${meta.col};margin-bottom:8px;text-shadow:0 0 10px ${meta.col}40;">${meta.name}</div>
-      <div style="background:rgba(0,0,0,.35);border:1px solid ${meta.col}30;border-left:3px solid ${meta.col};border-radius:5px;padding:8px 11px;margin-bottom:8px;">
-        <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:${meta.col};opacity:.7;text-transform:uppercase;margin-bottom:4px;">Sigil Description</div>
-        <div style="font-family:'EB Garamond',serif;font-size:12.5px;font-style:italic;color:var(--txt);line-height:1.6;">${desc}</div>
-      </div>
-      <div style="background:rgba(0,0,0,.22);border:1px solid ${meta.col}20;border-radius:5px;padding:7px 10px;margin-bottom:8px;">
-        <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:2px;color:${meta.col};text-transform:uppercase;margin-bottom:5px;">Sigil Bonuses &amp; Abilities</div>
-        ${powers.map(p=>`<div style="font-size:11px;color:var(--txt);padding:2px 0 2px 7px;border-left:2px solid ${meta.col}50;margin-bottom:3px;line-height:1.4;">${p}</div>`).join('')}
-      </div>
-      <div class="sigil-spells-list">${renderAttunedSpellItems(spells, meta, val)}</div>
-      <button type="button" class="add-btn" style="border-color:${meta.col}55;color:${meta.col};font-size:7px;padding:4px 10px;margin-top:6px;" onclick="toggleSigilSpellForm('${val}')">+ Add Sigil Spell</button>
-      <div class="sigil-spell-form" id="sigilSpellForm_${val}">
-        <input id="sigilSpellName_${val}" class="c-inp" placeholder="Spell name…" style="margin-bottom:5px;width:100%;box-sizing:border-box;">
-        <div style="display:grid;grid-template-columns:70px 1fr;gap:5px;margin-bottom:5px;">
-          <input id="sigilSpellRC_${val}" class="c-inp" type="number" min="0" value="2" placeholder="RC">
-          <input id="sigilSpellEffect_${val}" class="c-inp" placeholder="Effect / notes…">
-        </div>
-        <button type="button" class="add-btn" style="border-color:${meta.col}50;color:${meta.col};font-size:7px;padding:3px 10px;" onclick="addAttunedSigilSpell('${val}')">Add</button>
-      </div>
-    </div>`;
-  }).join('');
+  // Attunement is now a simple sigil-branding choice (which of the 6 core
+  // sigils you're attuned to) displayed in the Sigils tab under Sigil Origin.
+  // The sidebar just shows the toggle buttons — no per-sigil panels needed.
+  renderAttunedSigilToggles();
+  // Also rebuild the in-tab attunement row if the Sigils tab is rendered
+  if(typeof buildClassSigilDisplay === 'function') buildClassSigilDisplay();
 }
 
 // Kept as a compat shim for any remaining callers
