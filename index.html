@@ -25417,7 +25417,7 @@ function _renderSR(){
   const showProf   = ['save','attack','skill','spell_attack'].includes(t);
   const showSkill  = t === 'skill';
   const showDie    = !isD20 || t === 'raw' || t === 'damage';
-  const showAdv    = isD20 && t !== 'death' && t !== 'spell_save';
+  const showAdv    = t !== 'death' && t !== 'spell_save';
   const showDmg    = SR.damageDice.length > 0 && t !== 'spell_save';
   const showDmgSave= SR.damageDice.length > 0 && t === 'spell_save';
 
