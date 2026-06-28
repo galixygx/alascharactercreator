@@ -4819,6 +4819,119 @@
                 box-shadow: 0 0 10px rgba(201,162,39,.2);
             }
 
+        /* ─── Roll Intent: expanded configurator ─── */
+        .ri-type-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        .ri-type-btn {
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.1);
+            color: var(--txt-dim);
+            font-family: 'Cinzel', serif;
+            font-size: 7px;
+            letter-spacing: .8px;
+            padding: 7px 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            text-transform: uppercase;
+            transition: all .13s;
+            line-height: 1.3;
+        }
+        .ri-type-btn:hover { border-color: var(--gold-d); color: var(--gold-d); }
+        .ri-type-btn.ri-type-on {
+            background: rgba(201,162,39,.15);
+            border-color: var(--gold);
+            color: var(--gold);
+            font-weight: 700;
+        }
+        .ri-ability-row {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+        .ri-ab-chip {
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.1);
+            color: var(--txt-dim);
+            font-family: 'Cinzel', serif;
+            font-size: 7px;
+            letter-spacing: .5px;
+            padding: 6px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            text-transform: uppercase;
+            transition: all .13s;
+        }
+        .ri-ab-chip:hover { border-color: var(--gold-d); color: var(--gold-d); }
+        .ri-ab-chip.ri-ab-on {
+            background: rgba(201,162,39,.14);
+            border-color: var(--gold-d);
+            color: var(--gold);
+        }
+        .ri-adv-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+        .ri-adv-btn {
+            background: rgba(255,255,255,.03);
+            border: 1px solid rgba(255,255,255,.1);
+            color: var(--txt-dim);
+            font-family: 'Cinzel', serif;
+            font-size: 7.5px;
+            letter-spacing: 1px;
+            padding: 8px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            text-transform: uppercase;
+            transition: all .13s;
+        }
+        .ri-adv-btn:hover { border-color: var(--gold-d); color: var(--gold-d); }
+        .ri-adv-btn.ri-adv-on {
+            border-width: 2px;
+        }
+        .ri-adv-btn.ri-adv-on.adv { border-color: #4cbb6a; color: #4cbb6a; background: rgba(76,187,106,.1); }
+        .ri-adv-btn.ri-adv-on.dis { border-color: #e05050; color: #e05050; background: rgba(224,80,80,.1); }
+        .ri-roll-btn {
+            width: 100%;
+            padding: 11px;
+            background: rgba(201,162,39,.14);
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-family: 'Cinzel', serif;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all .15s;
+            margin-bottom: 6px;
+        }
+        .ri-roll-btn:hover { background: rgba(201,162,39,.28); box-shadow: 0 0 12px rgba(201,162,39,.2); }
+        .ri-full-btn {
+            width: 100%;
+            padding: 7px;
+            background: none;
+            border: 1px solid rgba(255,255,255,.1);
+            color: var(--txt-dim);
+            font-family: 'Cinzel', serif;
+            font-size: 7.5px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all .13s;
+        }
+        .ri-full-btn:hover { border-color: var(--gold-d); color: var(--gold-d); }
+
         .roll-intent-sub {
             font-family: 'EB Garamond',serif;
             font-size: 14px;
@@ -24933,7 +25046,27 @@ function closeDiceMenu(){} // kept for compat — menu is now inside the popup
 
 function openRollIntentPrompt(){
   const ov = document.getElementById('rollIntentOverlay');
-  if(ov) ov.classList.add('open');
+  if(!ov) return;
+  // Reset intent state to defaults on every open
+  _ri.type = 'raw'; _ri.adv = 'normal'; _ri.ab = 'STR';
+  // Sync type pills
+  document.querySelectorAll('#riTypeGrid .ri-type-btn').forEach(function(b){
+    b.classList.toggle('ri-type-on', b.dataset.ritype === 'raw');
+  });
+  // Hide ability row (only shown for ability/save)
+  const abRow = document.getElementById('riAbilityRow');
+  if(abRow) abRow.style.display = 'none';
+  // Reset adv buttons
+  const advBtn = document.getElementById('riAdvBtn');
+  const disBtn = document.getElementById('riDisBtn');
+  if(advBtn) advBtn.classList.remove('ri-adv-on');
+  if(disBtn) disBtn.classList.remove('ri-adv-on');
+  // Restore adv row (may have been hidden by death save selection)
+  const advRow = document.getElementById('riAdvRow');
+  const advLbl = document.getElementById('riAdvLbl');
+  if(advRow) advRow.style.display = 'grid';
+  if(advLbl) advLbl.style.display = '';
+  ov.classList.add('open');
   _syncRiDieHighlight();
 }
 
@@ -24957,8 +25090,95 @@ function closeRollIntent(){
 }
 
 function rollIntentOpenRoll(){
+  // Full Smart Roll modal — carries over current intent selections
   closeRollIntent();
-  openSmartRoll({type:'raw'});
+  openSmartRoll({type: _ri.type, ab: _ri.ab});
+  // Pre-set advantage from intent overlay
+  SR.adv = _ri.adv;
+  _renderSR();
+}
+
+// ── Roll Intent: extended configurator state ──────────────────
+const _ri = { type:'raw', adv:'normal', ab:'STR' };
+
+function _riSetType(t){
+  _ri.type = t;
+  // Sync type pill highlight
+  document.querySelectorAll('#riTypeGrid .ri-type-btn').forEach(function(b){
+    b.classList.toggle('ri-type-on', b.dataset.ritype === t);
+  });
+  // Show ability row for types that need an ability
+  const needsAb = t === 'ability' || t === 'save';
+  const abRow = document.getElementById('riAbilityRow');
+  if(abRow) abRow.style.display = needsAb ? 'grid' : 'none';
+  // For d20 types, highlight d20; for raw/damage, use whatever is selected
+  const isD20Type = !['raw','damage'].includes(t);
+  if(isD20Type){
+    // Highlight d20 but don't force it — user can change
+    document.querySelectorAll('#riDieGrid .ri-die-btn').forEach(function(b){
+      b.classList.toggle('ri-active', b.dataset.die === 'd20');
+    });
+    if(!['d20'].includes(state.selectedDie||'d20') && isD20Type){
+      // Just highlight d20 visually for d20 rolls without changing selectedDie
+    }
+  }
+  // Hide adv row for death save and spell_save (no adv/dis applies)
+  const hideAdv = t === 'death';
+  const advRow = document.getElementById('riAdvRow');
+  const advLbl = document.getElementById('riAdvLbl');
+  if(advRow) advRow.style.display = hideAdv ? 'none' : 'grid';
+  if(advLbl) advLbl.style.display = hideAdv ? 'none' : '';
+}
+
+function _riSetAb(ab){
+  _ri.ab = ab;
+  document.querySelectorAll('#riAbilityRow .ri-ab-chip').forEach(function(b){
+    b.classList.toggle('ri-ab-on', b.dataset.ab === ab);
+  });
+}
+
+function _riToggleAdv(a){
+  // Toggle: clicking active button resets to normal
+  _ri.adv = (_ri.adv === a) ? 'normal' : a;
+  const advBtn = document.getElementById('riAdvBtn');
+  const disBtn = document.getElementById('riDisBtn');
+  if(advBtn) advBtn.classList.toggle('ri-adv-on', _ri.adv === 'adv');
+  if(disBtn) disBtn.classList.toggle('ri-adv-on', _ri.adv === 'dis');
+}
+
+function _riRoll(){
+  closeRollIntent();
+  const t   = _ri.type;
+  const ab  = _ri.ab;
+  const adv = _ri.adv;
+
+  // Set up SR from intent state — falls back to SR.* when DOM elements absent
+  const ctx = { type: t, ab: ab };
+  // Initialize SR via openSmartRoll but suppress the overlay open
+  SR.notes = ''; SR.adv = adv; SR.rollDmg = false;
+  SR.sigilName = ''; SR.sigilAff = ''; SR.sigilEffect = '';
+  SR.damageDice = []; SR.dc = 0; SR.savingAbs = []; SR.flat = 0;
+  SR.type = t; SR.ab = ab;
+  SR.profChecked = t==='attack' || t==='spell_attack' ? true
+                 : t==='save' ? !!(state.saveProficiencies && state.saveProficiencies.includes(ab))
+                 : false;
+  if(t==='initiative'){ SR.ab='DEX'; SR.profChecked=false; }
+  if(t==='spell_attack'){ SR.ab=getSpellAb(); SR.profChecked=true; }
+  if(t==='raw'||t==='damage'){
+    const selDie = state.selectedDie || 'd20';
+    SR.dieSides = parseInt(selDie.replace('d',''))||20;
+    SR.dieCount = 1;
+  } else {
+    SR.dieSides = 20; SR.dieCount = 1;
+  }
+  if(t==='skill'){
+    SR.skill = SR.skill || (typeof SKILLS_DATA!=='undefined' ? SKILLS_DATA[0].name : 'Perception');
+    const sk = typeof SKILLS_DATA!=='undefined' ? SKILLS_DATA.find(function(s){return s.name===SR.skill;}) : null;
+    SR.ab = sk ? sk.ab : 'WIS';
+    SR.profChecked = skillProficientDOM ? skillProficientDOM(SR.skill) : false;
+  }
+  // Execute directly without showing the SR modal
+  _srExecute();
 }
 
 // ═══════════════════════════════════════════════════
@@ -32033,24 +32253,56 @@ function copyReport(){
     <!-- ═══════════ ROLL INTENT (Would you like to roll?) ═══════════ -->
     <div id="rollIntentOverlay" class="roll-intent-overlay" onclick="if(event.target===this)closeRollIntent()">
         <div class="roll-intent-box" onclick="event.stopPropagation()">
-            <div class="roll-intent-ttl">Would you like to roll?</div>
+            <div class="roll-intent-ttl">Configure &amp; Roll</div>
 
-            <div class="ri-section-lbl">Choose a die</div>
+            <!-- Roll Type -->
+            <div class="ri-section-lbl">Roll Type</div>
+            <div class="ri-type-grid" id="riTypeGrid">
+                <button type="button" class="ri-type-btn ri-type-on" data-ritype="raw"         onclick="_riSetType('raw')">Plain Roll</button>
+                <button type="button" class="ri-type-btn"            data-ritype="ability"      onclick="_riSetType('ability')">Ability Check</button>
+                <button type="button" class="ri-type-btn"            data-ritype="save"         onclick="_riSetType('save')">Saving Throw</button>
+                <button type="button" class="ri-type-btn"            data-ritype="attack"       onclick="_riSetType('attack')">Weapon Atk</button>
+                <button type="button" class="ri-type-btn"            data-ritype="spell_attack" onclick="_riSetType('spell_attack')">Spell Atk</button>
+                <button type="button" class="ri-type-btn"            data-ritype="skill"        onclick="_riSetType('skill')">Skill Check</button>
+                <button type="button" class="ri-type-btn"            data-ritype="initiative"   onclick="_riSetType('initiative')">Initiative</button>
+                <button type="button" class="ri-type-btn"            data-ritype="damage"       onclick="_riSetType('damage')">Damage</button>
+                <button type="button" class="ri-type-btn"            data-ritype="death"        onclick="_riSetType('death')">Death Save</button>
+            </div>
+
+            <!-- Ability chooser (shown for ability / save) -->
+            <div id="riAbilityRow" class="ri-ability-row" style="display:none;">
+                <button type="button" class="ri-ab-chip ri-ab-on" data-ab="STR" onclick="_riSetAb('STR')">STR</button>
+                <button type="button" class="ri-ab-chip" data-ab="DEX" onclick="_riSetAb('DEX')">DEX</button>
+                <button type="button" class="ri-ab-chip" data-ab="CON" onclick="_riSetAb('CON')">CON</button>
+                <button type="button" class="ri-ab-chip" data-ab="INT" onclick="_riSetAb('INT')">INT</button>
+                <button type="button" class="ri-ab-chip" data-ab="WIS" onclick="_riSetAb('WIS')">WIS</button>
+                <button type="button" class="ri-ab-chip" data-ab="CHA" onclick="_riSetAb('CHA')">CHA</button>
+            </div>
+
+            <!-- Die chooser -->
+            <div class="ri-section-lbl">Die</div>
             <div class="ri-die-grid" id="riDieGrid">
-                <button type="button" class="ri-die-btn" data-die="d4" onclick="selectDieInIntent('d4')">d4</button>
-                <button type="button" class="ri-die-btn" data-die="d6" onclick="selectDieInIntent('d6')">d6</button>
-                <button type="button" class="ri-die-btn" data-die="d8" onclick="selectDieInIntent('d8')">d8</button>
+                <button type="button" class="ri-die-btn" data-die="d4"  onclick="selectDieInIntent('d4')">d4</button>
+                <button type="button" class="ri-die-btn" data-die="d6"  onclick="selectDieInIntent('d6')">d6</button>
+                <button type="button" class="ri-die-btn" data-die="d8"  onclick="selectDieInIntent('d8')">d8</button>
                 <button type="button" class="ri-die-btn" data-die="d10" onclick="selectDieInIntent('d10')">d10</button>
                 <button type="button" class="ri-die-btn" data-die="d12" onclick="selectDieInIntent('d12')">d12</button>
                 <button type="button" class="ri-die-btn" data-die="d20" onclick="selectDieInIntent('d20')">d20</button>
                 <button type="button" class="ri-die-btn ri-die-btn-wide" data-die="d100" onclick="selectDieInIntent('d100')">d100</button>
             </div>
 
-            <div class="ri-divider">— or —</div>
+            <!-- Advantage / Disadvantage -->
+            <div class="ri-section-lbl" id="riAdvLbl">Advantage / Disadvantage</div>
+            <div class="ri-adv-row" id="riAdvRow">
+                <button type="button" class="ri-adv-btn adv" id="riAdvBtn" onclick="_riToggleAdv('adv')">▲ Advantage</button>
+                <button type="button" class="ri-adv-btn dis" id="riDisBtn" onclick="_riToggleAdv('dis')">▼ Disadvantage</button>
+            </div>
 
-            <div class="roll-intent-actions">
-                <button type="button" class="roll-intent-primary" onclick="rollIntentOpenRoll()">🎲 Configure &amp; Roll</button>
-                <button type="button" onclick="closeRollIntent()">Not now</button>
+            <!-- Action buttons -->
+            <button type="button" class="ri-roll-btn" onclick="_riRoll()">🎲 Roll!</button>
+            <button type="button" class="ri-full-btn" onclick="rollIntentOpenRoll()">⚙ Full Options</button>
+            <div style="text-align:center;margin-top:6px;">
+                <button type="button" onclick="closeRollIntent()" style="background:none;border:none;color:var(--txt-dim);font-family:'Cinzel',serif;font-size:7px;letter-spacing:1px;cursor:pointer;text-transform:uppercase;">Not now</button>
             </div>
         </div>
     </div>
