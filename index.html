@@ -19509,7 +19509,10 @@ function buildPlacesSidebar(){
   });
 }
 
+const _NO_BOUNTY_BOARD = new Set(['Dunesong Desert','Silkwood Forest','Thin Sheet Mountains']);
+
 function buildBountyBoard(locationId){
+  if(_NO_BOUNTY_BOARD.has(locationId)) return '';
   const rotating = (BOUNTY_BOARD.rotating||{})[locationId] || [];
   let h = `<div class="bounty-board-section">`;
   h += `<div class="bounty-board-hdr">⚑ Bounty Board</div>`;
