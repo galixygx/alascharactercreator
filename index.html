@@ -7714,6 +7714,35 @@
         }
         #alasTitleScreen.ts-fade-out { opacity:0; pointer-events:none; }
 
+        /* ── Title screen credits ── */
+        .ts-credits {
+            position: absolute;
+            bottom: 22px;
+            left: 0; right: 0;
+            text-align: center;
+            z-index: 2;
+            opacity: 0;
+            animation: tsFadeUp .9s ease forwards;
+            animation-delay: 2s;
+        }
+        .ts-credits-owner {
+            font-family: 'Cinzel', serif;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            color: rgba(201,162,39,.85);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .ts-credits-coowners {
+            font-family: 'Cinzel', serif;
+            font-size: 8px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: rgba(201,162,39,.5);
+            text-transform: uppercase;
+        }
+
         /* Starfield canvas behind everything */
         #tsStars {
             position:absolute; inset:0; z-index:0;
@@ -10184,6 +10213,10 @@
     <!-- ═══════════ ALAS TITLE SCREEN ═══════════ -->
     <div id="alasTitleScreen">
         <canvas id="tsStars"></canvas>
+        <div class="ts-credits">
+            <div class="ts-credits-owner">Owner &mdash; Galixy</div>
+            <div class="ts-credits-coowners">Co-Owners &mdash; PhoTurkey &nbsp;·&nbsp; Gladiator &nbsp;·&nbsp; Kether &nbsp;·&nbsp; ObliviousDisaster</div>
+        </div>
         <div class="ts-content">
             <div class="ts-rule"></div>
             <div class="ts-wordmark">ALAS</div>
