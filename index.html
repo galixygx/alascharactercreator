@@ -10101,6 +10101,18 @@
         .pc-cond-active-bar { margin-top:5px; font-family:'EB Garamond',serif; font-size:9.5px; font-style:italic; color:var(--txt-dim); line-height:1.55; }
         .pc-cond-panel .pc-cond-btn { font-size:7.5px; padding:4px 10px; }
         .pc-cond-panel .pc-cond-grid { gap:5px; }
+        /* condition damage modal */
+        .cond-dmg-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.65); z-index:9000; align-items:center; justify-content:center; }
+        .cond-dmg-overlay.open { display:flex; }
+        .cond-dmg-box { background:var(--bg-card,#16162a); border:1px solid var(--bdr-g); border-radius:8px; padding:24px 28px; min-width:260px; max-width:320px; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,.6); }
+        .cond-dmg-title { font-family:'Cinzel',serif; font-size:15px; letter-spacing:1.5px; margin-bottom:4px; font-weight:700; }
+        .cond-dmg-sub { font-family:'EB Garamond',serif; font-size:11.5px; font-style:italic; color:var(--txt-dim); margin-bottom:14px; }
+        .cond-dmg-inp { width:80px; font-size:22px; font-family:'Cinzel',serif; text-align:center; padding:6px 4px; border:1px solid var(--bdr-g); border-radius:4px; background:rgba(255,255,255,.05); color:var(--txt-main); }
+        .cond-dmg-btns { display:flex; gap:10px; justify-content:center; margin-top:16px; }
+        .cond-dmg-confirm { padding:6px 20px; border-radius:4px; font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; cursor:pointer; border:1px solid; font-weight:700; }
+        .cond-dmg-cancel  { padding:6px 18px; border-radius:4px; border:1px solid var(--bdr); background:transparent; font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; cursor:pointer; color:var(--txt-dim); }
+        .cond-take-dmg-btn { padding:3px 10px; border-radius:3px; font-family:'Cinzel',serif; font-size:7.5px; letter-spacing:.6px; cursor:pointer; border:1px solid; white-space:nowrap; transition:filter .12s; vertical-align:middle; }
+        .cond-take-dmg-btn:hover { filter:brightness(1.35); }
 
         /* ─── QUICK REFERENCE TAB ────────────────────────────────── */
         .qref-body { columns:2; column-gap:14px; padding-bottom:20px; }
@@ -10901,6 +10913,16 @@
                             </div>
                         </div>
                     </div>
+                    <!-- ─── PC CONDITIONS PANEL ─── -->
+                    <div class="pc-cond-panel" style="margin-top:16px">
+                        <div class="sec-hdr">Active Conditions</div>
+                        <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:10px;">
+                            Toggle conditions affecting your character. Active conditions auto-apply ADV/DIS to rolls. <span style="color:#ff6020;font-style:normal;font-weight:700">Burning</span>, <span style="color:#c82030;font-style:normal;font-weight:700">Bleeding</span> &amp; <span style="color:#40c040;font-style:normal;font-weight:700">Poisoned</span> prompt for per-turn damage — use ⚔ Take Dmg to apply it instantly.
+                        </div>
+                        <div class="pc-cond-grid" id="pcCondGridFull"></div>
+                        <div class="pc-cond-active-bar" id="pcCondActiveBarFull" style="margin-top:8px;">No active conditions.</div>
+                    </div>
+
                     <!-- Skills & Passive Perception (moved from Skills tab) -->
                     <div style="margin-top:18px">
                         <div class="sec-hdr">Skills &amp; Proficiencies</div>
@@ -10915,15 +10937,6 @@
                         <div class="skills-grid" id="skillsGrid"></div>
                     </div>
 
-                    <!-- ─── PC CONDITIONS PANEL ─── -->
-                    <div class="pc-cond-panel" style="margin-top:20px">
-                        <div class="sec-hdr">Active Conditions</div>
-                        <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:10px;">
-                            Toggle conditions affecting your character. Active conditions automatically apply advantage or disadvantage to relevant dice rolls.
-                        </div>
-                        <div class="pc-cond-grid" id="pcCondGridFull"></div>
-                        <div class="pc-cond-active-bar" id="pcCondActiveBarFull" style="margin-top:8px;">No active conditions.</div>
-                    </div>
                 </div>
 
                 <!-- ─── SKILLS ─── -->
@@ -14906,13 +14919,14 @@ function ensureStateDefaults(){
   if(state.acMod===undefined) state.acMod=0;
   if(state.initMod===undefined) state.initMod=0;
   if(!state.pcConditions || typeof state.pcConditions !== 'object') state.pcConditions = {};
+  if(!state.pcCondDmg    || typeof state.pcCondDmg    !== 'object') state.pcCondDmg    = {};
 }
 
 // ═══════════════════════════════════════════════════
 // PLAYER CHARACTER CONDITIONS
 // ═══════════════════════════════════════════════════
 const PC_COND_DEFS = [
-  { key:'psn', label:'Poisoned',      col:'#40c040', rgb:'64,192,64',   rollFx:{attack:'dis',spell_attack:'dis',ability:'dis',skill:'dis'}, desc:'DIS on attack rolls & ability checks' },
+  { key:'psn', label:'Poisoned', hasDmg:true, col:'#40c040', rgb:'64,192,64',   rollFx:{attack:'dis',spell_attack:'dis',ability:'dis',skill:'dis'}, desc:'DIS on attack rolls & ability checks' },
   { key:'frt', label:'Frightened',    col:'#d040c0', rgb:'208,64,192',  rollFx:{attack:'dis',spell_attack:'dis',ability:'dis',skill:'dis'}, desc:'DIS on attacks & checks while source is visible' },
   { key:'bld', label:'Blinded',       col:'#a0a8b8', rgb:'160,168,184', rollFx:{attack:'dis',spell_attack:'dis'},                           desc:'DIS on attacks; attackers have ADV vs. you' },
   { key:'prn', label:'Prone',         col:'#9060a0', rgb:'144,96,160',  rollFx:{attack:'dis',spell_attack:'dis'},                           desc:'DIS on attacks; melee attackers have ADV vs. you' },
@@ -14920,16 +14934,66 @@ const PC_COND_DEFS = [
   { key:'stn', label:'Stunned',       col:'#ffcc00', rgb:'255,204,0',   rollFx:{save_dex:'dis'},                                            desc:'DIS on DEX saves; can\'t move; attackers have ADV' },
   { key:'slw', label:'Slowed',        col:'#4080ff', rgb:'64,128,255',  rollFx:{save_dex:'dis'},                                            desc:'DIS on DEX saves; −2 AC; half speed' },
   { key:'chm', label:'Charmed',       col:'#ff80c0', rgb:'255,128,192', rollFx:{},                                                          desc:'Can\'t attack charmer; charmer has ADV on social checks vs. you' },
-  { key:'brn', label:'Burning',       col:'#ff6020', rgb:'255,96,32',   rollFx:{},                                                          desc:'Taking ongoing fire damage at start of each turn' },
-  { key:'blg', label:'Bleeding',      col:'#c82030', rgb:'200,32,48',   rollFx:{},                                                          desc:'Taking ongoing damage at start of each turn' },
+  { key:'brn', label:'Burning',  hasDmg:true, col:'#ff6020', rgb:'255,96,32',   rollFx:{},                                                          desc:'Taking ongoing fire damage at start of each turn' },
+  { key:'blg', label:'Bleeding', hasDmg:true, col:'#c82030', rgb:'200,32,48',   rollFx:{},                                                          desc:'Taking ongoing damage at start of each turn' },
   { key:'inc', label:'Incapacited',   col:'#505070', rgb:'80,80,112',   rollFx:{},                                                          desc:'Cannot take actions or reactions' },
 ];
 
+let _pendingCondDmgKey = null;
+
 function togglePCCondition(key){
   if(!state.pcConditions) state.pcConditions={};
-  state.pcConditions[key]=!state.pcConditions[key];
+  const def = PC_COND_DEFS.find(d=>d.key===key);
+  if(def && def.hasDmg && !state.pcConditions[key]){
+    _showCondDmgModal(key);
+    return;
+  }
+  state.pcConditions[key] = !state.pcConditions[key];
+  if(!state.pcConditions[key] && def && def.hasDmg){
+    if(state.pcCondDmg) delete state.pcCondDmg[key];
+  }
   _debouncedSave();
   buildPCCondTray();
+}
+
+function _showCondDmgModal(key){
+  const def = PC_COND_DEFS.find(d=>d.key===key); if(!def) return;
+  _pendingCondDmgKey = key;
+  const overlay = document.getElementById('pcCondDmgOverlay'); if(!overlay) return;
+  const title = document.getElementById('pcCondDmgTitle');
+  if(title){ title.textContent=def.label; title.style.color=def.col; }
+  const inp = document.getElementById('pcCondDmgInput');
+  if(inp){ inp.value=(state.pcCondDmg||{})[key]||''; inp.style.borderColor=def.col; }
+  const confirmBtn = document.getElementById('pcCondDmgConfirmBtn');
+  if(confirmBtn){ confirmBtn.style.borderColor=def.col; confirmBtn.style.color=def.col; confirmBtn.style.background='rgba('+def.rgb+',.12)'; }
+  overlay.classList.add('open');
+  setTimeout(()=>{ if(inp){inp.focus();inp.select();} }, 60);
+}
+
+function _pcCondDmgConfirm(){
+  if(!_pendingCondDmgKey) return;
+  const inp = document.getElementById('pcCondDmgInput');
+  const dmg = Math.max(0, parseInt(inp ? inp.value : '0')||0);
+  if(!state.pcConditions) state.pcConditions={};
+  if(!state.pcCondDmg)    state.pcCondDmg={};
+  state.pcConditions[_pendingCondDmgKey] = true;
+  state.pcCondDmg[_pendingCondDmgKey]    = dmg;
+  _pendingCondDmgKey = null;
+  const overlay = document.getElementById('pcCondDmgOverlay'); if(overlay) overlay.classList.remove('open');
+  _debouncedSave();
+  buildPCCondTray();
+}
+
+function _pcCondDmgCancel(){
+  _pendingCondDmgKey = null;
+  const overlay = document.getElementById('pcCondDmgOverlay'); if(overlay) overlay.classList.remove('open');
+}
+
+function applyCondDmg(key){
+  const dmg = parseInt((state.pcCondDmg||{})[key])||0; if(!dmg) return;
+  const el = document.getElementById('hpCur'); if(!el) return;
+  el.value = Math.max(0, (parseInt(el.value)||0) - dmg);
+  if(typeof updateBar==='function') updateBar('hp');
 }
 
 function getPCCondRollMod(rollType, ability){
@@ -14952,6 +15016,7 @@ function getPCCondRollMod(rollType, ability){
 
 function buildPCCondTray(){
   const conds = state.pcConditions||{};
+  const dmgs  = state.pcCondDmg||{};
   ['pcCondGridSide','pcCondGridFull'].forEach(gId=>{
     const grid = document.getElementById(gId); if(!grid) return;
     grid.innerHTML='';
@@ -14960,7 +15025,7 @@ function buildPCCondTray(){
       const btn = document.createElement('button');
       btn.className = 'pc-cond-btn'+(on?' active':'');
       btn.textContent = def.label;
-      btn.title = def.desc;
+      btn.title = def.hasDmg ? def.desc+' — click to set per-turn damage' : def.desc;
       if(on){ btn.style.setProperty('--cond-col',def.col); btn.style.setProperty('--cond-rgb',def.rgb); }
       btn.onclick = ()=>togglePCCondition(def.key);
       grid.appendChild(btn);
@@ -14970,7 +15035,17 @@ function buildPCCondTray(){
     const bar = document.getElementById(bId); if(!bar) return;
     const active = PC_COND_DEFS.filter(d=>conds[d.key]);
     if(!active.length){ bar.textContent='No active conditions.'; return; }
-    bar.innerHTML = active.map(d=>`<span style="color:${d.col};font-style:normal;font-weight:700">${d.label}</span>: ${d.desc}`).join('<br>');
+    bar.innerHTML = active.map(d=>{
+      const dmgAmt = d.hasDmg ? (dmgs[d.key]||0) : 0;
+      const takeBtnHtml = d.hasDmg
+        ? `<button class="cond-take-dmg-btn" style="border-color:${d.col};color:${d.col};background:rgba(${d.rgb},.12)" onclick="applyCondDmg('${d.key}')" title="Subtract ${dmgAmt} from current HP">⚔ Take ${dmgAmt} dmg</button>`
+        : '';
+      return `<div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;flex-wrap:wrap;">`
+        +`<span style="color:${d.col};font-style:normal;font-weight:700;white-space:nowrap">${d.label}</span>`
+        +`<span style="font-style:italic;flex:1;min-width:0">${d.desc}</span>`
+        +takeBtnHtml
+        +`</div>`;
+    }).join('');
   });
 }
 
@@ -37946,5 +38021,20 @@ window.toggleSidebar = function(){
 
 })();
 </script>
+
+<!-- ─── CONDITION DAMAGE MODAL ─── -->
+<div class="cond-dmg-overlay" id="pcCondDmgOverlay" onclick="if(event.target===this)_pcCondDmgCancel()">
+    <div class="cond-dmg-box">
+        <div class="cond-dmg-title" id="pcCondDmgTitle">Condition</div>
+        <div class="cond-dmg-sub">How much damage per turn?<br><span style="font-size:10px;opacity:.7">(Enter 0 to track condition without auto-damage)</span></div>
+        <input class="cond-dmg-inp" id="pcCondDmgInput" type="number" min="0" max="999" value="" placeholder="0"
+               onkeydown="if(event.key==='Enter')_pcCondDmgConfirm();if(event.key==='Escape')_pcCondDmgCancel()">
+        <div class="cond-dmg-btns">
+            <button class="cond-dmg-confirm" id="pcCondDmgConfirmBtn" onclick="_pcCondDmgConfirm()">Activate</button>
+            <button class="cond-dmg-cancel" onclick="_pcCondDmgCancel()">Cancel</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
