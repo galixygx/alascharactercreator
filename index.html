@@ -10078,6 +10078,48 @@
         .dms-action:last-child { border-bottom:none; }
         .dms-act-name { font-family:'Cinzel',serif; font-size:7px; letter-spacing:1.5px; color:#b87333; text-transform:uppercase; margin-bottom:1px; }
         .dms-act-desc { font-family:'EB Garamond',serif; font-size:10.5px; color:var(--txt-dim); line-height:1.35; }
+
+        /* ─── CHARACTER SLOT BAR ─────────────────────────────────── */
+        .char-slot-bar { display:flex; gap:4px; padding:6px 10px; background:rgba(0,0,0,.3); border-bottom:1px solid var(--bdr); overflow-x:auto; flex-shrink:0; }
+        .char-slot-bar::-webkit-scrollbar { height:2px; }
+        .char-slot-bar::-webkit-scrollbar-thumb { background:var(--bdr-g); border-radius:2px; }
+        .char-slot-btn { flex:1; min-width:42px; padding:5px 3px; background:var(--surf2); border:1px solid var(--bdr); border-radius:4px; cursor:pointer; text-align:center; transition:all .12s; display:flex; flex-direction:column; align-items:center; gap:2px; }
+        .char-slot-btn:hover { border-color:var(--gold-d); background:var(--surf3); }
+        .char-slot-btn.active { border-color:var(--gold); background:rgba(201,162,39,.1); box-shadow:0 0 6px rgba(201,162,39,.2); }
+        .char-slot-num { font-family:'Cinzel',serif; font-size:6px; letter-spacing:.8px; color:var(--txt-dim); text-transform:uppercase; line-height:1.2; }
+        .char-slot-btn.active .char-slot-num { color:var(--gold-d); }
+        .char-slot-name { font-family:'Raleway',sans-serif; font-size:7.5px; font-weight:600; color:var(--txt-lbl); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:48px; line-height:1.2; }
+        .char-slot-btn.active .char-slot-name { color:var(--gold-l); }
+
+        /* ─── PC CONDITIONS TRAY ─────────────────────────────────── */
+        .pc-cond-sec { padding:8px 12px 10px; border-top:1px solid var(--bdr); flex-shrink:0; }
+        .pc-cond-hdr { font-family:'Cinzel',serif; font-size:7.5px; letter-spacing:2px; color:var(--gold-d); text-transform:uppercase; margin-bottom:7px; }
+        .pc-cond-grid { display:flex; flex-wrap:wrap; gap:3px; }
+        .pc-cond-btn { padding:3px 7px; border-radius:3px; font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:.7px; cursor:pointer; border:1px solid rgba(255,255,255,.1); background:rgba(20,20,40,.9); color:#5060a0; text-transform:uppercase; transition:all .12s; white-space:nowrap; }
+        .pc-cond-btn:hover { border-color:rgba(255,255,255,.25); color:var(--txt-lbl); }
+        .pc-cond-btn.active { border-color:var(--cond-col,#c82030); background:rgba(var(--cond-rgb,200,32,48),.14); color:var(--cond-col,#c82030); box-shadow:0 0 5px rgba(var(--cond-rgb,200,32,48),.2); }
+        .pc-cond-active-bar { margin-top:5px; font-family:'EB Garamond',serif; font-size:9.5px; font-style:italic; color:var(--txt-dim); line-height:1.55; }
+        .pc-cond-panel .pc-cond-btn { font-size:7.5px; padding:4px 10px; }
+        .pc-cond-panel .pc-cond-grid { gap:5px; }
+
+        /* ─── QUICK REFERENCE TAB ────────────────────────────────── */
+        .qref-body { columns:2; column-gap:14px; padding-bottom:20px; }
+        .qref-card { background:var(--surf2); border:1px solid var(--bdr-g); border-radius:6px; overflow:hidden; margin-bottom:14px; break-inside:avoid; -webkit-column-break-inside:avoid; }
+        .qref-card-hdr { font-family:'Cinzel',serif; font-size:8.5px; letter-spacing:2px; color:var(--gold-d); text-transform:uppercase; padding:8px 13px; background:rgba(201,162,39,.06); border-bottom:1px solid var(--bdr-g); }
+        .qref-card-body { padding:10px 13px; }
+        .qref-table { width:100%; border-collapse:collapse; }
+        .qref-table th { font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:1.5px; color:var(--txt-dim); text-transform:uppercase; padding:3px 8px 3px 0; text-align:left; border-bottom:1px solid var(--bdr); }
+        .qref-table td { font-family:'EB Garamond',serif; font-size:12px; color:var(--txt); padding:4px 8px 4px 0; border-bottom:1px solid rgba(255,255,255,.04); vertical-align:top; line-height:1.4; }
+        .qref-table tr:last-child td { border-bottom:none; }
+        .qref-table td:first-child { color:var(--gold); font-weight:700; white-space:nowrap; padding-right:10px; min-width:100px; }
+        .qref-cond-list { display:grid; grid-template-columns:1fr 1fr; gap:7px 12px; }
+        .qref-cond-name { font-family:'Cinzel',serif; font-size:7.5px; letter-spacing:1px; text-transform:uppercase; font-weight:700; }
+        .qref-cond-desc { font-family:'EB Garamond',serif; font-size:10.5px; color:var(--txt-dim); font-style:italic; margin-top:1px; line-height:1.3; }
+        .qref-stage-row { display:flex; align-items:center; gap:8px; padding:4px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+        .qref-stage-row:last-child { border-bottom:none; }
+        .qref-stage-num { font-family:'Cinzel',serif; font-size:12px; font-weight:700; color:var(--gold); width:22px; text-align:center; flex-shrink:0; }
+        .qref-stage-label { font-family:'EB Garamond',serif; font-size:12.5px; color:var(--txt); flex:1; }
+        .qref-stage-casts { font-family:'Cinzel',serif; font-size:7.5px; color:var(--res); letter-spacing:.5px; flex-shrink:0; }
     </style>
 
     <!-- ── Site Protection ─────────────────────────────────────── -->
@@ -10426,6 +10468,11 @@
                 </div>
             </div>
 
+            <!-- Character Slots -->
+            <div class="char-slot-bar" id="charSlotBar">
+                <!-- Built by buildSlotBar() on page load -->
+            </div>
+
             <!-- Identity -->
             <div class="sb-sec">
                 <div class="sb-sec-ttl">Identity</div>
@@ -10682,6 +10729,13 @@
                 <div style="font-family:'EB Garamond',serif;font-size:9.5px;font-style:italic;color:var(--txt-dim);margin-top:4px;text-align:right;">Illuminates from Instability / Corruption thresholds</div>
             </div>
 
+            <!-- Active Conditions -->
+            <div class="pc-cond-sec">
+                <div class="pc-cond-hdr">⚡ Active Conditions</div>
+                <div class="pc-cond-grid" id="pcCondGridSide"></div>
+                <div class="pc-cond-active-bar" id="pcCondActiveBarSide">No active conditions.</div>
+            </div>
+
             <!-- Rest -->
             <div class="rest-sec">
                 <div class="rest-lbl">Rest</div>
@@ -10749,6 +10803,7 @@
                 <button class="tab-btn" onclick="showTab('notes',this)" data-tab-index="0">📝 Notes</button>
                 <button class="tab-btn" onclick="showTab('vtt',this)">⚔ VTT</button>
                 <button class="tab-btn" onclick="showTab('report',this)">📋 Report</button>
+                <button class="tab-btn" onclick="showTab('quickref',this)">📖 Quick Ref</button>
                 <button id="agentAlasBtn" onclick="toggleAgentPanel()" title="Agent Alas">🔮 Agent Alas</button>
             </nav>
 
@@ -10858,6 +10913,16 @@
                             PR = Proficient &nbsp;·&nbsp; EX = Expertise (double prof). Check boxes to apply.
                         </div>
                         <div class="skills-grid" id="skillsGrid"></div>
+                    </div>
+
+                    <!-- ─── PC CONDITIONS PANEL ─── -->
+                    <div class="pc-cond-panel" style="margin-top:20px">
+                        <div class="sec-hdr">Active Conditions</div>
+                        <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:10px;">
+                            Toggle conditions affecting your character. Active conditions automatically apply advantage or disadvantage to relevant dice rolls.
+                        </div>
+                        <div class="pc-cond-grid" id="pcCondGridFull"></div>
+                        <div class="pc-cond-active-bar" id="pcCondActiveBarFull" style="margin-top:8px;">No active conditions.</div>
                     </div>
                 </div>
 
@@ -11668,6 +11733,167 @@
                     </div>
                   </div>
                 </div><!-- /tab-report -->
+
+                <!-- ─── QUICK REFERENCE ─── -->
+                <div class="tab-panel" id="tab-quickref">
+                    <div class="sec-hdr">Quick Reference</div>
+                    <div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:16px;">Core Alas mechanics at a glance. Conditions auto-sync with the Active Conditions panel.</div>
+                    <div class="qref-body">
+
+                        <!-- Status Conditions — full width -->
+                        <div class="qref-card" style="column-span:all;-webkit-column-span:all">
+                            <div class="qref-card-hdr">Status Conditions &amp; Effects</div>
+                            <div class="qref-card-body">
+                                <div class="qref-cond-list">
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#40c040">Poisoned</div><div class="qref-cond-desc">DIS on attack rolls and ability checks.</div></div>
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#d040c0">Frightened</div><div class="qref-cond-desc">DIS on attacks & ability checks while source is visible. Can't move closer to source.</div></div>
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#a0a8b8">Blinded</div><div class="qref-cond-desc">DIS on attacks. Attackers have ADV vs. you. Auto-fail sight-based checks.</div></div>
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#9060a0">Prone</div><div class="qref-cond-desc">DIS on attacks. Melee attackers have ADV; ranged DIS. Move = crawl (½ speed).</div></div>
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#90a8c0">Invisible</div><div class="qref-cond-desc">ADV on attacks. Attackers have DIS vs. you. Position known by sound/tracks.</div></div>
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#ffcc00">Stunned</div><div class="qref-cond-desc">Can't move, act, or react. DIS on DEX saves. Attackers have ADV vs. you.</div></div>
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#4080ff">Slowed</div><div class="qref-cond-desc">DIS on DEX saves. −2 AC. Half speed. Max 1 attack or spell per turn.</div></div>
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#ff80c0">Charmed</div><div class="qref-cond-desc">Can't attack the charmer. Charmer has ADV on social checks vs. you.</div></div>
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#ff6020">Burning</div><div class="qref-cond-desc">Fire damage at start of each turn (Keeper sets amount). Action to extinguish.</div></div>
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#c82030">Bleeding</div><div class="qref-cond-desc">Lose HP at start of each turn until treated. Medicine DC 12 or magical healing stops it.</div></div>
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#808090">Incapacitated</div><div class="qref-cond-desc">Cannot take actions or reactions. Movement and speech unaffected.</div></div>
+                                    <div class="qref-cond-item"><div class="qref-cond-name" style="color:#c9a227">Exhausted</div><div class="qref-cond-desc">Tracked 0–5. Each stage adds DIS; speed halved at 3; 0 HP at 5. Deep Rest removes 1 stage.</div></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Economy -->
+                        <div class="qref-card">
+                            <div class="qref-card-hdr">Action Economy</div>
+                            <div class="qref-card-body">
+                                <table class="qref-table">
+                                    <thead><tr><th>Type</th><th>Per Turn / Notes</th></tr></thead>
+                                    <tbody>
+                                    <tr><td>Action</td><td>1 per turn — attack, cast, dash, disengage, dodge, help, hide, ready, search, use object</td></tr>
+                                    <tr><td>Bonus Action</td><td>1 per turn — only when a feature or spell explicitly grants one</td></tr>
+                                    <tr><td>Reaction</td><td>1 per round — triggered by another creature's action or a specific event</td></tr>
+                                    <tr><td>Free Action</td><td>Unlimited — drop item, speak a few words, release a held spell</td></tr>
+                                    <tr><td>Movement</td><td>Up to Speed per turn — split freely; difficult terrain costs 2× feet</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Roll Difficulty -->
+                        <div class="qref-card">
+                            <div class="qref-card-hdr">Roll Difficulty (DC)</div>
+                            <div class="qref-card-body">
+                                <table class="qref-table">
+                                    <thead><tr><th>Difficulty</th><th>DC</th></tr></thead>
+                                    <tbody>
+                                    <tr><td>Trivial</td><td>5</td></tr>
+                                    <tr><td>Easy</td><td>10</td></tr>
+                                    <tr><td>Medium</td><td>15</td></tr>
+                                    <tr><td>Hard</td><td>20</td></tr>
+                                    <tr><td>Very Hard</td><td>25</td></tr>
+                                    <tr><td>Legendary</td><td>30</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Proficiency Bonus -->
+                        <div class="qref-card">
+                            <div class="qref-card-hdr">Proficiency Bonus by Level</div>
+                            <div class="qref-card-body">
+                                <table class="qref-table">
+                                    <thead><tr><th>Levels</th><th>Bonus</th></tr></thead>
+                                    <tbody>
+                                    <tr><td>1 – 4</td><td>+2</td></tr>
+                                    <tr><td>5 – 8</td><td>+3</td></tr>
+                                    <tr><td>9 – 12</td><td>+4</td></tr>
+                                    <tr><td>13 – 16</td><td>+5</td></tr>
+                                    <tr><td>17 – 20</td><td>+6</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Death Saves -->
+                        <div class="qref-card">
+                            <div class="qref-card-hdr">Death Saves</div>
+                            <div class="qref-card-body">
+                                <table class="qref-table">
+                                    <thead><tr><th>Roll</th><th>Effect</th></tr></thead>
+                                    <tbody>
+                                    <tr><td>11 – 20</td><td>Success — 3 successes = stable (unconscious, 1 HP)</td></tr>
+                                    <tr><td>1 – 10</td><td>Failure — 3 failures = character death</td></tr>
+                                    <tr><td>Natural 20</td><td>Immediate recovery — regain 1 HP and stand</td></tr>
+                                    <tr><td>Natural 1</td><td>Counts as 2 failures</td></tr>
+                                    <tr><td>Hit at 0 HP</td><td>Each hit = 1 failure; crit = 2 failures</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Rest Types -->
+                        <div class="qref-card">
+                            <div class="qref-card-hdr">Rest Types</div>
+                            <div class="qref-card-body">
+                                <table class="qref-table">
+                                    <thead><tr><th>Rest</th><th>Duration &amp; Effect</th></tr></thead>
+                                    <tbody>
+                                    <tr><td>Resonance Rest</td><td>1 hr — Instability resets to 0. RP pool recovered.</td></tr>
+                                    <tr><td>Recovery Rest</td><td>4 hr — Recover ½ HP pool. −1 Exhaustion. RP restored.</td></tr>
+                                    <tr><td>Deep Rest</td><td>8 hr — Full HP, RP, Instability reset. −1 Exhaustion. Daily features refresh.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Advantage & Disadvantage -->
+                        <div class="qref-card">
+                            <div class="qref-card-hdr">Advantage &amp; Disadvantage</div>
+                            <div class="qref-card-body">
+                                <table class="qref-table">
+                                    <thead><tr><th>Rule</th><th>Effect</th></tr></thead>
+                                    <tbody>
+                                    <tr><td>ADV</td><td>Roll 2d20, keep higher (+5 avg). Active conditions auto-apply.</td></tr>
+                                    <tr><td>DIS</td><td>Roll 2d20, keep lower (−5 avg). Stacks are represented as flat ±.</td></tr>
+                                    <tr><td>ADV + DIS</td><td>Cancel out — roll 1d20 regardless of how many sources exist.</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Currency Hierarchy -->
+                        <div class="qref-card">
+                            <div class="qref-card-hdr">Currency Hierarchy</div>
+                            <div class="qref-card-body">
+                                <table class="qref-table">
+                                    <thead><tr><th>Tier (High → Low)</th><th>Notes</th></tr></thead>
+                                    <tbody>
+                                    <tr><td>Information</td><td>Most valuable — secrets, maps, leverage over others</td></tr>
+                                    <tr><td>Gems</td><td>Portable high value; used in sigil crafting &amp; attunement</td></tr>
+                                    <tr><td>Rare Materials</td><td>Dragon scales, void crystal, aetherstone, etc.</td></tr>
+                                    <tr><td>Artifacts</td><td>Unique enchanted items; effectively priceless</td></tr>
+                                    <tr><td>Gold (GP)</td><td>Standard — 100 CP = 10 SP = 1 GP</td></tr>
+                                    <tr><td>Metals</td><td>Iron, mithral, adamantine — primary crafting currency</td></tr>
+                                    <tr><td>Silver (SP)</td><td>10 SP = 1 GP</td></tr>
+                                    <tr><td>Copper (CP)</td><td>100 CP = 1 GP</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Affinity Stages -->
+                        <div class="qref-card">
+                            <div class="qref-card-hdr">Sigil Affinity Stages</div>
+                            <div class="qref-card-body">
+                                <div class="qref-stage-row"><div class="qref-stage-num">I</div><div class="qref-stage-label">Awakened — first spark of affinity</div><div class="qref-stage-casts">8 casts</div></div>
+                                <div class="qref-stage-row"><div class="qref-stage-num">II</div><div class="qref-stage-label">Attuned — resonance begins to deepen</div><div class="qref-stage-casts">25 casts</div></div>
+                                <div class="qref-stage-row"><div class="qref-stage-num">III</div><div class="qref-stage-label">Bound — the sigil flows naturally</div><div class="qref-stage-casts">60 casts</div></div>
+                                <div class="qref-stage-row"><div class="qref-stage-num">IV</div><div class="qref-stage-label">Sovereign — mastery over the school</div><div class="qref-stage-casts">120 casts</div></div>
+                                <div class="qref-stage-row"><div class="qref-stage-num">V</div><div class="qref-stage-label">Ascendant — narrative threshold (Keeper confirms)</div><div class="qref-stage-casts">250 + Keeper</div></div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div><!-- /tab-quickref -->
 
             </div><!-- /tab-content -->
         </main>
@@ -14539,9 +14765,29 @@ const SAVE_KEY = 'alas_cs_v3_8';
     }
   } catch(e) { /* silent */ }
 })();
+
+// ── MULTI-CHARACTER SLOT SYSTEM ──────────────────────────────────────────────
+const SLOT_KEYS = ['alas_slot_0','alas_slot_1','alas_slot_2','alas_slot_3','alas_slot_4'];
+let _activeSlot = 0;
+(function initSlots(){
+  try {
+    // Migrate existing SAVE_KEY data into slot 0 on first ever run
+    const existing = localStorage.getItem(SAVE_KEY);
+    if(existing && !localStorage.getItem(SLOT_KEYS[0])){
+      localStorage.setItem(SLOT_KEYS[0], existing);
+    }
+    const savedIdx = parseInt(localStorage.getItem('alas_active_slot')||'0')||0;
+    _activeSlot = Math.max(0, Math.min(4, savedIdx));
+  } catch(e){}
+})();
+
 function _debouncedSave(){
   clearTimeout(_saveTimer);
-  _saveTimer = setTimeout(()=>{ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }, 300);
+  _saveTimer = setTimeout(()=>{
+    const json = JSON.stringify(state);
+    localStorage.setItem(SLOT_KEYS[_activeSlot], json);
+    localStorage.setItem(SAVE_KEY, json); // mirror for VTT + legacy readers
+  }, 300);
 }
 
 // ═══════════════════════════════════════════════════
@@ -14659,6 +14905,126 @@ function ensureStateDefaults(){
   (state.sigils||[]).forEach(s=>{ if(s.dailySpent===undefined) s.dailySpent=false; });
   if(state.acMod===undefined) state.acMod=0;
   if(state.initMod===undefined) state.initMod=0;
+  if(!state.pcConditions || typeof state.pcConditions !== 'object') state.pcConditions = {};
+}
+
+// ═══════════════════════════════════════════════════
+// PLAYER CHARACTER CONDITIONS
+// ═══════════════════════════════════════════════════
+const PC_COND_DEFS = [
+  { key:'psn', label:'Poisoned',      col:'#40c040', rgb:'64,192,64',   rollFx:{attack:'dis',spell_attack:'dis',ability:'dis',skill:'dis'}, desc:'DIS on attack rolls & ability checks' },
+  { key:'frt', label:'Frightened',    col:'#d040c0', rgb:'208,64,192',  rollFx:{attack:'dis',spell_attack:'dis',ability:'dis',skill:'dis'}, desc:'DIS on attacks & checks while source is visible' },
+  { key:'bld', label:'Blinded',       col:'#a0a8b8', rgb:'160,168,184', rollFx:{attack:'dis',spell_attack:'dis'},                           desc:'DIS on attacks; attackers have ADV vs. you' },
+  { key:'prn', label:'Prone',         col:'#9060a0', rgb:'144,96,160',  rollFx:{attack:'dis',spell_attack:'dis'},                           desc:'DIS on attacks; melee attackers have ADV vs. you' },
+  { key:'inv', label:'Invisible',     col:'#90a8c0', rgb:'144,168,192', rollFx:{attack:'adv',spell_attack:'adv'},                           desc:'ADV on attacks; attackers have DIS vs. you' },
+  { key:'stn', label:'Stunned',       col:'#ffcc00', rgb:'255,204,0',   rollFx:{save_dex:'dis'},                                            desc:'DIS on DEX saves; can\'t move; attackers have ADV' },
+  { key:'slw', label:'Slowed',        col:'#4080ff', rgb:'64,128,255',  rollFx:{save_dex:'dis'},                                            desc:'DIS on DEX saves; −2 AC; half speed' },
+  { key:'chm', label:'Charmed',       col:'#ff80c0', rgb:'255,128,192', rollFx:{},                                                          desc:'Can\'t attack charmer; charmer has ADV on social checks vs. you' },
+  { key:'brn', label:'Burning',       col:'#ff6020', rgb:'255,96,32',   rollFx:{},                                                          desc:'Taking ongoing fire damage at start of each turn' },
+  { key:'blg', label:'Bleeding',      col:'#c82030', rgb:'200,32,48',   rollFx:{},                                                          desc:'Taking ongoing damage at start of each turn' },
+  { key:'inc', label:'Incapacited',   col:'#505070', rgb:'80,80,112',   rollFx:{},                                                          desc:'Cannot take actions or reactions' },
+];
+
+function togglePCCondition(key){
+  if(!state.pcConditions) state.pcConditions={};
+  state.pcConditions[key]=!state.pcConditions[key];
+  _debouncedSave();
+  buildPCCondTray();
+}
+
+function getPCCondRollMod(rollType, ability){
+  const conds = state.pcConditions||{};
+  let adv=0, dis=0;
+  PC_COND_DEFS.forEach(def=>{
+    if(!conds[def.key]) return;
+    const fx = def.rollFx;
+    let e = null;
+    if(rollType==='save' && ability==='DEX') e = fx.save_dex||null;
+    else e = fx[rollType]||null;
+    if(e==='adv') adv++;
+    if(e==='dis') dis++;
+  });
+  if(adv>0 && dis>0) return 'normal';
+  if(adv>0) return 'adv';
+  if(dis>0) return 'dis';
+  return 'normal';
+}
+
+function buildPCCondTray(){
+  const conds = state.pcConditions||{};
+  ['pcCondGridSide','pcCondGridFull'].forEach(gId=>{
+    const grid = document.getElementById(gId); if(!grid) return;
+    grid.innerHTML='';
+    PC_COND_DEFS.forEach(def=>{
+      const on = !!conds[def.key];
+      const btn = document.createElement('button');
+      btn.className = 'pc-cond-btn'+(on?' active':'');
+      btn.textContent = def.label;
+      btn.title = def.desc;
+      if(on){ btn.style.setProperty('--cond-col',def.col); btn.style.setProperty('--cond-rgb',def.rgb); }
+      btn.onclick = ()=>togglePCCondition(def.key);
+      grid.appendChild(btn);
+    });
+  });
+  ['pcCondActiveBarSide','pcCondActiveBarFull'].forEach(bId=>{
+    const bar = document.getElementById(bId); if(!bar) return;
+    const active = PC_COND_DEFS.filter(d=>conds[d.key]);
+    if(!active.length){ bar.textContent='No active conditions.'; return; }
+    bar.innerHTML = active.map(d=>`<span style="color:${d.col};font-style:normal;font-weight:700">${d.label}</span>: ${d.desc}`).join('<br>');
+  });
+}
+
+// ── MULTI-CHARACTER SLOT FUNCTIONS ────────────────────────────────
+function _getSlotPreview(idx){
+  try{
+    const raw = localStorage.getItem(SLOT_KEYS[idx]);
+    if(!raw) return null;
+    const d = JSON.parse(raw);
+    return { name:d.name||'', cls:d.charClass||'', lvl:d.level||1 };
+  }catch(e){ return null; }
+}
+
+function buildSlotBar(){
+  const bar = document.getElementById('charSlotBar'); if(!bar) return;
+  bar.innerHTML='';
+  for(let i=0;i<5;i++){
+    const p = _getSlotPreview(i);
+    const btn = document.createElement('button');
+    btn.className = 'char-slot-btn'+(i===_activeSlot?' active':'');
+    btn.title = 'Slot '+(i+1)+(p&&p.name?' — '+p.name+(p.cls?' ('+p.cls+' Lv'+p.lvl+')':''):' — Empty');
+    (function(idx){
+      btn.onclick = function(){
+        if(idx===_activeSlot) return;
+        if(confirm('Switch to Slot '+(idx+1)+'?\n\nYour current character will be saved automatically.')){ switchSlot(idx); }
+      };
+    })(i);
+    btn.innerHTML = '<span class="char-slot-num">SLOT '+(i+1)+'</span>'
+                  + '<span class="char-slot-name">'+(p&&p.name?p.name:'Empty')+'</span>';
+    bar.appendChild(btn);
+  }
+}
+
+function switchSlot(idx){
+  if(idx===_activeSlot) return;
+  // Persist current slot before switching
+  const json = JSON.stringify(state);
+  localStorage.setItem(SLOT_KEYS[_activeSlot], json);
+  localStorage.setItem(SAVE_KEY, json);
+  // Switch active index
+  _activeSlot = idx;
+  localStorage.setItem('alas_active_slot', String(idx));
+  // Load new slot data
+  const raw = localStorage.getItem(SLOT_KEYS[idx]);
+  const loaded = raw ? (function(){ try{ return JSON.parse(raw); }catch(e){ return {}; } })() : {};
+  // Reset state and populate
+  state = {};
+  ensureStateDefaults();
+  Object.assign(state, loaded);
+  _debouncedSave();
+  _loadStateObject(state);
+  buildSlotBar();
+  buildPCCondTray();
+  showToast('Slot '+(idx+1)+(state.name?' — '+state.name:'')+' loaded');
 }
 
 // ═══════════════════════════════════════════════════
@@ -14902,7 +15268,8 @@ function consumeEmbeddedPortableState(){
 }
 
 function loadState(){
-  const s = localStorage.getItem(SAVE_KEY);
+  const key = SLOT_KEYS[_activeSlot] || SAVE_KEY;
+  const s = localStorage.getItem(key) || localStorage.getItem(SAVE_KEY);
   if(s){try{Object.assign(state,JSON.parse(s));}catch(e){}}
   ensureStateDefaults();
 }
@@ -25668,6 +26035,15 @@ function _srExecute(){
 
     // Roll d20 then apply adv/dis as flat modifier
     raw = Math.floor(Math.random()*20)+1;
+    // ── Auto-apply PC condition roll modifiers ──────────────────────
+    if(typeof getPCCondRollMod === 'function'){
+      const _cm = getPCCondRollMod(t, SR.ab);
+      if(_cm !== 'normal'){
+        if(SR.adv === 'normal') SR.adv = _cm;
+        else if(SR.adv === 'adv' && _cm === 'dis') SR.adv = 'normal'; // cancel
+        else if(SR.adv === 'dis' && _cm === 'adv') SR.adv = 'normal'; // cancel
+      }
+    }
     const advReason = document.getElementById('srAdvReason');
     const advReasonTxt = advReason ? advReason.value.trim() : SR.advReason;
     if(SR.adv==='adv'){
@@ -28676,6 +29052,8 @@ window.addEventListener('load', function(){
   // Wire auto-save on any user input (V2-parity)
   document.addEventListener('input', saveAll);
   document.addEventListener('change', saveAll);
+  buildPCCondTray();
+  buildSlotBar();
 });
 
 // ═══════════════════════════════════════════════════
@@ -30888,6 +31266,8 @@ function _loadStateObject(loaded){
   if(companionsBuilt) _refreshAllCompCards();
   // Restore attuned sigil panel
   _getAttunedSigils(); renderAttunedSigilToggles(); renderAttunedSigilPanels();
+  if(typeof buildPCCondTray==='function') buildPCCondTray();
+  if(typeof buildSlotBar==='function') buildSlotBar();
 }
 
 // ═══════════════════════════════════════════════════════════════
