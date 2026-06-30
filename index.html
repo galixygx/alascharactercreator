@@ -10114,6 +10114,89 @@
         .cond-take-dmg-btn { padding:3px 10px; border-radius:3px; font-family:'Cinzel',serif; font-size:7.5px; letter-spacing:.6px; cursor:pointer; border:1px solid; white-space:nowrap; transition:filter .12s; vertical-align:middle; }
         .cond-take-dmg-btn:hover { filter:brightness(1.35); }
 
+        /* ─── COMBAT TAB ────────────────────────────────────────── */
+        .cmbt-hdr-row { display:flex; align-items:center; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+        .cmbt-hdr-title { font-family:'Cinzel',serif; font-size:13px; letter-spacing:2.5px; color:var(--gold); text-transform:uppercase; flex:1; }
+        .cmbt-round-block { display:flex; align-items:center; gap:5px; background:var(--surf2); border:1px solid var(--bdr-g); border-radius:5px; padding:5px 10px; }
+        .cmbt-round-lbl { font-family:'Cinzel',serif; font-size:7px; letter-spacing:1.5px; color:var(--txt-dim); text-transform:uppercase; }
+        .cmbt-round-num { font-family:'Cinzel',serif; font-size:18px; font-weight:700; color:var(--gold-l); min-width:22px; text-align:center; }
+        .cmbt-start-btn { padding:5px 14px; font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; cursor:pointer; border:1px solid var(--gold-d); background:rgba(201,162,39,.1); border-radius:4px; color:var(--gold); }
+        .cmbt-start-btn:hover { background:rgba(201,162,39,.2); }
+        .cmbt-end-btn { padding:5px 14px; font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; cursor:pointer; border:1px solid rgba(200,32,48,.5); background:rgba(200,32,48,.08); border-radius:4px; color:#e04060; }
+        /* Vitals */
+        .cmbt-vitals-row { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+        .cmbt-vital-card { flex:1; min-width:150px; background:var(--surf2); border:1px solid var(--bdr-g); border-radius:6px; padding:12px 14px; }
+        .cmbt-vital-hdr { font-family:'Cinzel',serif; font-size:7.5px; letter-spacing:2px; color:var(--txt-dim); text-transform:uppercase; margin-bottom:8px; }
+        .cmbt-bar-track { background:rgba(0,0,0,.4); border-radius:4px; height:12px; overflow:hidden; margin-bottom:6px; }
+        .cmbt-bar-fill { height:100%; border-radius:4px; transition:width .25s; }
+        .cmbt-bar-fill-hp { background:linear-gradient(90deg,#a01828,#e03048); }
+        .cmbt-bar-fill-rp { background:linear-gradient(90deg,#1840a0,#3060d8); }
+        .cmbt-bar-vals { font-family:'Cinzel',serif; font-size:20px; font-weight:700; text-align:center; color:var(--txt-main); margin-bottom:10px; letter-spacing:.5px; }
+        .cmbt-delta-row { display:flex; gap:3px; justify-content:center; flex-wrap:wrap; margin-bottom:7px; }
+        .cmbt-delta-btn { padding:3px 7px; font-family:'Cinzel',serif; font-size:8px; letter-spacing:.4px; cursor:pointer; border-radius:3px; border:1px solid var(--bdr); background:var(--surf3); color:var(--txt-dim); transition:all .1s; white-space:nowrap; }
+        .cmbt-delta-btn.neg:hover { border-color:#c82030; color:#e04050; background:rgba(200,32,48,.1); }
+        .cmbt-delta-btn.pos:hover { border-color:#40c070; color:#50d080; background:rgba(64,192,112,.1); }
+        .cmbt-custom-row { display:flex; gap:5px; align-items:center; justify-content:center; }
+        .cmbt-custom-inp { width:58px; padding:3px 5px; text-align:center; font-family:'Cinzel',serif; font-size:12px; border:1px solid var(--bdr-g); border-radius:3px; background:rgba(255,255,255,.05); color:var(--txt-main); }
+        .cmbt-dmg-btn { padding:3px 9px; font-family:'Cinzel',serif; font-size:8px; letter-spacing:.5px; cursor:pointer; border:1px solid rgba(200,32,48,.5); background:rgba(200,32,48,.1); border-radius:3px; color:#e04050; }
+        .cmbt-heal-btn { padding:3px 9px; font-family:'Cinzel',serif; font-size:8px; letter-spacing:.5px; cursor:pointer; border:1px solid rgba(64,192,112,.5); background:rgba(64,192,112,.1); border-radius:3px; color:#50d080; }
+        /* Stats card */
+        .cmbt-stats-card { background:var(--surf2); border:1px solid var(--bdr-g); border-radius:6px; padding:12px 14px; margin-bottom:14px; }
+        .cmbt-stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(90px,1fr)); gap:10px; margin-bottom:10px; }
+        .cmbt-stat { text-align:center; }
+        .cmbt-stat-lbl { font-family:'Cinzel',serif; font-size:6.5px; letter-spacing:1.5px; color:var(--txt-dim); text-transform:uppercase; margin-bottom:4px; }
+        .cmbt-stat-val { font-family:'Cinzel',serif; font-size:20px; font-weight:700; color:var(--gold-l); }
+        .cmbt-roll-init-btn { display:block; width:100%; padding:7px; font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; cursor:pointer; border:1px solid var(--gold-d); background:rgba(201,162,39,.1); border-radius:4px; color:var(--gold); text-align:center; margin-top:6px; }
+        .cmbt-roll-init-btn:hover { background:rgba(201,162,39,.2); }
+        .cmbt-init-result { font-family:'EB Garamond',serif; font-size:11px; font-style:italic; color:var(--txt-dim); text-align:center; margin-top:5px; min-height:16px; }
+        /* Initiative tracker */
+        .cmbt-init-section { background:var(--surf2); border:1px solid var(--bdr-g); border-radius:6px; padding:12px 14px; margin-bottom:14px; }
+        .cmbt-init-toolbar { display:flex; gap:5px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+        .cmbt-init-add-form { display:flex; gap:4px; flex-wrap:wrap; align-items:center; flex:1; min-width:0; }
+        .cmbt-init-inp { padding:4px 6px; font-family:'EB Garamond',serif; font-size:11px; border:1px solid var(--bdr-g); border-radius:3px; background:rgba(255,255,255,.05); color:var(--txt-main); }
+        .cmbt-init-inp.wide { flex:1; min-width:70px; }
+        .cmbt-init-inp.narrow { width:46px; text-align:center; }
+        .cmbt-add-btn { padding:4px 10px; font-family:'Cinzel',serif; font-size:8px; letter-spacing:.5px; cursor:pointer; border:1px solid var(--gold-d); background:rgba(201,162,39,.1); border-radius:3px; color:var(--gold); white-space:nowrap; }
+        .cmbt-add-btn:hover { background:rgba(201,162,39,.2); }
+        .cmbt-sort-btn,.cmbt-clear-btn { padding:4px 8px; font-family:'Cinzel',serif; font-size:8px; cursor:pointer; border:1px solid var(--bdr); background:transparent; border-radius:3px; color:var(--txt-dim); white-space:nowrap; }
+        .cmbt-sort-btn:hover { border-color:var(--gold-d); color:var(--gold); }
+        .cmbt-clear-btn { border-color:rgba(200,32,48,.3); color:#e04060; }
+        .cmbt-init-list { display:flex; flex-direction:column; gap:3px; margin-bottom:10px; min-height:24px; }
+        .cmbt-init-entry { display:flex; align-items:center; gap:6px; padding:7px 9px; border-radius:4px; border:1px solid var(--bdr); background:var(--surf3); transition:border-color .12s; }
+        .cmbt-init-entry.active-turn { border-color:var(--gold); background:rgba(201,162,39,.07); box-shadow:0 0 6px rgba(201,162,39,.15); }
+        .cmbt-init-entry.is-dead { opacity:.4; }
+        .cmbt-init-arrow { font-size:11px; width:14px; flex-shrink:0; color:var(--gold); }
+        .cmbt-init-name { flex:1; font-family:'Cinzel',serif; font-size:9.5px; color:var(--txt-main); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+        .cmbt-init-name.is-player { color:var(--gold-l); }
+        .cmbt-init-num { font-family:'Cinzel',serif; font-size:12px; font-weight:700; width:28px; text-align:center; color:var(--txt-lbl); flex-shrink:0; }
+        .cmbt-init-hp-track { display:flex; align-items:center; gap:3px; flex-shrink:0; }
+        .cmbt-init-hp-txt { font-family:'Cinzel',serif; font-size:9px; color:var(--txt-dim); min-width:48px; text-align:center; }
+        .cmbt-init-hp-btn { padding:1px 5px; font-size:10px; cursor:pointer; border:1px solid var(--bdr); background:transparent; border-radius:2px; color:var(--txt-dim); line-height:1.3; }
+        .cmbt-init-hp-btn:hover { border-color:var(--gold-d); color:var(--gold); }
+        .cmbt-init-action-btn { padding:2px 6px; font-family:'Cinzel',serif; font-size:7px; letter-spacing:.4px; cursor:pointer; border:1px solid var(--bdr); background:transparent; border-radius:2px; color:var(--txt-dim); flex-shrink:0; }
+        .cmbt-init-action-btn:hover { border-color:var(--gold-d); color:var(--gold); }
+        .cmbt-no-combatants { font-family:'EB Garamond',serif; font-size:11px; font-style:italic; color:var(--txt-dim); text-align:center; padding:12px 0; }
+        .cmbt-turn-btns { display:flex; gap:8px; justify-content:center; }
+        .cmbt-turn-btn { padding:6px 18px; font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; cursor:pointer; border:1px solid var(--gold-d); background:rgba(201,162,39,.1); border-radius:4px; color:var(--gold); }
+        .cmbt-turn-btn:hover { background:rgba(201,162,39,.2); }
+        /* Conditions in combat tab */
+        .cmbt-cond-section { background:var(--surf2); border:1px solid var(--bdr-g); border-radius:6px; padding:12px 14px; margin-bottom:14px; }
+        /* Death saves */
+        .cmbt-death-section { background:var(--surf2); border:1px solid var(--bdr-g); border-radius:6px; padding:12px 14px; }
+        .cmbt-death-row { display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin:10px 0; }
+        .cmbt-death-grp { display:flex; align-items:center; gap:8px; }
+        .cmbt-death-lbl { font-family:'Cinzel',serif; font-size:7.5px; letter-spacing:1.5px; color:var(--txt-dim); text-transform:uppercase; }
+        .cmbt-death-pips { display:flex; gap:5px; }
+        .cmbt-death-pip { width:20px; height:20px; border-radius:50%; border:2px solid; cursor:pointer; transition:all .12s; }
+        .cmbt-death-pip.suc { border-color:#40c070; }
+        .cmbt-death-pip.suc.on { background:#40c070; box-shadow:0 0 6px rgba(64,192,112,.4); }
+        .cmbt-death-pip.fal { border-color:#c82030; }
+        .cmbt-death-pip.fal.on { background:#c82030; box-shadow:0 0 6px rgba(200,32,48,.4); }
+        .cmbt-death-btns { display:flex; gap:8px; flex-wrap:wrap; }
+        .cmbt-death-roll-btn { padding:5px 14px; font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; cursor:pointer; border:1px solid var(--gold-d); background:rgba(201,162,39,.1); border-radius:4px; color:var(--gold); }
+        .cmbt-death-stable-btn { padding:5px 14px; font-family:'Cinzel',serif; font-size:9px; letter-spacing:1px; cursor:pointer; border:1px solid rgba(64,192,112,.5); background:rgba(64,192,112,.1); border-radius:4px; color:#50d080; }
+        .cmbt-death-result { font-family:'EB Garamond',serif; font-size:12px; font-style:italic; margin-top:8px; color:var(--txt-dim); min-height:18px; }
+
         /* ─── QUICK REFERENCE TAB ────────────────────────────────── */
         .qref-body { columns:2; column-gap:14px; padding-bottom:20px; }
         .qref-card { background:var(--surf2); border:1px solid var(--bdr-g); border-radius:6px; overflow:hidden; margin-bottom:14px; break-inside:avoid; -webkit-column-break-inside:avoid; }
@@ -10794,6 +10877,7 @@
         <main class="main-content">
             <nav class="tab-bar">
                 <button class="tab-btn active" onclick="showTab('attributes',this)" data-tab-index="1">⚡ Attributes</button>
+                <button class="tab-btn" onclick="showTab('combat',this);buildCombatTab()">🗡 Combat</button>
 
                 <!-- ── Grouped sheet tabs in a dropdown ── -->
                 <div class="tab-dropdown-wrap" id="tabDropdownWrap">
@@ -11907,6 +11991,154 @@
 
                     </div>
                 </div><!-- /tab-quickref -->
+
+                <!-- ─── COMBAT TAB ─── -->
+                <div class="tab-panel" id="tab-combat">
+
+                    <!-- Header: title + round counter + start/end -->
+                    <div class="cmbt-hdr-row">
+                        <div class="cmbt-hdr-title">🗡 Combat Hub</div>
+                        <div class="cmbt-round-block">
+                            <span class="cmbt-round-lbl">Round</span>
+                            <span class="cmbt-round-num" id="cmbtRoundNum">—</span>
+                        </div>
+                        <button class="cmbt-start-btn" id="cmbtStartBtn" onclick="combatStartCombat()">▶ Start Combat</button>
+                        <button class="cmbt-end-btn"   id="cmbtEndBtn"   onclick="combatEndCombat()"   style="display:none">■ End Combat</button>
+                    </div>
+
+                    <!-- HP + RP Vitals -->
+                    <div class="cmbt-vitals-row">
+
+                        <!-- HP Card -->
+                        <div class="cmbt-vital-card">
+                            <div class="cmbt-vital-hdr">❤ Hit Points</div>
+                            <div class="cmbt-bar-track"><div class="cmbt-bar-fill cmbt-bar-fill-hp" id="cmbtHpFill" style="width:100%"></div></div>
+                            <div class="cmbt-bar-vals" id="cmbtHpDisplay">— / —</div>
+                            <div class="cmbt-delta-row">
+                                <button class="cmbt-delta-btn neg" onclick="applyHpDelta(-10)">−10</button>
+                                <button class="cmbt-delta-btn neg" onclick="applyHpDelta(-5)">−5</button>
+                                <button class="cmbt-delta-btn neg" onclick="applyHpDelta(-1)">−1</button>
+                                <button class="cmbt-delta-btn pos" onclick="applyHpDelta(1)">+1</button>
+                                <button class="cmbt-delta-btn pos" onclick="applyHpDelta(5)">+5</button>
+                                <button class="cmbt-delta-btn pos" onclick="applyHpDelta(10)">+10</button>
+                            </div>
+                            <div class="cmbt-custom-row">
+                                <input class="cmbt-custom-inp" id="cmbtHpCustom" type="number" min="1" max="999" placeholder="amt"
+                                       onkeydown="if(event.key==='Enter')_applyCustomHpDelta(-1)">
+                                <button class="cmbt-dmg-btn"  onclick="_applyCustomHpDelta(-1)">Damage</button>
+                                <button class="cmbt-heal-btn" onclick="_applyCustomHpDelta(1)">Heal</button>
+                            </div>
+                        </div>
+
+                        <!-- RP Card -->
+                        <div class="cmbt-vital-card">
+                            <div class="cmbt-vital-hdr">🔷 Resonance Points</div>
+                            <div class="cmbt-bar-track"><div class="cmbt-bar-fill cmbt-bar-fill-rp" id="cmbtRpFill" style="width:100%"></div></div>
+                            <div class="cmbt-bar-vals" id="cmbtRpDisplay">— / —</div>
+                            <div class="cmbt-delta-row">
+                                <button class="cmbt-delta-btn neg" onclick="applyRpDelta(-5)">−5</button>
+                                <button class="cmbt-delta-btn neg" onclick="applyRpDelta(-3)">−3</button>
+                                <button class="cmbt-delta-btn neg" onclick="applyRpDelta(-1)">−1</button>
+                                <button class="cmbt-delta-btn pos" onclick="applyRpDelta(1)">+1</button>
+                                <button class="cmbt-delta-btn pos" onclick="applyRpDelta(3)">+3</button>
+                                <button class="cmbt-delta-btn pos" onclick="applyRpDelta(5)">+5</button>
+                            </div>
+                            <div class="cmbt-custom-row">
+                                <input class="cmbt-custom-inp" id="cmbtRpCustom" type="number" min="1" max="999" placeholder="amt"
+                                       onkeydown="if(event.key==='Enter')_applyCustomRpDelta(-1)">
+                                <button class="cmbt-dmg-btn"  onclick="_applyCustomRpDelta(-1)">Spend</button>
+                                <button class="cmbt-heal-btn" onclick="_applyCustomRpDelta(1)">Restore</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Combat Stats + Roll Initiative -->
+                    <div class="cmbt-stats-card">
+                        <div class="cmbt-stats-grid">
+                            <div class="cmbt-stat">
+                                <div class="cmbt-stat-lbl">Armor Class</div>
+                                <div class="cmbt-stat-val" id="cmbtStatAC">—</div>
+                            </div>
+                            <div class="cmbt-stat">
+                                <div class="cmbt-stat-lbl">Speed</div>
+                                <div class="cmbt-stat-val" id="cmbtStatSpd">—</div>
+                            </div>
+                            <div class="cmbt-stat">
+                                <div class="cmbt-stat-lbl">Initiative Mod</div>
+                                <div class="cmbt-stat-val" id="cmbtStatInit">+0</div>
+                            </div>
+                        </div>
+                        <button class="cmbt-roll-init-btn" onclick="combatRollInit()">🎲 Roll Initiative — adds you to the tracker</button>
+                        <div class="cmbt-init-result" id="cmbtInitRollResult"></div>
+                    </div>
+
+                    <!-- Initiative Order Tracker -->
+                    <div class="cmbt-init-section">
+                        <div class="sec-hdr" style="margin-bottom:10px">Initiative Order</div>
+                        <div class="cmbt-init-toolbar">
+                            <div class="cmbt-init-add-form">
+                                <input class="cmbt-init-inp wide" id="cmbtAddName" type="text" placeholder="NPC / Enemy name"
+                                       onkeydown="if(event.key==='Enter')combatAddEntry()">
+                                <input class="cmbt-init-inp narrow" id="cmbtAddInit" type="number" placeholder="Init" title="Initiative roll">
+                                <input class="cmbt-init-inp narrow" id="cmbtAddHp"   type="number" placeholder="HP"   title="Current HP">
+                                <span style="font-family:'EB Garamond',serif;font-size:10px;color:var(--txt-dim)">/</span>
+                                <input class="cmbt-init-inp narrow" id="cmbtAddMax"  type="number" placeholder="Max"  title="Max HP">
+                                <button class="cmbt-add-btn" onclick="combatAddEntry()">+ Add</button>
+                            </div>
+                            <button class="cmbt-sort-btn"  onclick="combatSortByInit();buildCombatTab()" title="Sort by initiative roll">↕ Sort</button>
+                            <button class="cmbt-clear-btn" onclick="combatClearAll()"                    title="Remove all combatants">✕ Clear</button>
+                        </div>
+                        <div class="cmbt-init-list" id="cmbtInitList">
+                            <div class="cmbt-no-combatants">No combatants yet — roll initiative or add entries above.</div>
+                        </div>
+                        <div class="cmbt-turn-btns">
+                            <button class="cmbt-turn-btn" onclick="combatPrevTurn()">← Prev Turn</button>
+                            <button class="cmbt-turn-btn" onclick="combatNextTurn()">Next Turn →</button>
+                        </div>
+                    </div>
+
+                    <!-- Active Conditions (reuses existing chip system) -->
+                    <div class="cmbt-cond-section">
+                        <div class="sec-hdr" style="margin-bottom:8px">Active Conditions</div>
+                        <div style="font-family:'EB Garamond',serif;font-size:11px;font-style:italic;color:var(--txt-dim);margin-bottom:8px;">
+                            Synced with the Attributes tab. <span style="color:#ff6020;font-style:normal;font-weight:700">Burning</span>, <span style="color:#c82030;font-style:normal;font-weight:700">Bleeding</span> &amp; <span style="color:#40c040;font-style:normal;font-weight:700">Poisoned</span> show a quick-apply damage button.
+                        </div>
+                        <div class="pc-cond-grid" id="pcCondGridCombat"></div>
+                        <div class="pc-cond-active-bar" id="pcCondActiveBarCombat" style="margin-top:8px">No active conditions.</div>
+                    </div>
+
+                    <!-- Death Saving Throws -->
+                    <div class="cmbt-death-section">
+                        <div class="sec-hdr" style="margin-bottom:4px">Death Saving Throws</div>
+                        <div style="font-family:'EB Garamond',serif;font-size:11px;font-style:italic;color:var(--txt-dim);">
+                            Used when HP drops to 0. Click pips to manually toggle. 3 successes = stable; 3 failures = death.
+                        </div>
+                        <div class="cmbt-death-row">
+                            <div class="cmbt-death-grp">
+                                <span class="cmbt-death-lbl">Successes</span>
+                                <div class="cmbt-death-pips">
+                                    <div class="cmbt-death-pip suc" id="cmbtDsPip_s0" onclick="combatToggleDeathSave('success',0)" title="Toggle success 1"></div>
+                                    <div class="cmbt-death-pip suc" id="cmbtDsPip_s1" onclick="combatToggleDeathSave('success',1)" title="Toggle success 2"></div>
+                                    <div class="cmbt-death-pip suc" id="cmbtDsPip_s2" onclick="combatToggleDeathSave('success',2)" title="Toggle success 3"></div>
+                                </div>
+                            </div>
+                            <div class="cmbt-death-grp">
+                                <span class="cmbt-death-lbl">Failures</span>
+                                <div class="cmbt-death-pips">
+                                    <div class="cmbt-death-pip fal" id="cmbtDsPip_f0" onclick="combatToggleDeathSave('failure',0)" title="Toggle failure 1"></div>
+                                    <div class="cmbt-death-pip fal" id="cmbtDsPip_f1" onclick="combatToggleDeathSave('failure',1)" title="Toggle failure 2"></div>
+                                    <div class="cmbt-death-pip fal" id="cmbtDsPip_f2" onclick="combatToggleDeathSave('failure',2)" title="Toggle failure 3"></div>
+                                </div>
+                            </div>
+                            <div class="cmbt-death-btns">
+                                <button class="cmbt-death-roll-btn"   onclick="combatRollDeathSave()">🎲 Roll Death Save</button>
+                                <button class="cmbt-death-stable-btn" onclick="combatStabilize()">✚ Stabilize</button>
+                            </div>
+                        </div>
+                        <div class="cmbt-death-result" id="cmbtDeathResult"></div>
+                    </div>
+
+                </div><!-- /tab-combat -->
 
             </div><!-- /tab-content -->
         </main>
@@ -14920,6 +15152,10 @@ function ensureStateDefaults(){
   if(state.initMod===undefined) state.initMod=0;
   if(!state.pcConditions || typeof state.pcConditions !== 'object') state.pcConditions = {};
   if(!state.pcCondDmg    || typeof state.pcCondDmg    !== 'object') state.pcCondDmg    = {};
+  if(!state.combatInitEntries || !Array.isArray(state.combatInitEntries)) state.combatInitEntries = [];
+  if(state.combatRound    === undefined) state.combatRound    = 0;
+  if(state.combatTurnIdx  === undefined) state.combatTurnIdx  = -1;
+  if(state.combatLastInitRoll === undefined) state.combatLastInitRoll = null;
 }
 
 // ═══════════════════════════════════════════════════
@@ -15017,7 +15253,7 @@ function getPCCondRollMod(rollType, ability){
 function buildPCCondTray(){
   const conds = state.pcConditions||{};
   const dmgs  = state.pcCondDmg||{};
-  ['pcCondGridSide','pcCondGridFull'].forEach(gId=>{
+  ['pcCondGridSide','pcCondGridFull','pcCondGridCombat'].forEach(gId=>{
     const grid = document.getElementById(gId); if(!grid) return;
     grid.innerHTML='';
     PC_COND_DEFS.forEach(def=>{
@@ -15031,7 +15267,7 @@ function buildPCCondTray(){
       grid.appendChild(btn);
     });
   });
-  ['pcCondActiveBarSide','pcCondActiveBarFull'].forEach(bId=>{
+  ['pcCondActiveBarSide','pcCondActiveBarFull','pcCondActiveBarCombat'].forEach(bId=>{
     const bar = document.getElementById(bId); if(!bar) return;
     const active = PC_COND_DEFS.filter(d=>conds[d.key]);
     if(!active.length){ bar.textContent='No active conditions.'; return; }
@@ -15047,6 +15283,319 @@ function buildPCCondTray(){
         +`</div>`;
     }).join('');
   });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COMBAT TAB FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+
+function _refreshCombatVitals(){
+  const hpCur = parseInt((document.getElementById('hpCur')||{}).value)||0;
+  const hpMax = Math.max(1, parseInt((document.getElementById('hpMax')||{}).value)||1);
+  const rpCur = parseInt((document.getElementById('rpCur')||{}).value)||0;
+  const rpMax = Math.max(1, parseInt((document.getElementById('rpMax')||{}).value)||1);
+  const hpPct = Math.max(0,Math.min(100,(hpCur/hpMax)*100));
+  const rpPct = Math.max(0,Math.min(100,(rpCur/rpMax)*100));
+  const hpDisp = document.getElementById('cmbtHpDisplay');
+  const rpDisp = document.getElementById('cmbtRpDisplay');
+  const hpFill = document.getElementById('cmbtHpFill');
+  const rpFill = document.getElementById('cmbtRpFill');
+  if(hpDisp) hpDisp.textContent = hpCur+' / '+hpMax;
+  if(rpDisp) rpDisp.textContent = rpCur+' / '+rpMax;
+  if(hpFill) hpFill.style.width = hpPct+'%';
+  if(rpFill) rpFill.style.width = rpPct+'%';
+  const pEntry = (state.combatInitEntries||[]).find(e=>e.isPlayer);
+  if(pEntry){ pEntry.hp=hpCur; pEntry.maxHp=hpMax; }
+}
+
+function applyHpDelta(delta){
+  const el=document.getElementById('hpCur'); if(!el) return;
+  const max=parseInt((document.getElementById('hpMax')||{}).value)||999;
+  el.value=Math.max(0,Math.min(max,(parseInt(el.value)||0)+delta));
+  if(typeof updateBar==='function') updateBar('hp');
+  _refreshCombatVitals();
+}
+
+function applyRpDelta(delta){
+  const el=document.getElementById('rpCur'); if(!el) return;
+  const max=parseInt((document.getElementById('rpMax')||{}).value)||999;
+  el.value=Math.max(0,Math.min(max,(parseInt(el.value)||0)+delta));
+  if(typeof updateBar==='function') updateBar('rp');
+  _refreshCombatVitals();
+}
+
+function _applyCustomHpDelta(sign){
+  const inp=document.getElementById('cmbtHpCustom');
+  const v=Math.abs(parseInt(inp?inp.value:'0')||0); if(!v) return;
+  applyHpDelta(sign*v);
+  if(inp) inp.value='';
+}
+
+function _applyCustomRpDelta(sign){
+  const inp=document.getElementById('cmbtRpCustom');
+  const v=Math.abs(parseInt(inp?inp.value:'0')||0); if(!v) return;
+  applyRpDelta(sign*v);
+  if(inp) inp.value='';
+}
+
+function combatRollInit(){
+  const initEl=document.getElementById('initVal');
+  const initTxt=(initEl?initEl.textContent:'').replace(/[^-\d]/g,'');
+  const initMod=parseInt(initTxt)||0;
+  const roll=Math.floor(Math.random()*20)+1;
+  const total=roll+initMod;
+  state.combatLastInitRoll={roll,mod:initMod,total};
+  if(!state.combatInitEntries) state.combatInitEntries=[];
+  const pName=(document.getElementById('charName')?document.getElementById('charName').value:'')||state.name||'You';
+  const hpCur=parseInt((document.getElementById('hpCur')||{}).value)||0;
+  const hpMax=parseInt((document.getElementById('hpMax')||{}).value)||8;
+  const pIdx=state.combatInitEntries.findIndex(e=>e.isPlayer);
+  if(pIdx>=0){
+    state.combatInitEntries[pIdx].init=total;
+    state.combatInitEntries[pIdx].name=pName;
+    state.combatInitEntries[pIdx].hp=hpCur;
+    state.combatInitEntries[pIdx].maxHp=hpMax;
+  } else {
+    state.combatInitEntries.unshift({id:'player',name:pName,init:total,hp:hpCur,maxHp:hpMax,isPlayer:true,isDead:false});
+  }
+  combatSortByInit();
+  if(!state.combatRound) state.combatRound=1;
+  _debouncedSave();
+  buildCombatTab();
+}
+
+function combatAddEntry(){
+  const nameInp=document.getElementById('cmbtAddName');
+  const initInp=document.getElementById('cmbtAddInit');
+  const hpInp  =document.getElementById('cmbtAddHp');
+  const maxInp =document.getElementById('cmbtAddMax');
+  const name=(nameInp?nameInp.value.trim():'')||'Enemy';
+  const init=parseInt(initInp?initInp.value:0)||0;
+  const maxHp=Math.max(1,parseInt(maxInp?maxInp.value:0)||1);
+  const hp=Math.min(maxHp,Math.max(0,parseInt(hpInp?hpInp.value:maxHp)||maxHp));
+  if(!state.combatInitEntries) state.combatInitEntries=[];
+  state.combatInitEntries.push({id:'tok_'+Date.now(),name,init,hp,maxHp,isPlayer:false,isDead:false});
+  if(nameInp) nameInp.value='';
+  if(initInp) initInp.value='';
+  if(hpInp)   hpInp.value='';
+  if(maxInp)  maxInp.value='';
+  combatSortByInit();
+  _debouncedSave();
+  buildCombatTab();
+}
+
+function combatRemoveEntry(id){
+  if(!state.combatInitEntries) return;
+  state.combatInitEntries=state.combatInitEntries.filter(e=>e.id!==id);
+  if(state.combatTurnIdx>=state.combatInitEntries.length && state.combatInitEntries.length>0){
+    state.combatTurnIdx=state.combatInitEntries.length-1;
+  }
+  _debouncedSave();
+  buildCombatTab();
+}
+
+function combatToggleDead(id){
+  const e=(state.combatInitEntries||[]).find(e=>e.id===id); if(!e) return;
+  e.isDead=!e.isDead;
+  if(e.isDead && !e.isPlayer) e.hp=0;
+  _debouncedSave();
+  buildCombatTab();
+}
+
+function combatUpdateHP(id,delta){
+  const e=(state.combatInitEntries||[]).find(e=>e.id===id); if(!e) return;
+  if(e.isPlayer){ applyHpDelta(delta); return; }
+  e.hp=Math.max(0,Math.min(e.maxHp||999,(e.hp||0)+delta));
+  if(e.hp===0) e.isDead=true;
+  _debouncedSave();
+  buildCombatTab();
+}
+
+function combatSortByInit(){
+  if(!state.combatInitEntries) return;
+  state.combatInitEntries.sort((a,b)=>b.init-a.init);
+}
+
+function combatClearAll(){
+  if(!confirm('Clear all combatants and reset the round counter?')) return;
+  state.combatInitEntries=[];
+  state.combatTurnIdx=-1;
+  state.combatRound=0;
+  state.combatLastInitRoll=null;
+  _debouncedSave();
+  buildCombatTab();
+}
+
+function combatStartCombat(){
+  if(state.combatRound>0) return;
+  state.combatRound=1;
+  if(state.combatTurnIdx<0 && state.combatInitEntries && state.combatInitEntries.length>0){
+    state.combatTurnIdx=0;
+    while(state.combatTurnIdx<state.combatInitEntries.length && state.combatInitEntries[state.combatTurnIdx].isDead) state.combatTurnIdx++;
+  }
+  _debouncedSave();
+  buildCombatTab();
+}
+
+function combatEndCombat(){
+  state.combatRound=0;
+  state.combatTurnIdx=-1;
+  _debouncedSave();
+  buildCombatTab();
+}
+
+function combatNextTurn(){
+  const entries=state.combatInitEntries||[];
+  if(!entries.length) return;
+  let next=state.combatTurnIdx+1;
+  while(next<entries.length && entries[next].isDead) next++;
+  if(next>=entries.length){
+    next=0;
+    while(next<entries.length && entries[next].isDead) next++;
+    state.combatRound=(state.combatRound||1)+1;
+  }
+  state.combatTurnIdx=next<entries.length?next:-1;
+  _debouncedSave();
+  buildCombatTab();
+}
+
+function combatPrevTurn(){
+  const entries=state.combatInitEntries||[];
+  if(!entries.length) return;
+  let prev=state.combatTurnIdx-1;
+  while(prev>=0 && entries[prev].isDead) prev--;
+  if(prev<0){
+    if(state.combatRound>1){ state.combatRound--; prev=entries.length-1; while(prev>0&&entries[prev].isDead) prev--; }
+    else prev=0;
+  }
+  state.combatTurnIdx=prev;
+  _debouncedSave();
+  buildCombatTab();
+}
+
+function combatToggleDeathSave(type,idx){
+  if(!state.deathSaveBlips) state.deathSaveBlips=[];
+  const suc=state.deathSaveBlips.filter(b=>b==='success').length;
+  const fal=state.deathSaveBlips.filter(b=>b==='fail').length;
+  if(type==='success'){
+    if(idx<suc){ const i=state.deathSaveBlips.lastIndexOf('success'); if(i>=0) state.deathSaveBlips.splice(i,1); }
+    else { state.deathSaveBlips.push('success'); state.deathSaveBlips=state.deathSaveBlips.slice(-6); }
+  } else {
+    if(idx<fal){ const i=state.deathSaveBlips.lastIndexOf('fail'); if(i>=0) state.deathSaveBlips.splice(i,1); }
+    else { state.deathSaveBlips.push('fail'); state.deathSaveBlips=state.deathSaveBlips.slice(-6); }
+  }
+  _debouncedSave();
+  _refreshDeathSaves();
+}
+
+function combatRollDeathSave(){
+  const roll=Math.floor(Math.random()*20)+1;
+  const resultEl=document.getElementById('cmbtDeathResult');
+  if(!state.deathSaveBlips) state.deathSaveBlips=[];
+  let msg='';
+  if(roll===20){
+    const hpEl=document.getElementById('hpCur');
+    if(hpEl){ hpEl.value=Math.max(1,parseInt(hpEl.value)||0); if(typeof updateBar==='function') updateBar('hp'); }
+    state.deathSaveBlips=[];
+    msg='Natural 20 — you regain 1 HP and regain consciousness!';
+  } else if(roll===1){
+    state.deathSaveBlips.push('fail','fail');
+    state.deathSaveBlips=state.deathSaveBlips.slice(-6);
+    msg='Natural 1 — two death save failures.';
+  } else if(roll>=10){
+    state.deathSaveBlips.push('success');
+    state.deathSaveBlips=state.deathSaveBlips.slice(-6);
+    msg='Success (rolled '+roll+').';
+  } else {
+    state.deathSaveBlips.push('fail');
+    state.deathSaveBlips=state.deathSaveBlips.slice(-6);
+    msg='Failure (rolled '+roll+').';
+  }
+  if(resultEl) resultEl.textContent=msg;
+  _debouncedSave();
+  _refreshDeathSaves();
+}
+
+function combatStabilize(){
+  state.deathSaveBlips=[];
+  _debouncedSave();
+  const res=document.getElementById('cmbtDeathResult');
+  if(res) res.textContent='Stabilized — death saves cleared.';
+  _refreshDeathSaves();
+}
+
+function _refreshDeathSaves(){
+  const blips=state.deathSaveBlips||[];
+  const successes=blips.filter(b=>b==='success').length;
+  const failures =blips.filter(b=>b==='fail').length;
+  for(let i=0;i<3;i++){
+    const p=document.getElementById('cmbtDsPip_s'+i); if(p) p.classList.toggle('on',i<successes);
+  }
+  for(let i=0;i<3;i++){
+    const p=document.getElementById('cmbtDsPip_f'+i); if(p) p.classList.toggle('on',i<failures);
+  }
+  const res=document.getElementById('cmbtDeathResult');
+  if(res && successes>=3 && !res.textContent.includes('Stable')) res.textContent='Stable — 3 successes!';
+  if(res && failures>=3  && !res.textContent.includes('perished')) res.textContent='3 failures — character has perished.';
+}
+
+function buildCombatTab(){
+  _refreshCombatVitals();
+  // Stats
+  const acEl =document.getElementById('combatAC');
+  const spdEl=document.getElementById('combatSpeed');
+  const initEl=document.getElementById('initVal');
+  const acDisp  =document.getElementById('cmbtStatAC');
+  const spdDisp =document.getElementById('cmbtStatSpd');
+  const initDisp=document.getElementById('cmbtStatInit');
+  if(acDisp  && acEl)   acDisp.textContent  = acEl.value||'—';
+  if(spdDisp && spdEl)  spdDisp.textContent = spdEl.value||'—';
+  if(initDisp && initEl) initDisp.textContent = initEl.textContent||'+0';
+  // Init roll result
+  const rollRes=document.getElementById('cmbtInitRollResult');
+  if(rollRes && state.combatLastInitRoll){
+    const r=state.combatLastInitRoll;
+    rollRes.textContent='Last roll: d20('+r.roll+') '+(r.mod>=0?'+':'')+r.mod+' = '+r.total;
+  }
+  // Round counter & start/end buttons
+  const roundNum=document.getElementById('cmbtRoundNum');
+  if(roundNum) roundNum.textContent=state.combatRound>0?state.combatRound:'—';
+  const startBtn=document.getElementById('cmbtStartBtn');
+  const endBtn  =document.getElementById('cmbtEndBtn');
+  if(startBtn) startBtn.style.display=state.combatRound>0?'none':'';
+  if(endBtn)   endBtn.style.display  =state.combatRound>0?'':'none';
+  // Initiative list
+  const list=document.getElementById('cmbtInitList');
+  if(list){
+    const entries=state.combatInitEntries||[];
+    if(!entries.length){
+      list.innerHTML='<div class="cmbt-no-combatants">No combatants yet — roll initiative or add entries above.</div>';
+    } else {
+      list.innerHTML='';
+      entries.forEach((e,i)=>{
+        const isActive=i===state.combatTurnIdx && state.combatRound>0;
+        const hpNow=e.isPlayer?(parseInt((document.getElementById('hpCur')||{}).value)||0):(e.hp||0);
+        const hpMx =e.isPlayer?(parseInt((document.getElementById('hpMax')||{}).value)||8):(e.maxHp||1);
+        const hpPct=Math.max(0,Math.min(100,(hpNow/hpMx)*100));
+        const hpColor=hpPct>50?'#40c070':hpPct>25?'#e8a020':'#c82030';
+        const div=document.createElement('div');
+        div.className='cmbt-init-entry'+(isActive?' active-turn':'')+(e.isDead?' is-dead':'');
+        div.innerHTML=
+          `<span class="cmbt-init-arrow">${isActive?'►':''}</span>`
+          +`<span class="cmbt-init-name${e.isPlayer?' is-player':''}">${e.isPlayer?'⚡ ':''}`+`${e.name}${e.isDead?' 💀':''}</span>`
+          +`<span class="cmbt-init-num" title="Initiative">${e.init}</span>`
+          +`<div class="cmbt-init-hp-track">`
+            +`<button class="cmbt-init-hp-btn" onclick="combatUpdateHP('${e.id}',-1)" title="Deal 1 damage">−</button>`
+            +`<span class="cmbt-init-hp-txt" style="color:${hpColor}">${hpNow}/${hpMx}</span>`
+            +`<button class="cmbt-init-hp-btn" onclick="combatUpdateHP('${e.id}',1)" title="Heal 1">+</button>`
+          +`</div>`
+          +`<button class="cmbt-init-action-btn" onclick="combatToggleDead('${e.id}')" title="${e.isDead?'Revive':'Mark dead'}">${e.isDead?'↩':'💀'}</button>`
+          +(!e.isPlayer?` <button class="cmbt-init-action-btn" onclick="combatRemoveEntry('${e.id}')" title="Remove">✕</button>`:'');
+        list.appendChild(div);
+      });
+    }
+  }
+  _refreshDeathSaves();
 }
 
 // ── MULTI-CHARACTER SLOT FUNCTIONS ────────────────────────────────
@@ -15099,6 +15648,7 @@ function switchSlot(idx){
   _loadStateObject(state);
   buildSlotBar();
   buildPCCondTray();
+  buildCombatTab();
   showToast('Slot '+(idx+1)+(state.name?' — '+state.name:'')+' loaded');
 }
 
@@ -15682,6 +16232,7 @@ function updateBar(type){
   // BUGFIX — auto-save HP/RP changes (inputs only call updateBar, never saveAll)
   if(type==='hp'){ state.hpCur=cur; state.hpMax=max; _debouncedSave(); }
   if(type==='rp'){ state.rpCur=cur; state.rpMax=max; _debouncedSave(); }
+  if(typeof _refreshCombatVitals==='function') _refreshCombatVitals();
 }
 
 function updateRpState(){
@@ -29129,6 +29680,7 @@ window.addEventListener('load', function(){
   document.addEventListener('change', saveAll);
   buildPCCondTray();
   buildSlotBar();
+  buildCombatTab();
 });
 
 // ═══════════════════════════════════════════════════
@@ -31343,6 +31895,7 @@ function _loadStateObject(loaded){
   _getAttunedSigils(); renderAttunedSigilToggles(); renderAttunedSigilPanels();
   if(typeof buildPCCondTray==='function') buildPCCondTray();
   if(typeof buildSlotBar==='function') buildSlotBar();
+  if(typeof buildCombatTab==='function') buildCombatTab();
 }
 
 // ═══════════════════════════════════════════════════════════════
