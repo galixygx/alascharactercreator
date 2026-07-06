@@ -4723,25 +4723,51 @@
                 vertical-align: top;
             }
 
-            /* Flat-dice fallback face — shown when "Disable 3D Dice" is on,
-               THREE.js failed to load, or WebGL is unavailable on this device.
-               Keeps the sidebar dice button visible & clickable in all cases. */
-            .dice-button-3d.flat-mode {
-                flex-direction: column;
-                gap: 2px;
+            /* CSS-3D fallback die — shown when THREE/WebGL genuinely cannot run
+               on this device (e.g. Firefox WebGL context creation failure:
+               FEATURE_FAILURE_EGL_NO_CONFIG / EXHAUSTED_DRIVERS, common over
+               RDP/VPN sessions or broken GPU drivers). Pure CSS 3D transforms
+               run on the compositor, not WebGL/ANGLE, so this keeps a real
+               rotating 3D-looking die on screen unconditionally — no browser
+               or driver stack can block it. Keeps the sidebar dice button
+               visible & clickable in all cases. */
+            .dice-css3d-scene {
+                width: 100%; height: 100%;
+                display: flex; align-items: center; justify-content: center;
+                perspective: 240px;
             }
-            .dice-flat-face {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-                gap: 2px;
+            .dice-css3d-cube {
+                position: relative;
+                width: 44px; height: 44px;
+                transform-style: preserve-3d;
+                animation: diceCss3dSpin 7s linear infinite;
+            }
+            .dice-css3d-face {
+                position: absolute;
+                width: 44px; height: 44px;
+                display: flex; align-items: center; justify-content: center;
                 font-family: 'Cinzel',serif;
+                font-weight: 700;
+                font-size: 13px;
+                letter-spacing: .5px;
                 color: var(--gold);
+                background: linear-gradient(160deg, rgba(30,20,55,.92), rgba(10,10,24,.96));
+                border: 1px solid var(--gold-d);
+                border-radius: 4px;
+                box-shadow: inset 0 0 8px rgba(157,85,255,.3);
+                backface-visibility: hidden;
                 user-select: none;
             }
-            .dice-flat-face .dice-flat-icon { font-size: 26px; line-height: 1; }
-            .dice-flat-face .dice-flat-label { font-size: 13px; letter-spacing: 1.5px; color: var(--txt-dim); }
+            .dice-css3d-face.f1 { transform: translateZ(22px); }
+            .dice-css3d-face.f2 { transform: rotateY(180deg) translateZ(22px); }
+            .dice-css3d-face.f3 { transform: rotateY(90deg) translateZ(22px); }
+            .dice-css3d-face.f4 { transform: rotateY(-90deg) translateZ(22px); }
+            .dice-css3d-face.f5 { transform: rotateX(90deg) translateZ(22px); }
+            .dice-css3d-face.f6 { transform: rotateX(-90deg) translateZ(22px); }
+            @keyframes diceCss3dSpin {
+                0%   { transform: rotateX(0deg) rotateY(0deg); }
+                100% { transform: rotateX(360deg) rotateY(720deg); }
+            }
 
         .ri-section-lbl {
             font-family: 'Cinzel',serif;
@@ -28140,7 +28166,10 @@ function _renderFlatDiceFace(container){
   const sides = dieKeyToSides((typeof state!=='undefined' && state.selectedDie) || 'd20');
   const label = sides === 100 ? 'd%' : ('d' + sides);
   container.classList.add('flat-mode');
-  container.innerHTML = '<div class="dice-flat-face"><span class="dice-flat-icon">⚄</span><span class="dice-flat-label">'+label+'</span></div>';
+  const faces = ['f1','f2','f3','f4','f5','f6'].map(function(f){
+    return '<div class="dice-css3d-face '+f+'">'+label+'</div>';
+  }).join('');
+  container.innerHTML = '<div class="dice-css3d-scene"><div class="dice-css3d-cube">'+faces+'</div></div>';
 }
 
 // Binds the click/keyboard roll-prompt handlers exactly once, regardless of
@@ -28187,6 +28216,11 @@ function _bindDiceButtonRoll(diceContainer){
 // behavior exactly), with the flat face reserved purely for genuine WebGL
 // construction failures below.
 let _diceThreeRetries = 0;
+// Set true once THREE.WebGLRenderer construction has actually thrown this
+// session (confirmed driver-level failure, e.g. Firefox EGL/ANGLE exhaustion
+// over RDP/VPN) — lets the watchdog back off instead of retrying WebGL
+// creation (and re-logging the same driver errors) every 60s forever.
+let _dice3DWebglBroken = false;
 function initDice3DButton(){
   const diceContainer = document.getElementById('diceButton3D');
   if(!diceContainer) return;
@@ -28267,9 +28301,11 @@ function initDice3DButton(){
     // (handler is already bound at the top of this function).
     console.warn('Sidebar 3D die: WebGL unavailable, falling back to flat face.');
     dice3dInited = false;
+    _dice3DWebglBroken = true;
     _renderFlatDiceFace(diceContainer);
     return;
   }
+  _dice3DWebglBroken = false;
 
   diceDieGroup = new THREE.Group();
   diceScene.add(diceDieGroup);
@@ -29661,10 +29697,18 @@ window.addEventListener('load', function(){
   // Watchdog: every 60 s check whether THREE arrived late or the die somehow
   // lost its 3D state (e.g. WebGL context lost). Re-init automatically so the
   // 3D die is always alive for the entire session without user intervention.
+  // Once a real WebGL construction failure is confirmed this session
+  // (_dice3DWebglBroken — driver/EGL-level, not a timing issue), back off to
+  // once every 10 min instead of hammering the same broken driver path every
+  // 60s and re-spamming console errors; the CSS-3D cube fallback already
+  // keeps a rotating die on screen in the meantime regardless of browser.
+  var _dice3DWatchdogTicks = 0;
   setInterval(function(){
     var _c = document.getElementById('diceButton3D');
     if(!_c) return;
+    _dice3DWatchdogTicks++;
     if(typeof THREE !== 'undefined' && !dice3dInited){
+      if(_dice3DWebglBroken && (_dice3DWatchdogTicks % 10) !== 0) return;
       _diceThreeRetries = 0;
       initDice3DButton();
     } else if(typeof THREE === 'undefined' && typeof window._threeHealLoad === 'function'){
