@@ -12179,7 +12179,40 @@
          comments at createDiceShellMaterial(), initDice3DButton(), and
          diceAnimate() (search "PROTECTED — DO NOT REMOVE").
          ═══════════════════════════════════════════════════════════════════ -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js" defer></script>
+    <!-- THREE.js — PRIMARY: same-origin /three.min.js (served from Netlify; browsers
+         CANNOT block same-origin scripts). CDN cascade fires automatically if the
+         local copy is somehow missing (offline, mis-deploy, etc.).
+         DO NOT change this back to a CDN-only tag — same-origin is what makes the
+         dice impossible to block. See self-healing loader block immediately below. -->
+    <script src="/three.min.js" defer></script>
+    <script>
+/* THREE.js self-healing loader v1 — runs before app code, exposes window._threeHealLoad().
+   Cascades unpkg → jsdelivr → cdnjs if same-origin /three.min.js somehow fails to load.
+   initDice3DButton() calls this automatically after its retry window expires. */
+(function(){
+  var _CDNS=[
+    'https://unpkg.com/three@0.149.0/build/three.min.js',
+    'https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js',
+    'https://cdnjs.cloudflare.com/ajax/libs/three.js/r149/three.min.js'
+  ];
+  var _pending=false,_idx=0;
+  window._threeHealLoad=function(cb){
+    if(typeof THREE!=='undefined'){if(cb)cb(true);return;}
+    if(_pending)return;
+    _pending=true;
+    (function _next(){
+      if(typeof THREE!=='undefined'){_pending=false;if(cb)cb(true);return;}
+      if(_idx>=_CDNS.length){_idx=0;_pending=false;if(cb)cb(false);return;}
+      var url=_CDNS[_idx++],s=document.createElement('script'),done=false;
+      var t=setTimeout(function(){if(!done){done=true;_pending=false;_next();}},10000);
+      s.onload=function(){clearTimeout(t);if(!done){done=true;_pending=false;
+        if(typeof THREE!=='undefined'){if(cb)cb(true);}else{_idx=0;_next();}}};
+      s.onerror=function(){clearTimeout(t);if(!done){done=true;_pending=false;_next();}};
+      s.src=url;document.head.appendChild(s);
+    })();
+  };
+})();
+</script>
     <script>// ═══════════════════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════════════════
@@ -23504,8 +23537,26 @@ try{
   }
 }catch(e){console.warn('[VTT] parent THREE unavailable:',e.message);}
 <\/script>
-<!-- Step 2: if parent THREE wasn't available, load from CDN (blocking, same version) -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"><\/script>
+<!-- Step 2: if parent THREE wasn't available, load same-origin copy (never blocked),
+     then cascade through CDNs as final fallback. -->
+<script src="/three.min.js"><\/script>
+<script>
+(function(){
+  if(typeof THREE!=='undefined') return;
+  var _vttCdns=['https://unpkg.com/three@0.149.0/build/three.min.js',
+                'https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js',
+                'https://cdnjs.cloudflare.com/ajax/libs/three.js/r149/three.min.js'];
+  var _vi=0;
+  (function _vttNext(){
+    if(typeof THREE!=='undefined'||_vi>=_vttCdns.length) return;
+    var s=document.createElement('script'),done=false;
+    var t=setTimeout(function(){if(!done){done=true;_vi++;_vttNext();}},8000);
+    s.onload=function(){clearTimeout(t);if(!done){done=true;}};
+    s.onerror=function(){clearTimeout(t);if(!done){done=true;_vi++;_vttNext();}};
+    s.src=_vttCdns[_vi++];document.head.appendChild(s);
+  })();
+})();
+<\/script>
 <script>
 // ── Step 3: hard guard ───────────────────────────────────────────────
 if(typeof THREE === 'undefined'){
@@ -28154,6 +28205,25 @@ function initDice3DButton(){
       setTimeout(initDice3DButton, 150);
       return;
     }
+    // Timing retries exhausted — primary load (/three.min.js) may be blocked or
+    // unavailable. Trigger the self-healing CDN cascade (unpkg → jsdelivr → cdnjs)
+    // and retry init once any CDN delivers THREE. If all CDNs fail (true offline),
+    // show flat face now but schedule another attempt in 90s in case connectivity
+    // recovers (captive portal, airplane mode, etc.).
+    if(typeof window._threeHealLoad === 'function'){
+      _diceThreeRetries = 0;
+      window._threeHealLoad(function(ok){
+        if(ok){
+          initDice3DButton();
+        } else {
+          dice3dInited = false;
+          diceContainer.classList.remove('flat-mode');
+          _renderFlatDiceFace(diceContainer);
+          setTimeout(function(){ _diceThreeRetries=0; initDice3DButton(); }, 90000);
+        }
+      });
+      return;
+    }
     dice3dInited = false;
     diceContainer.classList.remove('flat-mode');
     _renderFlatDiceFace(diceContainer);
@@ -29587,6 +29657,20 @@ window.addEventListener('load', function(){
   loadState();
   initDice3DButton();
   initDiceUI();
+
+  // Watchdog: every 60 s check whether THREE arrived late or the die somehow
+  // lost its 3D state (e.g. WebGL context lost). Re-init automatically so the
+  // 3D die is always alive for the entire session without user intervention.
+  setInterval(function(){
+    var _c = document.getElementById('diceButton3D');
+    if(!_c) return;
+    if(typeof THREE !== 'undefined' && !dice3dInited){
+      _diceThreeRetries = 0;
+      initDice3DButton();
+    } else if(typeof THREE === 'undefined' && typeof window._threeHealLoad === 'function'){
+      window._threeHealLoad(function(ok){ if(ok){ _diceThreeRetries=0; initDice3DButton(); } });
+    }
+  }, 60000);
 
   // ── Full UI restore from localStorage state (V2-parity) ──────────────
   // Without this block, a page reload leaves the sheet blank even though
