@@ -28188,9 +28188,10 @@ function _stopDiceCanvas2D(){
   _dice2D = null;
 }
 
-function _dice2DBuildGeometry(sides){
-  if(!_dice2D || typeof THREE === 'undefined') return;
-  const geo = getGeometryForDieSides(sides);
+// Shared by both the sidebar idle die and the full-screen roll animation's
+// Canvas-2D fallback: pulls raw triangles + visible edge segments out of a
+// THREE geometry without ever touching a renderer.
+function _extractDiceTrisEdges(geo){
   const nonIdx = geo.index ? geo.toNonIndexed() : geo;
   const pos = nonIdx.attributes.position;
   const tris = [];
@@ -28210,8 +28211,15 @@ function _dice2DBuildGeometry(sides){
       new THREE.Vector3().fromBufferAttribute(ePos, i + 1)
     ]);
   }
-  _dice2D.tris = tris;
-  _dice2D.edges = edges;
+  return { tris: tris, edges: edges };
+}
+
+function _dice2DBuildGeometry(sides){
+  if(!_dice2D || typeof THREE === 'undefined') return;
+  const geo = getGeometryForDieSides(sides);
+  const extracted = _extractDiceTrisEdges(geo);
+  _dice2D.tris = extracted.tris;
+  _dice2D.edges = extracted.edges;
 }
 
 // Per-face color — same math as the WebGL fragment shader in
@@ -28521,8 +28529,14 @@ function rollSelected3DDie(sides, forcedRaw, total){
   // "Disable 3D Dice" settings flag. That wiring (added/removed 2026-06-07)
   // is what caused the rotating-3D-dice regression — see the long comment
   // above initDice3DButton(). The 3D roll animation always plays; the flat
-  // result (_showFlatRollResult) remains purely a last-resort fallback for
-  // genuine WebGL/THREE failure, handled a few lines below via `!renderer`.
+  // result (_showFlatRollResult) remains purely an absolute-last-resort
+  // fallback for THREE itself failing to load (handled by the guard at the
+  // top of this function). When THREE loaded but WebGL context creation
+  // fails (Firefox EGL/ANGLE driver exhaustion, common over RDP/VPN), the
+  // Canvas-2D branch below (`use2D`) plays the SAME bounce/spin/settle
+  // physics and renders the SAME geometry/shader-palette/edges/face numbers
+  // through a plain 2D canvas instead of `renderer.render()` — see
+  // _renderRollFrame2D. No GPU pipeline required, so this always plays.
 
   const rollLayer = document.createElement('div');
   rollLayer.style.position = 'fixed';
@@ -28531,8 +28545,6 @@ function rollSelected3DDie(sides, forcedRaw, total){
   rollLayer.style.zIndex = '99999';
   rollLayer.style.overflow = 'hidden';
   document.body.appendChild(rollLayer);
-
-  const scene = new THREE.Scene();
 
   const camera = new THREE.PerspectiveCamera(
     60,
@@ -28546,54 +28558,66 @@ function rollSelected3DDie(sides, forcedRaw, total){
   if(_rollAnimId){ cancelAnimationFrame(_rollAnimId); _rollAnimId=null; }
 
   const renderer = _getRollRenderer();
-  if(!renderer){
-    // WebGL unavailable — show the flat result instead.
-    // BUGFIX: this previously displayed `total` if present, else a brand-new
-    // random re-roll — which could show a different number than the result
-    // already computed (and logged to history) above. Now uses the same
-    // `displayValue` so the number on screen always matches the real roll.
-    rollLayer.remove();
-    _showFlatRollResult(displayValue);
-    return;
-  }
-
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  rollLayer.appendChild(renderer.domElement);
+  const use2D = !renderer;
 
   const dieGroup = new THREE.Group();
-  scene.add(dieGroup);
-
   const geometry = getRollGeometryForDie(sides);
-  const material = createRollingDieMaterial();
+  let scene = null, material = null, canvas2d = null, ctx2d = null;
+  let tris2d = [], edges2d = [], numberFaces2d = [];
 
-  const die = new THREE.Mesh(geometry, material);
-  dieGroup.add(die);
+  if(!use2D){
+    scene = new THREE.Scene();
+    scene.add(dieGroup);
 
-  const edges = new THREE.LineSegments(
-    new THREE.EdgesGeometry(geometry),
-    new THREE.LineBasicMaterial({
-      color: 0xf0e6ff,
-      transparent: true,
-      opacity: 0.95
-    })
-  );
-  die.add(edges);
+    material = createRollingDieMaterial();
 
-  addRollNumbers(die, geometry, sides);
+    const die = new THREE.Mesh(geometry, material);
+    dieGroup.add(die);
 
-  scene.add(new THREE.AmbientLight(0x302040, 1.5));
+    const edges = new THREE.LineSegments(
+      new THREE.EdgesGeometry(geometry),
+      new THREE.LineBasicMaterial({
+        color: 0xf0e6ff,
+        transparent: true,
+        opacity: 0.95
+      })
+    );
+    die.add(edges);
 
-  const keyLight = new THREE.PointLight(0xffffff, 2);
-  keyLight.position.set(5, 6, 6);
-  scene.add(keyLight);
+    addRollNumbers(die, geometry, sides);
 
-  const purpleLight = new THREE.PointLight(0x9d55ff, 2.2);
-  purpleLight.position.set(-5, -3, 5);
-  scene.add(purpleLight);
+    scene.add(new THREE.AmbientLight(0x302040, 1.5));
 
-  const fireLight = new THREE.PointLight(0xff7a1a, 1.3);
-  fireLight.position.set(0, 1, 4);
-  scene.add(fireLight);
+    const keyLight = new THREE.PointLight(0xffffff, 2);
+    keyLight.position.set(5, 6, 6);
+    scene.add(keyLight);
+
+    const purpleLight = new THREE.PointLight(0x9d55ff, 2.2);
+    purpleLight.position.set(-5, -3, 5);
+    scene.add(purpleLight);
+
+    const fireLight = new THREE.PointLight(0xff7a1a, 1.3);
+    fireLight.position.set(0, 1, 4);
+    scene.add(fireLight);
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    rollLayer.appendChild(renderer.domElement);
+  } else {
+    const extracted = _extractDiceTrisEdges(geometry);
+    tris2d = extracted.tris;
+    edges2d = extracted.edges;
+    numberFaces2d = _computeRollNumberFaces(geometry, sides);
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas2d = document.createElement('canvas');
+    canvas2d.width = window.innerWidth * dpr;
+    canvas2d.height = window.innerHeight * dpr;
+    canvas2d.style.width = window.innerWidth + 'px';
+    canvas2d.style.height = window.innerHeight + 'px';
+    rollLayer.appendChild(canvas2d);
+    ctx2d = canvas2d.getContext('2d');
+    ctx2d.scale(dpr, dpr);
+  }
 
   const startX = -4.8;
   const endX = 3.2;
@@ -28618,10 +28642,13 @@ function rollSelected3DDie(sides, forcedRaw, total){
   const resultLabel = createFloatingRollResult(displayValue);
   rollLayer.appendChild(resultLabel);
 
+  let materialTime = 0;
+
   function animateRoll(){
     frame++;
 
-    material.uniforms.time.value += 0.02;
+    materialTime += 0.02;
+    if(material) material.uniforms.time.value = materialTime;
 
     if(!hasSettled){
       x += velocityX;
@@ -28677,15 +28704,23 @@ function rollSelected3DDie(sides, forcedRaw, total){
 
     dieGroup.position.set(x, y, 0);
 
-    renderer.render(scene, camera);
+    if(!use2D){
+      renderer.render(scene, camera);
+    } else {
+      _renderRollFrame2D(ctx2d, window.innerWidth, window.innerHeight, camera, dieGroup, tris2d, edges2d, numberFaces2d, materialTime);
+    }
 
     if(frame < 430){
       _rollAnimId = requestAnimationFrame(animateRoll);
     } else {
       try{
-        // Detach canvas from rollLayer but keep the shared renderer alive
-        if(renderer.domElement && renderer.domElement.parentNode)
-          renderer.domElement.parentNode.removeChild(renderer.domElement);
+        if(!use2D){
+          // Detach canvas from rollLayer but keep the shared renderer alive
+          if(renderer.domElement && renderer.domElement.parentNode)
+            renderer.domElement.parentNode.removeChild(renderer.domElement);
+        } else if(canvas2d && canvas2d.parentNode){
+          canvas2d.parentNode.removeChild(canvas2d);
+        }
         if(geometry && geometry.dispose) geometry.dispose();
         if(material && material.dispose) material.dispose();
       }catch(_){}
@@ -28695,6 +28730,145 @@ function rollSelected3DDie(sides, forcedRaw, total){
   }
 
   animateRoll();
+}
+
+// Computes the same per-face label placement as addRollNumbers() (position,
+// outward normal, number) but as plain data instead of THREE.Mesh/texture
+// objects — used by the Canvas-2D roll fallback to draw the numbers as flat
+// text at each face's projected screen position.
+function _computeRollNumberFaces(geometry, sides){
+  const pos = geometry.attributes.position;
+  if(!pos) return [];
+  const faceCount = Math.floor(pos.count / 3);
+  const maxLabels = sides === 100 ? 10 : Math.min(sides, faceCount);
+  const out = [];
+  for(let i = 1; i <= maxLabels; i++){
+    const faceIndex = i - 1;
+    const a = new THREE.Vector3().fromBufferAttribute(pos, faceIndex * 3);
+    const b = new THREE.Vector3().fromBufferAttribute(pos, faceIndex * 3 + 1);
+    const c = new THREE.Vector3().fromBufferAttribute(pos, faceIndex * 3 + 2);
+    const center = new THREE.Vector3().addVectors(a, b).add(c).divideScalar(3);
+    const normal = new THREE.Vector3().crossVectors(
+      new THREE.Vector3().subVectors(b, a),
+      new THREE.Vector3().subVectors(c, a)
+    ).normalize();
+    if(normal.dot(center) < 0) normal.negate();
+    const label = sides === 100 ? i * 10 : i;
+    out.push({
+      center: center.clone().add(normal.clone().multiplyScalar(0.035)),
+      normal: normal,
+      label: String(label)
+    });
+  }
+  return out;
+}
+
+// Per-face color for the full-screen roll die — mirrors the fragment shader
+// in createRollingDieMaterial() exactly (fresnel rim-light + brightCloud
+// terms included, unlike the simpler sidebar-die palette).
+function _rollFaceColor(p, n, t){
+  function ss(a, b, x){ x = Math.max(0, Math.min(1, (x - a) / (b - a))); return x * x * (3 - 2 * x); }
+  const px = p.x * 1.55, py = p.y * 1.55, pz = p.z * 1.55;
+  const s = Math.sin(px * 7.2 + t * 0.22) + Math.sin(py * 9.4 - t * 0.18)
+          + Math.sin(pz * 6.8 + t * 0.14) + Math.sin((px + py - pz) * 8.5);
+  const cloud = Math.sin(s * 2.15 + py * 10.0);
+  const mist  = Math.sin((px - pz) * 13.0 + s);
+  const cA = cloud * 0.5 + 0.5;
+  let r = 0.08 + (0.31 - 0.08) * cA,
+      g = 0.02 * cA,
+      b = 0.20 + (0.58 - 0.20) * cA;
+  const mA = mist * 0.16 + 0.18;
+  r += (0.58 - r) * mA; g += (0.14 - g) * mA; b += (0.95 - b) * mA;
+  const vein = ss(0.58, 1.0, Math.abs(cloud)) * 0.36;
+  r += (0.86 - r) * vein; g += (0.70 - g) * vein; b += (1.00 - b) * vein;
+  const bright = ss(0.88, 1.0, Math.abs(mist)) * 0.20;
+  r += (1.00 - r) * bright; g += (0.95 - g) * bright; b += (1.00 - b) * bright;
+  // Fresnel rim-light: pow(1 - max(dot(n, (0,0,1)), 0), 2) * 0.35 tint
+  const nDotView = Math.max(n.z, 0);
+  const fresnel = Math.pow(1 - nDotView, 2) * 0.35;
+  r += 0.55 * fresnel; g += 0.25 * fresnel; b += 1.0 * fresnel;
+  const light = (n.x * 0.35 + n.y * 0.8 + n.z * 1.0) / 1.3286 * 0.45 + 0.7;
+  r *= light; g *= light; b *= light;
+  const c = function(x){ return Math.round(Math.max(0, Math.min(1, x)) * 255); };
+  return [c(r), c(g), c(b)];
+}
+
+// Software-renders one frame of the full-screen roll animation through a
+// plain 2D canvas — same geometry, same die-group rotation/position, same
+// shader-derived palette, same edges, same face numbers as the WebGL path,
+// just rasterized on the CPU. Used whenever WebGL context creation fails.
+function _renderRollFrame2D(ctx, w, h, camera, dieGroup, tris, edgeSegs, numberFaces, t){
+  ctx.clearRect(0, 0, w, h);
+  const fovRad = camera.fov * Math.PI / 180;
+  const F = (h / 2) / Math.tan(fovRad / 2);
+  const camZ = camera.position.z;
+  const cx = w / 2, cy = h / 2;
+  function proj(v){
+    const zz = camZ - v.z;
+    return [cx + v.x * F / zz, cy - v.y * F / zz, zz];
+  }
+  const m = new THREE.Matrix4().makeRotationFromEuler(dieGroup.rotation);
+  const gp = dieGroup.position;
+  const va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3();
+  const ab = new THREE.Vector3(), ac = new THREE.Vector3(), nrm = new THREE.Vector3();
+  const faces = [];
+  for(let i = 0; i < tris.length; i++){
+    const t0 = tris[i];
+    va.copy(t0[0]).applyMatrix4(m).add(gp);
+    vb.copy(t0[1]).applyMatrix4(m).add(gp);
+    vc.copy(t0[2]).applyMatrix4(m).add(gp);
+    ab.subVectors(vb, va); ac.subVectors(vc, va);
+    nrm.crossVectors(ab, ac).normalize();
+    const centroidLocal = {
+      x: (t0[0].x + t0[1].x + t0[2].x) / 3,
+      y: (t0[0].y + t0[1].y + t0[2].y) / 3,
+      z: (t0[0].z + t0[1].z + t0[2].z) / 3
+    };
+    const col = _rollFaceColor(centroidLocal, nrm, t);
+    const pa = proj(va), pb = proj(vb), pc = proj(vc);
+    faces.push({ p: [pa, pb, pc], z: (pa[2] + pb[2] + pc[2]) / 3, col: col });
+  }
+  faces.sort(function(a, b){ return b.z - a.z; });  // farthest first, nearest drawn last (on top)
+  for(let i = 0; i < faces.length; i++){
+    const f = faces[i];
+    ctx.beginPath();
+    ctx.moveTo(f.p[0][0], f.p[0][1]);
+    ctx.lineTo(f.p[1][0], f.p[1][1]);
+    ctx.lineTo(f.p[2][0], f.p[2][1]);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(' + f.col[0] + ',' + f.col[1] + ',' + f.col[2] + ',0.9)';
+    ctx.fill();
+  }
+  ctx.strokeStyle = 'rgba(240,230,255,0.95)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  const e1 = new THREE.Vector3(), e2 = new THREE.Vector3();
+  for(let i = 0; i < edgeSegs.length; i++){
+    e1.copy(edgeSegs[i][0]).applyMatrix4(m).add(gp);
+    e2.copy(edgeSegs[i][1]).applyMatrix4(m).add(gp);
+    const a = proj(e1), b = proj(e2);
+    ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
+  }
+  ctx.stroke();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const nWorld = new THREE.Vector3(), cWorld = new THREE.Vector3();
+  for(let i = 0; i < numberFaces.length; i++){
+    const nf = numberFaces[i];
+    nWorld.copy(nf.normal).transformDirection(m);
+    if(nWorld.z <= 0.15) continue;  // back-facing relative to the camera — skip
+    cWorld.copy(nf.center).applyMatrix4(m).add(gp);
+    const sp = proj(cWorld);
+    const scale = Math.max(0.5, Math.min(1.6, 320 / sp[2]));
+    ctx.save();
+    ctx.translate(sp[0], sp[1]);
+    ctx.scale(scale, scale);
+    ctx.font = 'bold 34px Georgia';
+    ctx.lineWidth = 7; ctx.strokeStyle = '#06000c'; ctx.strokeText(nf.label, 0, 0);
+    ctx.fillStyle = '#18001f'; ctx.fillText(nf.label, 0, 0);
+    ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255,255,255,0.96)'; ctx.strokeText(nf.label, 0, 0);
+    ctx.restore();
+  }
 }
 
 function getRollGeometryForDie(sides){
