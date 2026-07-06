@@ -4723,51 +4723,28 @@
                 vertical-align: top;
             }
 
-            /* CSS-3D fallback die — shown when THREE/WebGL genuinely cannot run
-               on this device (e.g. Firefox WebGL context creation failure:
-               FEATURE_FAILURE_EGL_NO_CONFIG / EXHAUSTED_DRIVERS, common over
-               RDP/VPN sessions or broken GPU drivers). Pure CSS 3D transforms
-               run on the compositor, not WebGL/ANGLE, so this keeps a real
-               rotating 3D-looking die on screen unconditionally — no browser
-               or driver stack can block it. Keeps the sidebar dice button
-               visible & clickable in all cases. */
-            .dice-css3d-scene {
-                width: 100%; height: 100%;
-                display: flex; align-items: center; justify-content: center;
-                perspective: 240px;
+            /* Flat-dice fallback face — ABSOLUTE last resort, shown only when
+               THREE.js itself failed to load from every source (same-origin +
+               all CDNs; effectively: no network at all). When THREE loads but
+               WebGL context creation fails (Firefox EGL/ANGLE driver failure
+               over RDP/VPN etc.), the Canvas-2D software die renders instead —
+               see _initDiceCanvas2D — which looks identical to the WebGL die. */
+            .dice-button-3d.flat-mode {
+                flex-direction: column;
+                gap: 2px;
             }
-            .dice-css3d-cube {
-                position: relative;
-                width: 44px; height: 44px;
-                transform-style: preserve-3d;
-                animation: diceCss3dSpin 7s linear infinite;
-            }
-            .dice-css3d-face {
-                position: absolute;
-                width: 44px; height: 44px;
-                display: flex; align-items: center; justify-content: center;
+            .dice-flat-face {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 2px;
                 font-family: 'Cinzel',serif;
-                font-weight: 700;
-                font-size: 13px;
-                letter-spacing: .5px;
                 color: var(--gold);
-                background: linear-gradient(160deg, rgba(30,20,55,.92), rgba(10,10,24,.96));
-                border: 1px solid var(--gold-d);
-                border-radius: 4px;
-                box-shadow: inset 0 0 8px rgba(157,85,255,.3);
-                backface-visibility: hidden;
                 user-select: none;
             }
-            .dice-css3d-face.f1 { transform: translateZ(22px); }
-            .dice-css3d-face.f2 { transform: rotateY(180deg) translateZ(22px); }
-            .dice-css3d-face.f3 { transform: rotateY(90deg) translateZ(22px); }
-            .dice-css3d-face.f4 { transform: rotateY(-90deg) translateZ(22px); }
-            .dice-css3d-face.f5 { transform: rotateX(90deg) translateZ(22px); }
-            .dice-css3d-face.f6 { transform: rotateX(-90deg) translateZ(22px); }
-            @keyframes diceCss3dSpin {
-                0%   { transform: rotateX(0deg) rotateY(0deg); }
-                100% { transform: rotateX(360deg) rotateY(720deg); }
-            }
+            .dice-flat-face .dice-flat-icon { font-size: 26px; line-height: 1; }
+            .dice-flat-face .dice-flat-label { font-size: 13px; letter-spacing: 1.5px; color: var(--txt-dim); }
 
         .ri-section-lbl {
             font-family: 'Cinzel',serif;
@@ -26131,8 +26108,14 @@ function diceAnimate(){
 }
 
 function syncDice3DFromState(){
-  if(!dice3dInited || !diceDieGroup) return;
   const sides = dieKeyToSides(state.selectedDie || 'd20');
+  // Canvas-2D software die active (WebGL context unavailable) — rebuild
+  // its geometry for the newly selected die type instead.
+  if(!dice3dInited){
+    if(typeof _dice2D !== 'undefined' && _dice2D) _dice2DBuildGeometry(sides);
+    return;
+  }
+  if(!diceDieGroup) return;
   diceBuildGeometry(sides);
 }
 
@@ -28166,10 +28149,156 @@ function _renderFlatDiceFace(container){
   const sides = dieKeyToSides((typeof state!=='undefined' && state.selectedDie) || 'd20');
   const label = sides === 100 ? 'd%' : ('d' + sides);
   container.classList.add('flat-mode');
-  const faces = ['f1','f2','f3','f4','f5','f6'].map(function(f){
-    return '<div class="dice-css3d-face '+f+'">'+label+'</div>';
-  }).join('');
-  container.innerHTML = '<div class="dice-css3d-scene"><div class="dice-css3d-cube">'+faces+'</div></div>';
+  container.innerHTML = '<div class="dice-flat-face"><span class="dice-flat-icon">⚄</span><span class="dice-flat-label">'+label+'</span></div>';
+}
+
+// ── Canvas-2D software die (WebGL-free) ─────────────────────────────
+// Renders the SAME die as the WebGL path — same THREE geometry from
+// getGeometryForDieSides(), same rotation speeds as diceAnimate(), same
+// purple swirl palette as the createDiceShellMaterial() fragment shader
+// (evaluated per-face at the centroid), same pale 0xf0e6ff edge lines
+// from EdgesGeometry, same golden dragon-eye core — drawn through a
+// plain 2D canvas. Used when THREE is loaded but the browser cannot
+// create a WebGL context at all (e.g. Firefox EGL/ANGLE driver
+// exhaustion: FEATURE_FAILURE_EGL_NO_CONFIG / EXHAUSTED_DRIVERS, common
+// over RDP/VPN). Canvas2D needs no GPU pipeline, so this works in every
+// browser unconditionally and looks identical to the WebGL die.
+let _dice2D = null;
+
+function _initDiceCanvas2D(container){
+  if(typeof THREE === 'undefined'){ _renderFlatDiceFace(container); return; }
+  if(_dice2D && _dice2D.canvas && _dice2D.canvas.parentNode === container) return; // already live
+  _stopDiceCanvas2D();
+  container.classList.remove('flat-mode');
+  container.innerHTML = '';
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const cv = document.createElement('canvas');
+  cv.width = 88 * dpr; cv.height = 88 * dpr;
+  cv.style.width = '88px'; cv.style.height = '88px';
+  container.appendChild(cv);
+  const ctx = cv.getContext('2d');
+  ctx.scale(dpr, dpr);
+  _dice2D = { canvas: cv, ctx: ctx, tris: [], edges: [], rotX: 0, rotY: 0, time: 0, animId: null };
+  _dice2DBuildGeometry(dieKeyToSides((typeof state !== 'undefined' && state.selectedDie) || 'd20'));
+  _dice2DAnimate();
+}
+
+function _stopDiceCanvas2D(){
+  if(_dice2D && _dice2D.animId) cancelAnimationFrame(_dice2D.animId);
+  _dice2D = null;
+}
+
+function _dice2DBuildGeometry(sides){
+  if(!_dice2D || typeof THREE === 'undefined') return;
+  const geo = getGeometryForDieSides(sides);
+  const nonIdx = geo.index ? geo.toNonIndexed() : geo;
+  const pos = nonIdx.attributes.position;
+  const tris = [];
+  for(let i = 0; i < pos.count; i += 3){
+    tris.push([
+      new THREE.Vector3().fromBufferAttribute(pos, i),
+      new THREE.Vector3().fromBufferAttribute(pos, i + 1),
+      new THREE.Vector3().fromBufferAttribute(pos, i + 2)
+    ]);
+  }
+  // Same visible-edge extraction the WebGL die uses (EdgesGeometry)
+  const ePos = new THREE.EdgesGeometry(geo).attributes.position;
+  const edges = [];
+  for(let i = 0; i < ePos.count; i += 2){
+    edges.push([
+      new THREE.Vector3().fromBufferAttribute(ePos, i),
+      new THREE.Vector3().fromBufferAttribute(ePos, i + 1)
+    ]);
+  }
+  _dice2D.tris = tris;
+  _dice2D.edges = edges;
+}
+
+// Per-face color — same math as the WebGL fragment shader in
+// createDiceShellMaterial(), evaluated at the face centroid.
+function _dice2DFaceColor(p, n, t){
+  function ss(a, b, x){ x = Math.max(0, Math.min(1, (x - a) / (b - a))); return x * x * (3 - 2 * x); }
+  const px = p.x * 1.55, py = p.y * 1.55, pz = p.z * 1.55;
+  const s = Math.sin(px * 7.2 + t * 0.22) + Math.sin(py * 9.4 - t * 0.18)
+          + Math.sin(pz * 6.8 + t * 0.14) + Math.sin((px + py - pz) * 8.5);
+  const cloud = Math.sin(s * 2.15 + py * 10.0);
+  const mist  = Math.sin((px - pz) * 13.0 + s);
+  const cA = cloud * 0.5 + 0.5;
+  let r = 0.08 + (0.31 - 0.08) * cA,
+      g = 0.02 * cA,
+      b = 0.20 + (0.58 - 0.20) * cA;
+  const mA = mist * 0.16 + 0.18;
+  r += (0.58 - r) * mA; g += (0.14 - g) * mA; b += (0.95 - b) * mA;
+  const vein = ss(0.58, 1.0, Math.abs(cloud)) * 0.35;
+  r += (0.86 - r) * vein; g += (0.70 - g) * vein; b += (1.00 - b) * vein;
+  // Light dir matches the shader: normalize(vec3(0.35,0.8,1.0))
+  const light = (n.x * 0.35 + n.y * 0.8 + n.z * 1.0) / 1.3286 * 0.5 + 0.7;
+  r *= light; g *= light; b *= light;
+  const c = function(x){ return Math.round(Math.max(0, Math.min(1, x)) * 255); };
+  return [c(r), c(g), c(b)];
+}
+
+function _dice2DAnimate(){
+  if(!_dice2D) return;
+  _dice2D.animId = requestAnimationFrame(_dice2DAnimate);
+  const d = _dice2D, ctx = d.ctx;
+  d.time += 0.01; d.rotX += 0.01; d.rotY += 0.015;   // same speeds as diceAnimate()
+  const m = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(d.rotX, d.rotY, 0));
+  const F = 44 / Math.tan(Math.PI / 6);              // fov 60°, 88px viewport — same camera
+  const CZ = 4;                                       // camera z — same as WebGL path
+  function proj(v){ const zz = CZ - v.z; return [44 + v.x * F / zz, 44 - v.y * F / zz]; }
+  ctx.clearRect(0, 0, 88, 88);
+  // Golden "dragon eye" glow at the core (the sphere inside the WebGL shell)
+  const eyeR = 0.4 * F / CZ * 1.8;
+  const gr = ctx.createRadialGradient(44, 44, 0, 44, 44, eyeR);
+  gr.addColorStop(0, 'rgba(255,204,102,0.9)');
+  gr.addColorStop(1, 'rgba(255,204,102,0)');
+  ctx.fillStyle = gr;
+  ctx.beginPath(); ctx.arc(44, 44, eyeR, 0, Math.PI * 2); ctx.fill();
+  // Transform, shade, painter-sort, fill faces
+  const va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3();
+  const ab = new THREE.Vector3(), ac = new THREE.Vector3(), nrm = new THREE.Vector3();
+  const faces = [];
+  for(let i = 0; i < d.tris.length; i++){
+    const t0 = d.tris[i];
+    va.copy(t0[0]).applyMatrix4(m);
+    vb.copy(t0[1]).applyMatrix4(m);
+    vc.copy(t0[2]).applyMatrix4(m);
+    ab.subVectors(vb, va); ac.subVectors(vc, va);
+    nrm.crossVectors(ab, ac).normalize();
+    const col = _dice2DFaceColor(
+      { x:(t0[0].x + t0[1].x + t0[2].x) / 3,
+        y:(t0[0].y + t0[1].y + t0[2].y) / 3,
+        z:(t0[0].z + t0[1].z + t0[2].z) / 3 },
+      nrm, d.time);
+    faces.push({ p:[proj(va), proj(vb), proj(vc)],
+                 z:(va.z + vb.z + vc.z) / 3,
+                 front: nrm.z > 0, col: col });
+  }
+  faces.sort(function(a, b){ return a.z - b.z; });   // far → near
+  for(let i = 0; i < faces.length; i++){
+    const f = faces[i];
+    ctx.beginPath();
+    ctx.moveTo(f.p[0][0], f.p[0][1]);
+    ctx.lineTo(f.p[1][0], f.p[1][1]);
+    ctx.lineTo(f.p[2][0], f.p[2][1]);
+    ctx.closePath();
+    // Back faces faint like the 0.82-alpha translucent WebGL shell
+    ctx.fillStyle = 'rgba(' + f.col[0] + ',' + f.col[1] + ',' + f.col[2] + ',' + (f.front ? 0.9 : 0.35) + ')';
+    ctx.fill();
+  }
+  // Pale edge lines — same 0xf0e6ff as the WebGL EdgesGeometry lines
+  ctx.strokeStyle = 'rgba(240,230,255,0.75)';
+  ctx.lineWidth = 1;
+  const e1 = new THREE.Vector3(), e2 = new THREE.Vector3();
+  ctx.beginPath();
+  for(let i = 0; i < d.edges.length; i++){
+    e1.copy(d.edges[i][0]).applyMatrix4(m);
+    e2.copy(d.edges[i][1]).applyMatrix4(m);
+    const a = proj(e1), b = proj(e2);
+    ctx.moveTo(a[0], a[1]); ctx.lineTo(b[0], b[1]);
+  }
+  ctx.stroke();
 }
 
 // Binds the click/keyboard roll-prompt handlers exactly once, regardless of
@@ -28299,13 +28428,14 @@ function initDice3DButton(){
     // attachment further below — leaving a visible-but-dead button on any
     // device where WebGL init throws. Fall back to the flat face instead
     // (handler is already bound at the top of this function).
-    console.warn('Sidebar 3D die: WebGL unavailable, falling back to flat face.');
+    console.warn('Sidebar 3D die: WebGL context unavailable — rendering the same die via Canvas-2D software renderer.');
     dice3dInited = false;
     _dice3DWebglBroken = true;
-    _renderFlatDiceFace(diceContainer);
+    _initDiceCanvas2D(diceContainer);
     return;
   }
   _dice3DWebglBroken = false;
+  _stopDiceCanvas2D();
 
   diceDieGroup = new THREE.Group();
   diceScene.add(diceDieGroup);
