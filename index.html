@@ -26006,7 +26006,7 @@ function dieKeyToSides(k){
 // ═══════════════════════════════════════════════════════════════════════
 // ─── Three.js 3D die (sidebar) ───
 let dice3dInited = false;
-let diceScene, diceCamera, diceRenderer, diceDieGroup, diceDieMesh, diceShellMaterial, diceRuneGroup;
+let diceScene, diceCamera, diceRenderer, diceDieGroup, diceDieMesh, diceShellMaterial;
 
 function createDiceShellMaterial(){
   return new THREE.ShaderMaterial({
@@ -26043,19 +26043,12 @@ function createDiceShellMaterial(){
         color = mix(color, violet, mist*0.16+0.18);
         float whiteVein = smoothstep(0.58,1.0,abs(cloud));
         color = mix(color, paleMist, whiteVein*0.35);
-        // Gold Vein-crack lines — the Alas "Vein" life-force motif threading
-        // the shell like a fractured geode.
-        float crackLine = abs(sin(p.x*9.0 + p.y*6.5 - p.z*5.0 + time*0.12));
-        float crack = 1.0 - smoothstep(0.0,0.05,crackLine);
-        vec3 goldVein = vec3(0.91,0.77,0.28);
-        color = mix(color, goldVein, crack*0.8);
         float light = dot(normalize(vNormal), normalize(vec3(0.35,0.8,1.0))) * 0.5 + 0.7;
         color *= light;
         gl_FragColor = vec4(color,0.82);
       }
     `,
-    transparent:true,
-    depthWrite:false
+    transparent:true
   });
 }
 
@@ -26072,51 +26065,12 @@ function getGeometryForDieSides(sides){
   }
 }
 
-// Shared Sigil rune core — used by both the sidebar idle die and the
-// full-screen roll animation. A glowing violet rune (the game's magic-Sigil
-// motif) glimpsed at the die's heart, backed by a warm gold ember glow,
-// combined with the shell's gold Vein-cracks for the "Combined Relic" look.
-let _sigilRuneTexture = null;
-function createSigilRuneTexture(){
-  if(_sigilRuneTexture) return _sigilRuneTexture;
-  const canvas = document.createElement('canvas');
-  canvas.width = 128; canvas.height = 128;
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0,0,128,128);
-  // Warm gold ember halo behind the rune
-  const glow = ctx.createRadialGradient(64,64,8,64,64,60);
-  glow.addColorStop(0,'rgba(255,204,102,0.55)');
-  glow.addColorStop(1,'rgba(255,204,102,0)');
-  ctx.fillStyle = glow;
-  ctx.beginPath(); ctx.arc(64,64,60,0,Math.PI*2); ctx.fill();
-  // Violet Sigil rune — ring + crossing lines + core mote
-  ctx.strokeStyle = 'rgba(180,120,255,0.95)';
-  ctx.lineWidth = 5;
-  ctx.beginPath(); ctx.arc(64,64,42,0,Math.PI*2); ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(34,34); ctx.lineTo(94,94);
-  ctx.moveTo(94,34); ctx.lineTo(34,94);
-  ctx.stroke();
-  ctx.fillStyle = 'rgba(180,120,255,0.95)';
-  ctx.beginPath(); ctx.arc(64,64,7,0,Math.PI*2); ctx.fill();
-  _sigilRuneTexture = new THREE.CanvasTexture(canvas);
-  _sigilRuneTexture.needsUpdate = true;
-  return _sigilRuneTexture;
-}
-
-function diceAddSigilRune(parent, size){
-  const tex = createSigilRuneTexture();
-  const mat = new THREE.MeshBasicMaterial({
-    map: tex, transparent:true, depthWrite:false, depthTest:true, side:THREE.DoubleSide
-  });
-  const s = size || 0.85;
-  const rune1 = new THREE.Mesh(new THREE.PlaneGeometry(s,s), mat);
-  const rune2 = new THREE.Mesh(new THREE.PlaneGeometry(s,s), mat);
-  rune2.rotation.y = Math.PI/2;
-  const group = new THREE.Group();
-  group.add(rune1, rune2);
-  parent.add(group);
-  return group;
+function diceAddDragonEye(parent){
+  const eye = new THREE.Mesh(
+    new THREE.SphereGeometry(0.4,32,32),
+    new THREE.MeshStandardMaterial({ color:0xffcc66, emissive:0x551100, roughness:0.3 })
+  );
+  parent.add(eye);
 }
 
 function diceBuildGeometry(sides){
@@ -26131,7 +26085,7 @@ function diceBuildGeometry(sides){
     new THREE.LineBasicMaterial({ color:0xf0e6ff })
   );
   diceDieMesh.add(edges);
-  diceRuneGroup = diceAddSigilRune(diceDieGroup, 0.85);
+  diceAddDragonEye(diceDieGroup);
 }
 
 // PROTECTED — DO NOT REMOVE: this is the live render loop for the rotating
@@ -26150,7 +26104,6 @@ function diceAnimate(){
   diceShellMaterial.uniforms.time.value += 0.01;
   diceDieGroup.rotation.x += 0.01;
   diceDieGroup.rotation.y += 0.015;
-  if(diceRuneGroup) diceRuneGroup.rotation.z += 0.025;
   diceRenderer.render(diceScene, diceCamera);
 }
 
@@ -28225,7 +28178,7 @@ function _initDiceCanvas2D(container){
   container.appendChild(cv);
   const ctx = cv.getContext('2d');
   ctx.scale(dpr, dpr);
-  _dice2D = { canvas: cv, ctx: ctx, tris: [], edges: [], rotX: 0, rotY: 0, runeRot: 0, time: 0, animId: null };
+  _dice2D = { canvas: cv, ctx: ctx, tris: [], edges: [], rotX: 0, rotY: 0, time: 0, animId: null };
   _dice2DBuildGeometry(dieKeyToSides((typeof state !== 'undefined' && state.selectedDie) || 'd20'));
   _dice2DAnimate();
 }
@@ -28269,25 +28222,9 @@ function _dice2DBuildGeometry(sides){
   _dice2D.edges = extracted.edges;
 }
 
-// Thin gold Vein-crack mask, same formula as the WebGL shader's crackLine
-// term. In WebGL this varies per-pixel across a face so a crack reliably
-// shows up somewhere; our Canvas-2D path only flat-shades once per face, so
-// callers sample this at all 3 vertices + centroid and take the max — a
-// low-poly stand-in for per-fragment interpolation, without which the crack
-// (a <1%-wide band) would almost never land on a single centroid sample.
-function _diceCrackMask(px, py, pz, t){
-  function ss(a, b, x){ x = Math.max(0, Math.min(1, (x - a) / (b - a))); return x * x * (3 - 2 * x); }
-  const crackLine = Math.abs(Math.sin(px * 9.0 + py * 6.5 - pz * 5.0 + t * 0.12));
-  // Wider band than the WebGL shader's 0.05 (see call sites) — a flat-shaded
-  // low-poly face needs a much larger hit-region than a per-pixel fragment
-  // does to ever land inside the crack band at all.
-  return (1 - ss(0.0, 0.15, crackLine)) * 0.8;
-}
-
 // Per-face color — same math as the WebGL fragment shader in
-// createDiceShellMaterial(), evaluated at the face centroid (tri, if given,
-// is the raw 3 local vertices — used only to better-sample the thin crack).
-function _dice2DFaceColor(p, n, t, tri){
+// createDiceShellMaterial(), evaluated at the face centroid.
+function _dice2DFaceColor(p, n, t){
   function ss(a, b, x){ x = Math.max(0, Math.min(1, (x - a) / (b - a))); return x * x * (3 - 2 * x); }
   const px = p.x * 1.55, py = p.y * 1.55, pz = p.z * 1.55;
   const s = Math.sin(px * 7.2 + t * 0.22) + Math.sin(py * 9.4 - t * 0.18)
@@ -28302,15 +28239,6 @@ function _dice2DFaceColor(p, n, t, tri){
   r += (0.58 - r) * mA; g += (0.14 - g) * mA; b += (0.95 - b) * mA;
   const vein = ss(0.58, 1.0, Math.abs(cloud)) * 0.35;
   r += (0.86 - r) * vein; g += (0.70 - g) * vein; b += (1.00 - b) * vein;
-  // Gold Vein-crack lines — same crack term as the WebGL shader, sampled at
-  // the vertices too (see _diceCrackMask) so a low-poly face still catches it.
-  let crack = _diceCrackMask(px, py, pz, t);
-  if(tri){
-    for(let i = 0; i < 3; i++){
-      crack = Math.max(crack, _diceCrackMask(tri[i].x * 1.55, tri[i].y * 1.55, tri[i].z * 1.55, t));
-    }
-  }
-  r += (0.91 - r) * crack; g += (0.77 - g) * crack; b += (0.28 - b) * crack;
   // Light dir matches the shader: normalize(vec3(0.35,0.8,1.0))
   const light = (n.x * 0.35 + n.y * 0.8 + n.z * 1.0) / 1.3286 * 0.5 + 0.7;
   r *= light; g *= light; b *= light;
@@ -28318,43 +28246,23 @@ function _dice2DFaceColor(p, n, t, tri){
   return [c(r), c(g), c(b)];
 }
 
-// Draws the rotating violet Sigil rune + gold ember backlight at the die's
-// screen-space center — the Canvas-2D equivalent of diceAddSigilRune()'s
-// crossed-plane rune mesh.
-function _drawSigilRune2D(ctx, cx, cy, radius, rot){
-  const glow = ctx.createRadialGradient(cx, cy, radius * 0.15, cx, cy, radius);
-  glow.addColorStop(0, 'rgba(255,204,102,0.55)');
-  glow.addColorStop(1, 'rgba(255,204,102,0)');
-  ctx.fillStyle = glow;
-  ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.fill();
-  ctx.save();
-  ctx.translate(cx, cy);
-  ctx.rotate(rot);
-  const r = radius * 0.68;
-  ctx.strokeStyle = 'rgba(180,120,255,0.95)';
-  ctx.lineWidth = 2;
-  ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(-r * 0.7, -r * 0.7); ctx.lineTo(r * 0.7, r * 0.7);
-  ctx.moveTo(r * 0.7, -r * 0.7); ctx.lineTo(-r * 0.7, r * 0.7);
-  ctx.stroke();
-  ctx.fillStyle = 'rgba(180,120,255,0.95)';
-  ctx.beginPath(); ctx.arc(0, 0, r * 0.12, 0, Math.PI * 2); ctx.fill();
-  ctx.restore();
-}
-
 function _dice2DAnimate(){
   if(!_dice2D) return;
   _dice2D.animId = requestAnimationFrame(_dice2DAnimate);
   const d = _dice2D, ctx = d.ctx;
-  d.time += 0.01; d.rotX += 0.01; d.rotY += 0.015; d.runeRot += 0.025;  // same speeds as diceAnimate()
+  d.time += 0.01; d.rotX += 0.01; d.rotY += 0.015;   // same speeds as diceAnimate()
   const m = new THREE.Matrix4().makeRotationFromEuler(new THREE.Euler(d.rotX, d.rotY, 0));
   const F = 44 / Math.tan(Math.PI / 6);              // fov 60°, 88px viewport — same camera
   const CZ = 4;                                       // camera z — same as WebGL path
   function proj(v){ const zz = CZ - v.z; return [44 + v.x * F / zz, 44 - v.y * F / zz]; }
   ctx.clearRect(0, 0, 88, 88);
-  // Rotating violet Sigil rune + gold ember backlight at the die's core
-  _drawSigilRune2D(ctx, 44, 44, 0.4 * F / CZ * 1.8, d.runeRot);
+  // Golden "dragon eye" glow at the core (the sphere inside the WebGL shell)
+  const eyeR = 0.4 * F / CZ * 1.8;
+  const gr = ctx.createRadialGradient(44, 44, 0, 44, 44, eyeR);
+  gr.addColorStop(0, 'rgba(255,204,102,0.9)');
+  gr.addColorStop(1, 'rgba(255,204,102,0)');
+  ctx.fillStyle = gr;
+  ctx.beginPath(); ctx.arc(44, 44, eyeR, 0, Math.PI * 2); ctx.fill();
   // Transform, shade, painter-sort, fill faces
   const va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3();
   const ab = new THREE.Vector3(), ac = new THREE.Vector3(), nrm = new THREE.Vector3();
@@ -28370,7 +28278,7 @@ function _dice2DAnimate(){
       { x:(t0[0].x + t0[1].x + t0[2].x) / 3,
         y:(t0[0].y + t0[1].y + t0[2].y) / 3,
         z:(t0[0].z + t0[1].z + t0[2].z) / 3 },
-      nrm, d.time, t0);
+      nrm, d.time);
     faces.push({ p:[proj(va), proj(vb), proj(vc)],
                  z:(va.z + vb.z + vc.z) / 3,
                  front: nrm.z > 0, col: col });
@@ -28654,7 +28562,7 @@ function rollSelected3DDie(sides, forcedRaw, total){
 
   const dieGroup = new THREE.Group();
   const geometry = getRollGeometryForDie(sides);
-  let scene = null, material = null, canvas2d = null, ctx2d = null, rollRuneGroup = null;
+  let scene = null, material = null, canvas2d = null, ctx2d = null;
   let tris2d = [], edges2d = [], numberFaces2d = [];
 
   if(!use2D){
@@ -28677,7 +28585,6 @@ function rollSelected3DDie(sides, forcedRaw, total){
     die.add(edges);
 
     addRollNumbers(die, geometry, sides);
-    rollRuneGroup = diceAddSigilRune(dieGroup, 0.75);
 
     scene.add(new THREE.AmbientLight(0x302040, 1.5));
 
@@ -28796,7 +28703,6 @@ function rollSelected3DDie(sides, forcedRaw, total){
     }
 
     dieGroup.position.set(x, y, 0);
-    if(rollRuneGroup) rollRuneGroup.rotation.z += 0.03;
 
     if(!use2D){
       renderer.render(scene, camera);
@@ -28860,7 +28766,7 @@ function _computeRollNumberFaces(geometry, sides){
 // Per-face color for the full-screen roll die — mirrors the fragment shader
 // in createRollingDieMaterial() exactly (fresnel rim-light + brightCloud
 // terms included, unlike the simpler sidebar-die palette).
-function _rollFaceColor(p, n, t, tri){
+function _rollFaceColor(p, n, t){
   function ss(a, b, x){ x = Math.max(0, Math.min(1, (x - a) / (b - a))); return x * x * (3 - 2 * x); }
   const px = p.x * 1.55, py = p.y * 1.55, pz = p.z * 1.55;
   const s = Math.sin(px * 7.2 + t * 0.22) + Math.sin(py * 9.4 - t * 0.18)
@@ -28877,15 +28783,6 @@ function _rollFaceColor(p, n, t, tri){
   r += (0.86 - r) * vein; g += (0.70 - g) * vein; b += (1.00 - b) * vein;
   const bright = ss(0.88, 1.0, Math.abs(mist)) * 0.20;
   r += (1.00 - r) * bright; g += (0.95 - g) * bright; b += (1.00 - b) * bright;
-  // Gold Vein-crack lines — sampled at the vertices too (see
-  // _diceCrackMask) so a low-poly face still catches the thin band.
-  let crack = _diceCrackMask(px, py, pz, t);
-  if(tri){
-    for(let i = 0; i < 3; i++){
-      crack = Math.max(crack, _diceCrackMask(tri[i].x * 1.55, tri[i].y * 1.55, tri[i].z * 1.55, t));
-    }
-  }
-  r += (0.91 - r) * crack; g += (0.77 - g) * crack; b += (0.28 - b) * crack;
   // Fresnel rim-light: pow(1 - max(dot(n, (0,0,1)), 0), 2) * 0.35 tint
   const nDotView = Math.max(n.z, 0);
   const fresnel = Math.pow(1 - nDotView, 2) * 0.35;
@@ -28912,12 +28809,6 @@ function _renderRollFrame2D(ctx, w, h, camera, dieGroup, tris, edgeSegs, numberF
   }
   const m = new THREE.Matrix4().makeRotationFromEuler(dieGroup.rotation);
   const gp = dieGroup.position;
-  // Rotating violet Sigil rune + gold ember backlight at the die's core —
-  // runeRot derived from elapsed time to match rollRuneGroup's 0.03/frame
-  // spin at materialTime's 0.02/frame increment (ratio 1.5), no extra
-  // per-frame state needed since this function is stateless between calls.
-  const dieCenterProj = proj(gp);
-  _drawSigilRune2D(ctx, dieCenterProj[0], dieCenterProj[1], 0.75 * F / camZ, t * 1.5);
   const va = new THREE.Vector3(), vb = new THREE.Vector3(), vc = new THREE.Vector3();
   const ab = new THREE.Vector3(), ac = new THREE.Vector3(), nrm = new THREE.Vector3();
   const faces = [];
@@ -28933,7 +28824,7 @@ function _renderRollFrame2D(ctx, w, h, camera, dieGroup, tris, edgeSegs, numberF
       y: (t0[0].y + t0[1].y + t0[2].y) / 3,
       z: (t0[0].z + t0[1].z + t0[2].z) / 3
     };
-    const col = _rollFaceColor(centroidLocal, nrm, t, t0);
+    const col = _rollFaceColor(centroidLocal, nrm, t);
     const pa = proj(va), pb = proj(vb), pc = proj(vc);
     faces.push({ p: [pa, pb, pc], z: (pa[2] + pb[2] + pc[2]) / 3, col: col });
   }
@@ -29049,13 +28940,6 @@ function createRollingDieMaterial(){
 
         float brightCloud = smoothstep(0.88, 1.0, abs(mist));
         color = mix(color, whiteCloud, brightCloud * 0.20);
-
-        // Gold Vein-crack lines — the Alas "Vein" life-force motif threading
-        // the shell like a fractured geode.
-        float crackLine = abs(sin(p.x*9.0 + p.y*6.5 - p.z*5.0 + time*0.12));
-        float crack = 1.0 - smoothstep(0.0, 0.05, crackLine);
-        vec3 goldVein = vec3(0.91, 0.77, 0.28);
-        color = mix(color, goldVein, crack * 0.8);
 
         float fresnel = pow(1.0 - max(dot(normalize(vNormal), vec3(0.0, 0.0, 1.0)), 0.0), 2.0);
         color += vec3(0.55, 0.25, 1.0) * fresnel * 0.35;
