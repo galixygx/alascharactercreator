@@ -10844,11 +10844,19 @@
                     </button>
                     <button class="rest-btn" onclick="doRest('recovery')">
                         <span>Recovery Rest</span>
-                        <span class="rest-sub">4 hr — +½ Pool · −1 Exhaustion</span>
+                        <span class="rest-sub">4 hr — +½ Pool · −1 Exhaustion (Elves: Full Restore)</span>
+                    </button>
+                    <button class="rest-btn" onclick="doRest('full')">
+                        <span>Full Rest</span>
+                        <span class="rest-sub">8 hr — Full restore</span>
                     </button>
                     <button class="rest-btn" onclick="doRest('deep')">
                         <span>Deep Rest</span>
-                        <span class="rest-sub">8 hr — Full restore</span>
+                        <span class="rest-sub">12 hr — Full restore + non-magical conditions</span>
+                    </button>
+                    <button class="rest-btn" onclick="doRest('magical')">
+                        <span>Magical Rest</span>
+                        <span class="rest-sub">24 hr — Full restore + all conditions</span>
                     </button>
                 </div>
                 <!-- Save / Load / DM row -->
@@ -11937,9 +11945,11 @@
                                 <table class="qref-table">
                                     <thead><tr><th>Rest</th><th>Duration &amp; Effect</th></tr></thead>
                                     <tbody>
-                                    <tr><td>Resonance Rest</td><td>1 hr — Instability resets to 0. RP pool recovered.</td></tr>
-                                    <tr><td>Recovery Rest</td><td>4 hr — Recover ½ HP pool. −1 Exhaustion. RP restored.</td></tr>
-                                    <tr><td>Deep Rest</td><td>8 hr — Full HP, RP, Instability reset. −1 Exhaustion. Daily features refresh.</td></tr>
+                                    <tr><td>Resonance Rest</td><td>1 hr — Instability resets to 0. +½ RP restored.</td></tr>
+                                    <tr><td>Recovery Rest</td><td>4 hr — +½ RP · −1 Exhaustion. Elf races: Trance grants a Full Rest instead.</td></tr>
+                                    <tr><td>Full Rest</td><td>8 hr — Full HP, RP, Instability reset. −2 Exhaustion. Daily features refresh.</td></tr>
+                                    <tr><td>Deep Rest</td><td>12 hr — Full Rest, plus all non-magical conditions cleared.</td></tr>
+                                    <tr><td>Magical Rest</td><td>24 hr — Full Rest, plus all conditions cleared (magical &amp; non-magical).</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -15197,19 +15207,26 @@ function ensureStateDefaults(){
 // ═══════════════════════════════════════════════════
 // PLAYER CHARACTER CONDITIONS
 // ═══════════════════════════════════════════════════
+// `magical` flags the condition as always spell/curse-based in origin (vs.
+// mundane/physical) — used by Deep Rest (clears non-magical conditions only)
+// vs. Magical Rest (clears both) to decide which conditions each removes.
 const PC_COND_DEFS = [
   { key:'psn', label:'Poisoned', hasDmg:true, col:'#40c040', rgb:'64,192,64',   rollFx:{attack:'dis',spell_attack:'dis',ability:'dis',skill:'dis'}, desc:'DIS on attack rolls & ability checks' },
-  { key:'frt', label:'Frightened',    col:'#d040c0', rgb:'208,64,192',  rollFx:{attack:'dis',spell_attack:'dis',ability:'dis',skill:'dis'}, desc:'DIS on attacks & checks while source is visible' },
+  { key:'frt', label:'Frightened', magical:true, col:'#d040c0', rgb:'208,64,192',  rollFx:{attack:'dis',spell_attack:'dis',ability:'dis',skill:'dis'}, desc:'DIS on attacks & checks while source is visible' },
   { key:'bld', label:'Blinded',       col:'#a0a8b8', rgb:'160,168,184', rollFx:{attack:'dis',spell_attack:'dis'},                           desc:'DIS on attacks; attackers have ADV vs. you' },
   { key:'prn', label:'Prone',         col:'#9060a0', rgb:'144,96,160',  rollFx:{attack:'dis',spell_attack:'dis'},                           desc:'DIS on attacks; melee attackers have ADV vs. you' },
-  { key:'inv', label:'Invisible',     col:'#90a8c0', rgb:'144,168,192', rollFx:{attack:'adv',spell_attack:'adv'},                           desc:'ADV on attacks; attackers have DIS vs. you' },
-  { key:'stn', label:'Stunned',       col:'#ffcc00', rgb:'255,204,0',   rollFx:{save_dex:'dis'},                                            desc:'DIS on DEX saves; can\'t move; attackers have ADV' },
+  { key:'inv', label:'Invisible', magical:true, col:'#90a8c0', rgb:'144,168,192', rollFx:{attack:'adv',spell_attack:'adv'},                           desc:'ADV on attacks; attackers have DIS vs. you' },
+  { key:'stn', label:'Stunned', magical:true, col:'#ffcc00', rgb:'255,204,0',   rollFx:{save_dex:'dis'},                                            desc:'DIS on DEX saves; can\'t move; attackers have ADV' },
   { key:'slw', label:'Slowed',        col:'#4080ff', rgb:'64,128,255',  rollFx:{save_dex:'dis'},                                            desc:'DIS on DEX saves; −2 AC; half speed' },
-  { key:'chm', label:'Charmed',       col:'#ff80c0', rgb:'255,128,192', rollFx:{},                                                          desc:'Can\'t attack charmer; charmer has ADV on social checks vs. you' },
+  { key:'chm', label:'Charmed', magical:true, col:'#ff80c0', rgb:'255,128,192', rollFx:{},                                                          desc:'Can\'t attack charmer; charmer has ADV on social checks vs. you' },
   { key:'brn', label:'Burning',  hasDmg:true, col:'#ff6020', rgb:'255,96,32',   rollFx:{},                                                          desc:'Taking ongoing fire damage at start of each turn' },
   { key:'blg', label:'Bleeding', hasDmg:true, col:'#c82030', rgb:'200,32,48',   rollFx:{},                                                          desc:'Taking ongoing damage at start of each turn' },
   { key:'inc', label:'Incapacited',   col:'#505070', rgb:'80,80,112',   rollFx:{},                                                          desc:'Cannot take actions or reactions' },
 ];
+
+// Elf races — the only races whose Trance trait (4 hr trance = 8 hr sleep)
+// lets a 4-hour Recovery Rest grant the full 8-hour Full Rest benefit.
+const ELF_RACES = ['High Elf', 'Dunesong Elf', 'Drow', 'Wood Elf'];
 
 let _pendingCondDmgKey = null;
 
@@ -16688,11 +16705,57 @@ function updateScarTiers(){
 // ═══════════════════════════════════════════════════
 // REST
 // ═══════════════════════════════════════════════════
-function doRest(type){
+// Shared "full restore" (HP/RP/Instability/Exhaustion-2/Corruption prompt/
+// spell refresh) used by Full Rest, Deep Rest, Magical Rest, and Recovery
+// Rest for Elf races (Trance: 4 hr trance = 8 hr sleep, see ELF_RACES).
+// Returns true if the player chose to clear Corruption too.
+function _applyFullRestore(){
   const rpMax=parseInt(document.getElementById('rpMax').value)||8;
   const rpCurEl=document.getElementById('rpCur');
   const hpMaxEl=parseInt(document.getElementById('hpMax').value)||8;
   const hpCurEl=document.getElementById('hpCur');
+  rpCurEl.value=rpMax;  state.rpCur=rpMax;
+  hpCurEl.value=hpMaxEl; state.hpCur=hpMaxEl;
+  state.instability=0;
+  document.getElementById('insVal').textContent=0;
+  document.getElementById('insState').textContent='Stable';
+  state.exhaustion=Math.max(0,(state.exhaustion||0)-2);
+  buildExhaustionPips();
+  updateBar('rp');updateRpState();updateBar('hp');
+  const corrReset=confirm('Reset Corruption?\n(Only if no sigils were cast while Unstable/Corrupted during rest)');
+  if(corrReset){
+    state.corruption=0;
+    document.getElementById('corVal').textContent=0;
+    document.getElementById('corState').textContent='Clean';
+  }
+  // Restore all spell list availability (long rest equivalent)
+  if(Array.isArray(state.completedSpells)){
+    state.completedSpells.forEach(function(s){ s.available = true; });
+    if(typeof renderSpellList === 'function') renderSpellList();
+  }
+  return corrReset;
+}
+
+// Clears active PC conditions. onlyNonMagical=true skips conditions flagged
+// `magical` in PC_COND_DEFS (Deep Rest); false clears everything (Magical Rest).
+// Returns the number of conditions cleared.
+function _clearPCConditions(onlyNonMagical){
+  if(!state.pcConditions) return 0;
+  let cleared = 0;
+  PC_COND_DEFS.forEach(function(def){
+    if(!state.pcConditions[def.key]) return;
+    if(onlyNonMagical && def.magical) return;
+    state.pcConditions[def.key] = false;
+    if(state.pcCondDmg) delete state.pcCondDmg[def.key];
+    cleared++;
+  });
+  if(cleared>0 && typeof buildPCCondTray==='function') buildPCCondTray();
+  return cleared;
+}
+
+function doRest(type){
+  const rpMax=parseInt(document.getElementById('rpMax').value)||8;
+  const rpCurEl=document.getElementById('rpCur');
   let msg='';
   if(type==='resonance'){
     // Instability reset
@@ -16707,36 +16770,30 @@ function doRest(type){
     updateBar('rp'); updateRpState();
     msg=`Resonance Rest — Instability reset · +${rpRestore} Resonance restored`;
   } else if(type==='recovery'){
-    const restore=Math.floor(rpMax/2);
-    const newRp=Math.min(rpMax,(parseInt(rpCurEl.value)||0)+restore);
-    rpCurEl.value=newRp; state.rpCur=newRp;   // FIX: keep state in sync so save/reload keeps the restored value
-    state.exhaustion=Math.max(0,(state.exhaustion||0)-1);
-    buildExhaustionPips();
-    updateBar('rp');updateRpState();
-    msg=`Recovery Rest — +${restore} Resonance, −1 Exhaustion`;
-  } else {
-    rpCurEl.value=rpMax;  state.rpCur=rpMax;
-    hpCurEl.value=hpMaxEl; state.hpCur=hpMaxEl;
-    state.instability=0;
-    document.getElementById('insVal').textContent=0;
-    document.getElementById('insState').textContent='Stable';
-    state.exhaustion=Math.max(0,(state.exhaustion||0)-2);
-    buildExhaustionPips();
-    updateBar('rp');updateRpState();updateBar('hp');
-    const corrReset=confirm('Deep Rest: Reset Corruption?\n(Only if no sigils were cast while Unstable/Corrupted during rest)');
-    if(corrReset){
-      state.corruption=0;
-      document.getElementById('corVal').textContent=0;
-      document.getElementById('corState').textContent='Clean';
-      msg='Deep Rest — Full restore. Corruption cleared.';
+    // Elf races (Trance): 4 hr Recovery Rest counts as a full 8-hr Full Rest.
+    if(ELF_RACES.includes(state.race)){
+      const corrReset=_applyFullRestore();
+      msg='Recovery Rest (Trance) — Full restore, as if an 8-hr rest.'+(corrReset?' Corruption cleared.':' Corruption unchanged.');
     } else {
-      msg='Deep Rest — Full restore. Corruption unchanged.';
+      const restore=Math.floor(rpMax/2);
+      const newRp=Math.min(rpMax,(parseInt(rpCurEl.value)||0)+restore);
+      rpCurEl.value=newRp; state.rpCur=newRp;   // FIX: keep state in sync so save/reload keeps the restored value
+      state.exhaustion=Math.max(0,(state.exhaustion||0)-1);
+      buildExhaustionPips();
+      updateBar('rp');updateRpState();
+      msg=`Recovery Rest — +${restore} Resonance, −1 Exhaustion`;
     }
-    // Restore all spell list availability on Deep Rest (long rest equivalent)
-    if(Array.isArray(state.completedSpells)){
-      state.completedSpells.forEach(function(s){ s.available = true; });
-      if(typeof renderSpellList === 'function') renderSpellList();
-    }
+  } else if(type==='full'){
+    const corrReset=_applyFullRestore();
+    msg='Full Rest — Full restore.'+(corrReset?' Corruption cleared.':' Corruption unchanged.');
+  } else if(type==='deep'){
+    const corrReset=_applyFullRestore();
+    const cleared=_clearPCConditions(true);
+    msg='Deep Rest — Full restore'+(cleared?` · ${cleared} non-magical condition(s) cleared`:'')+'.'+(corrReset?' Corruption cleared.':' Corruption unchanged.');
+  } else if(type==='magical'){
+    const corrReset=_applyFullRestore();
+    const cleared=_clearPCConditions(false);
+    msg='Magical Rest — Full restore'+(cleared?` · ${cleared} condition(s) cleared`:'')+'.'+(corrReset?' Corruption cleared.':' Corruption unchanged.');
   }
   _debouncedSave();
   showToast(msg);
