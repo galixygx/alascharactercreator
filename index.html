@@ -19754,7 +19754,20 @@ const SIGIL_ATTUNEMENT_CHARTS = {
       {n:8,name:'Verdant Sovereign', desc:'Manifest the will of the wild. Summon a spectral nature dragon that shields allies and crushes your foes.', potency:'Very High', duration:'20s', rc:8},
     ]
   },
-  water: null, // not yet supplied — placeholder shown by _buildSigilAttunementChart
+  water: {
+    title:'Water Sigil — Attunement Chart', col:'#288cff',
+    dragoon:{name:'Dragoon of the Deep', text:'The water sigil answers those who move with purpose and flow with conviction. Let not your heart be still. Let the tide carry your spear.'},
+    tiers:[
+      {n:1,name:'Riptide Stance', desc:'Assume the flow of the tide. Increases movement speed and enhances lance techniques.', potency:'Low', duration:'10s', rc:1},
+      {n:2,name:'Whirlpool Thrust', desc:'Spin your lance to summon a whirling current that pulls enemies inward.', potency:'Medium', range:'30 ft', rc:3},
+      {n:3,name:'Tidebreaker', desc:'A powerful forward thrust that cleaves through waves and armor alike.', potency:'High', range:'25 ft', rc:4},
+      {n:4,name:'Surge Strike', desc:'Ride a surge of water to close distances in an instant and strike with force.', potency:'High', range:'20 ft', rc:4},
+      {n:5,name:'Living Current', desc:'Envelop yourself in living water, healing allies and granting them renewed vigor.', potency:'Medium', duration:'15s', rc:5},
+      {n:6,name:'Crashing Depths', desc:'Leap high and plunge into the ground, creating a violent eruption of water.', potency:'High', area:'15 ft radius', rc:6},
+      {n:7,name:'Abyssal Lance', desc:'Hurl a condensed lance of abyssal water. Pierces all enemies in its path and shatters shields.', potency:'High', range:'60 ft', rc:7},
+      {n:8,name:'Tidal Sovereign', desc:'Manifest the will of the deep. Summon a spectral water dragon that rains destruction upon your foes.', potency:'Very High', duration:'20s', rc:8},
+    ]
+  },
 };
 
 function _buildSigilAttunementChart(key){
