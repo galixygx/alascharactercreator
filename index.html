@@ -21559,6 +21559,19 @@ const SIGIL_COMPENDIUM_DATA = {
     {name:'Eye of the Flow State',aff:'Physical',rc:3,ip:0,ct:'Concentration',range:'Self',dur:'1 minute (Concentration)',spellLevel:5,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
      effect:'Requirement: Any Combat Style.\nYou enter complete combat awareness. Every movement, every breath, every shift in weight, every hostile intention — becomes visible before it occurs.\nWhile active: gain +3 AC; advantage on Dexterity saves, Initiative, and opportunity-attack avoidance; you cannot be surprised; and you gain +10 ft movement.\nFlow Vision: once per turn, you may force one creature attacking you to reroll its attack.\nPerfect Rhythm: you no longer lose Flow from missed attacks.\nFlow Surge: whenever you successfully dodge, redirect, or avoid an attack, gain 1 temporary Flow (max +2 beyond your normal cap).\nEnding Effect: when concentration ends, release a Flow Burst — all hostile creatures within 15 ft must succeed on a Dexterity save or be knocked prone, lose their reactions, and have movement halved next turn.',
      notes:'Flavor: Combat slows into perfect clarity. The future exists one movement ahead of everyone else.'},
+
+    // ── LEVEL 6 DEFENSIVE TECHNIQUES (Ki-costed, not Resonance) ──────
+    {name:'Flowing River Stance',aff:'Physical',rc:0,ip:0,ct:'Reaction (when you are hit by an attack)',range:'Self',dur:'Until the start of your next turn',spellLevel:6,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',kiCost:2,
+     effect:'Rather than resisting force, you become part of it. Your body yields like flowing water, redirecting the momentum of incoming attacks around you instead of through you. Your movements become impossibly fluid, leaving behind shimmering afterimages of rippling water.\nReduce the triggering attack\'s damage by 4d10 + your Wisdom modifier + your Martial Arts die.\nYou gain Resistance to all weapon damage until the start of your next turn.\nYou may immediately move up to 15 feet without provoking opportunity attacks.\nIf this movement places you outside the attacker\'s reach, that creature has disadvantage on any additional attacks against you this turn.',
+     notes:'Cost: 2 Ki. Level 6 Defensive Technique.'},
+
+    {name:'Echoing Current Guard',aff:'Physical',rc:0,ip:0,ct:'Bonus Action',range:'Self (15-foot Aura)',dur:'Concentration, up to 1 minute',spellLevel:6,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',kiCost:3,
+     effect:'A circular current of translucent resonance flows around you, intercepting attacks before they ever reach their intended target. Every strike bends through invisible currents that subtly alter their trajectory.\nYou gain +3 AC. Allies within 15 feet gain +2 AC.\nOnce each round, when you or an ally inside the aura is hit by an attack, reduce that damage by 3d8 + your Wisdom modifier.\nCreatures making Opportunity Attacks against creatures inside the aura do so with disadvantage.',
+     notes:'Cost: 3 Ki. Level 6 Defensive Technique.'},
+
+    {name:'Perfect Reflection',aff:'Physical',rc:0,ip:0,ct:'Reaction (when targeted by a melee attack)',range:'Self',dur:'Instantaneous',spellLevel:6,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',kiCost:4,
+     effect:'Your awareness reaches absolute clarity. Before the attack connects, you perfectly mirror your opponent\'s movement, causing their strike to glide harmlessly past you before redirecting their own momentum against them. To outside observers, it appears as though time skipped.\nThe triggering melee attack automatically misses.\nImmediately move up to 10 feet to any unoccupied space adjacent to the attacker.\nThe attacker must succeed on a Strength saving throw against your Ki Save DC (spell save) or be knocked Prone.\nUntil the end of your next turn, attacks against you have Disadvantage as your movements continue to blur with flowing resonance.\nLingering effect: if the attacker misses another attack against you before your next turn, you regain 1 Ki Point (once per round).',
+     notes:'Cost: 4 Ki. Level 6 Defensive Technique.'},
   ],
 };
 
@@ -21743,7 +21756,7 @@ function _scRenderSpells(spells, search, affFilter, lvlFilter){
         <div class="sc-tags">
           <span class="sc-tag" style="border-color:${col}50;color:${col};">${isCantrip?'Cantrip':'Lv '+lvlNum}</span>
           <span class="sc-tag" style="border-color:${col}30;color:${col}80;">${sp.aff||'Arcane'}</span>
-          <span class="sc-tag">RC ${sp.rc||0}</span>
+          <span class="sc-tag"${sp.kiCost?' style="border-color:rgba(232,160,32,.4);color:rgba(232,160,32,.9);"':''}>${sp.kiCost?'KI '+sp.kiCost:'RC '+(sp.rc||0)}</span>
           ${parseInt(sp.ip||0)>0?`<span class="sc-tag instab">+${sp.ip} Instability</span>`:''}
           ${sp.unstableMagic?`<span class="sc-tag unstable">⚡ Unstable</span>`:''}
           <span class="sc-tag">${sp.ct||'Action'}</span>
