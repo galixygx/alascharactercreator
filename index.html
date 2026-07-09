@@ -21372,6 +21372,19 @@ const SIGIL_COMPENDIUM_DATA = {
     {name:"Pacifist's Pressure",aff:'Physical',rc:1,ip:0,ct:'Action',range:'Melee',dur:'1 turn',spellLevel:1,dmgDie:'d6',dmgCount:'1',dmgType:'Physical',element:'Physical',
      effect:'A precise strike meant to end conflict, not life.\nMake an unarmed strike dealing 1d6 + your Dexterity modifier damage.\nChoose one effect: Disarm (target drops a held item), Immobilize (its movement becomes 0 until the end of its next turn), or Silence the Body (it cannot take Attack actions on its next turn).\nIf the target is below half HP: it must succeed on a Wisdom save (vs your Sigil Save DC) or lose its reaction and suffer disadvantage on its next attack.\nRestriction: you cannot deal lethal damage this turn after using this ability.',
      notes:'Flavor: You strike where violence ends.'},
+
+    // ── LEVEL 2 SIGILS ──────────────────────────────────────────────
+    {name:'Cascade of Motion',aff:'Physical',rc:1,ip:0,ct:'Bonus Action',range:'Self',dur:'Until end of turn',spellLevel:2,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'Your movement spills from one action into the next, uninterrupted and untraceable.\nYou may take the Dash (without restrictions) or Disengage action — double movement, or movement without provoking opportunity attacks.\nDuring this movement: you ignore difficult terrain, and you may move through enemy spaces (you must end in an unoccupied space).\nIf you moved at least 15 ft this turn: your next attack gains +2 to hit, and on a hit you may reposition the target 5 ft.\nFlow Bonus: if this is used after hitting an enemy, you may instead move up to 20 ft without provoking opportunity attacks.',
+     notes:'Flavor: You are not traveling across the battlefield; you are flowing through it.'},
+
+    {name:'Patient Current',aff:'Physical',rc:1,ip:0,ct:'Action',range:'Self',dur:'Until start of your next turn',spellLevel:2,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'You abandon resistance entirely, becoming impossible to properly strike.\nUntil the start of your next turn, all attacks against you are made with disadvantage.\nIf an attack misses you during this time: you may immediately move 5 ft, or force the attacker to suffer −2 to its next attack.\nEnhanced Flow: if you did not attack this turn before using this ability, you also gain +2 AC in addition to the disadvantage.',
+     notes:'Flavor: Still water cannot be struck, only disturbed.'},
+
+    {name:'Unbroken Sequence',aff:'Physical',rc:1,ip:0,ct:'Action',range:'Melee',dur:'Instant',spellLevel:2,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'You unleash a seamless chain of motion — strikes that are not separate, but one continuous action.\nMake two unarmed strikes. After each successful hit, choose one: step 5 ft without provoking opportunity attacks, or apply "Off-Balance" (disadvantage on the target\'s next attack).\nIf both attacks hit: you may make a third strike that deals reduced damage (−1d4), OR apply Pacifist\'s Pressure without an additional Resonance cost.\nRestriction: if you choose the Pacifist option, all damage from this ability becomes non-lethal (unless the damage exceeds 35).',
+     notes:'Flavor: There are no openings, only moments you allow to exist.'},
   ],
 };
 
