@@ -19974,7 +19974,31 @@ const SIGIL_DRAGOON_CHARTS = {
       {name:'Typhoon Dragoon',   desc:'Transform into a vortex of water and become untouchable while delivering relentless strikes.', cost:5, ultimate:true},
     ]
   },
-  light: null, // not yet supplied — placeholder shown by _buildDragoonSection
+  light: {
+    title:'Light Sigil Attunement Chart', path:'Path of the Radiant Dragoon', col:'#e8c547',
+    quote:'"As light banishes darkness, so does the spear illuminate truth."',
+    desc:'Harness the radiant power of light to become an unstoppable bulwark upon the battlefield. Shine. Shield. Uplift. Illuminate.',
+    benefits:['Enhanced Healing & Protection','High-Speed Lancer Combos','Ally Empowerment & Cleansing','Crowd Control & Displacement','Adaptable in Any Terrain'],
+    gaugeName:'Radiant Gauge', gaugeMax:6,
+    tiers:[
+      {n:'I',   name:'Radiant Initiate',    desc:'Your light begins to shine. Clarity and purpose are awakened.'},
+      {n:'II',  name:'Luminous Lancer',     desc:'Pierce through the shadows. Your thrusts enlighten allies.'},
+      {n:'III', name:'Dawnblade Dragoon',   desc:'Light surrounds your spear. Your presence inspires hope.'},
+      {n:'IV',  name:'Solar Spear',         desc:"Harness the sun's brilliance. Your strikes blind evil."},
+      {n:'V',   name:'Luminara Champion',   desc:'You are the light divine. Your radiance shapes destiny.'},
+    ],
+    abilities:[
+      {name:'Radiant Thrust',    desc:'A blinding lunge of light that pierces enemies and sears them with radiance.', cost:1},
+      {name:'Blazing Pierce',    desc:'A sweeping slash of holy light that cuts through darkness and leaves a trail of stars.', cost:2},
+      {name:'Luminary Cyclone',  desc:'Spin your lance to summon a cyclone of light that repels and damages all around you.', cost:2},
+      {name:'Celestial Ascent',  desc:'Launch high into the air bathed in light, granting allies shields below.', cost:2},
+      {name:'Sanctify Impale',   desc:'Impale the target with a lance of pure radiance, cleansing debuffs and restoring health.', cost:3},
+      {name:'Aurora Veil',       desc:'Surround yourself and allies in a barrier of light that absorbs damage and purifies ailments.', cost:3},
+      {name:'Beacon of Hope',    desc:'Create a pillar of light that heals allies, boosts their stats, and weakens foes.', cost:3},
+      {name:'Solar Deluge',      desc:'Rain down spears of light from the heavens, smiting enemies in a radiant storm.', cost:4},
+      {name:'Divine Dragoon',    desc:'Transform into an avatar of light, unleashing the full brilliance of the sun to vanquish darkness.', cost:5, ultimate:true},
+    ]
+  },
 };
 
 function toggleDragoonStatus(key){
