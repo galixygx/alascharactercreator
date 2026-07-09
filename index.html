@@ -16158,8 +16158,9 @@ function updateCalcs(){
   const spellAbilityBon = getSpellAbilityEffectBonuses();
   const equippedItemBon = getEquippedItemEffectBonuses();
   const setStatBonEarly = getActiveSetStatBonuses();
+  const sigilAttuneBon = getSigilAttunementBonuses();
   const totalInit = dex + biomeInit + getManualAbilityMod('DEX')
-    + (spellAbilityBon['ab_DEX']||0) + (equippedItemBon['ab_DEX']||0) + (setStatBonEarly['ab_DEX']||0)
+    + (spellAbilityBon['ab_DEX']||0) + (equippedItemBon['ab_DEX']||0) + (setStatBonEarly['ab_DEX']||0) + (sigilAttuneBon['ab_DEX']||0)
     + (spellAbilityBon.ex_init||0) + (equippedItemBon.ex_init||0) + (setStatBonEarly.ex_init||0)
     + (state.initMod||0);
   document.getElementById('initDisplay').textContent = fmtMod(totalInit);
@@ -16205,7 +16206,8 @@ function updateCalcs(){
     const manB=getManualAbilityMod(ab);
     const spB=spellAbilityBon['ab_'+ab]||0;
     const eqB=equippedItemBon['ab_'+ab]||0;
-    const abBonus=setB+effB+manB+spB+eqB;
+    const sigB=sigilAttuneBon['ab_'+ab]||0;
+    const abBonus=setB+effB+manB+spB+eqB+sigB;
     el.textContent=fmtMod(getMod(ab)+abBonus);
     el.style.color=abBonus?'var(--gold-l)':'';
     const parts=[];
@@ -16214,6 +16216,7 @@ function updateCalcs(){
     if(manB) parts.push('Mods '+(manB>=0?'+':'')+manB);
     if(spB)  parts.push('Spell '+(spB>=0?'+':'')+spB);
     if(eqB)  parts.push('Item '+(eqB>=0?'+':'')+eqB);
+    if(sigB) parts.push('Sigil Attunement '+(sigB>=0?'+':'')+sigB);
     el.title=parts.length?parts.join(', '):'';
   });
   // Saves
@@ -16222,7 +16225,7 @@ function updateCalcs(){
     if(!el)return;
     const profEl=document.getElementById('sav_'+ab);
     const isProficient=profEl&&profEl.checked;
-    const abBonus=(setStatBon['ab_'+ab]||0)+(effBon[ab]||0)+getManualAbilityMod(ab)+(spellAbilityBon['ab_'+ab]||0)+(equippedItemBon['ab_'+ab]||0);
+    const abBonus=(setStatBon['ab_'+ab]||0)+(effBon[ab]||0)+getManualAbilityMod(ab)+(spellAbilityBon['ab_'+ab]||0)+(equippedItemBon['ab_'+ab]||0)+(sigilAttuneBon['ab_'+ab]||0);
     const svBonus=(setStatBon['sv_'+ab]||0)+(spellAbilityBon['sv_'+ab]||0)+(equippedItemBon['sv_'+ab]||0);
     const total=getMod(ab)+(isProficient?prof:0)+abBonus+svBonus;
     el.textContent=fmtMod(total);
@@ -16237,7 +16240,7 @@ function updateCalcs(){
     const base=getMod(sk.ab);
     const isPr=(document.getElementById('sp_'+skId)||{}).checked;
     const isEx=(document.getElementById('se_'+skId)||{}).checked;
-    const abBonus=(setStatBon['ab_'+sk.ab]||0)+(effBon[sk.ab]||0)+getManualAbilityMod(sk.ab)+(spellAbilityBon['ab_'+sk.ab]||0)+(equippedItemBon['ab_'+sk.ab]||0);
+    const abBonus=(setStatBon['ab_'+sk.ab]||0)+(effBon[sk.ab]||0)+getManualAbilityMod(sk.ab)+(spellAbilityBon['ab_'+sk.ab]||0)+(equippedItemBon['ab_'+sk.ab]||0)+(sigilAttuneBon['ab_'+sk.ab]||0);
     const skBonus=(setStatBon['sk_'+sk.name]||0)+(spellAbilityBon['sk_'+sk.name]||0)+(equippedItemBon['sk_'+sk.name]||0);
     const total=base+(isPr?prof:0)+(isEx?prof:0)+abBonus+skBonus;
     totEl.textContent=fmtMod(total);
@@ -16248,7 +16251,7 @@ function updateCalcs(){
   const percEl=document.getElementById('sp_Perception');
   const percProf=percEl&&percEl.checked;
   const percExp=(document.getElementById('se_Perception')||{}).checked;
-  const passPercSetBonus=(setStatBon['ab_WIS']||0)+(setStatBon['sk_Perception']||0)+(effBon['WIS']||0)+getManualAbilityMod('WIS')+(spellAbilityBon['ab_WIS']||0)+(equippedItemBon['ab_WIS']||0)+(spellAbilityBon['sk_Perception']||0)+(equippedItemBon['sk_Perception']||0);
+  const passPercSetBonus=(setStatBon['ab_WIS']||0)+(setStatBon['sk_Perception']||0)+(effBon['WIS']||0)+getManualAbilityMod('WIS')+(spellAbilityBon['ab_WIS']||0)+(equippedItemBon['ab_WIS']||0)+(spellAbilityBon['sk_Perception']||0)+(equippedItemBon['sk_Perception']||0)+(sigilAttuneBon['ab_WIS']||0);
   const passPerc=10+getMod('WIS')+(percProf?prof:0)+(percExp?prof:0)+passPercSetBonus;
   document.getElementById('passPerc').textContent=passPerc;
   // Combat effect bonus bar (ex_atk, ex_dmg, ex_init, ex_ac from spells/abilities)
@@ -19673,6 +19676,143 @@ function _buildAttunementRow(){
   return h;
 }
 
+// ── SIGIL ATTUNEMENT CHARTS ─────────────────────────────────────────────
+// Abilities gained when a player attunes to a Sigil (state.attunedSigils).
+// Not tied to any class — any attuned character gets these. "Water" chart
+// not yet supplied; _buildSigilAttunementChart() shows a placeholder for it.
+// A character with ANY sigil attuned also gets a flat, non-stacking
+// Attunement Bonus (STR+2/DEX+2/CON+2/WIS+1/CHA+1) — see
+// getSigilAttunementBonuses(), wired into updateCalcs().
+const SIGIL_ATTUNEMENT_CHARTS = {
+  air: {
+    title:'Air Sigil — Attunement Chart', col:'#90c8f8',
+    dragoon:{name:'Dragoon of the Wind', text:'The air sigil answers those who move with freedom and strike with unbound purpose. Let not your heart be tethered. Let the wind be your spear.'},
+    tiers:[
+      {n:1,name:'Windcutter Stance', desc:'Assume the stance of the storm. Increases movement speed and enhances your lance techniques.', potency:'Low', duration:'10s', rc:1},
+      {n:2,name:'Thunderspin', desc:'Spin your lance to summon a raging cyclone that pulls enemies inward and lifts them.', potency:'Medium', range:'30 ft', rc:3},
+      {n:3,name:'Skystalker', desc:'A high-speed forward thrust that cleaves through enemies and rides the wind.', potency:'High', range:'25 ft', rc:4},
+      {n:4,name:'Rising Gust', desc:'Charge forward in a burst of wind, launching enemies into the air and knocking them back.', potency:'High', range:'20 ft', rc:4},
+      {n:5,name:'Eye of the Storm', desc:'Envelop yourself in roaring winds, increasing your speed and granting allies swiftness and evasion.', potency:'Medium', duration:'15s', rc:5},
+      {n:6,name:'Gale Impact', desc:'Leap high and crash down with hurricane force, creating a blast of razor wind.', potency:'High', area:'15 ft radius', rc:6},
+      {n:7,name:'Skyrend Lance', desc:'Hurl a condensed spear of compressed air. Pierces all enemies in its path and ruptures defenses.', potency:'High', range:'60 ft', rc:7},
+      {n:8,name:'Tempest Sovereign', desc:'Manifest the will of the storm. Summon a spectral air dragon that tears through your foes.', potency:'Very High', duration:'20s', rc:8},
+    ]
+  },
+  chaos: {
+    title:'Chaos Sigil — Attunement Chart', col:'#9d55ff',
+    dragoon:{name:'Dragoon of Chaos', text:'The chaos sigil answers those who walk the edge of madness and wield disorder as a weapon. Let not your mind be shackled. Let chaos be your truth.'},
+    tiers:[
+      {n:1,name:'Unstable Stance', desc:'Assume the stance of chaos. Increases movement speed and randomly empowers your techniques.', potency:'Low', duration:'10s', rc:1},
+      {n:2,name:'Chaotic Whirlwind', desc:'Spin your lance to summon a maelstrom of chaos that pulls enemies inward and warps them.', potency:'Medium', range:'30 ft', rc:3},
+      {n:3,name:'Reality Cleaver', desc:'A violent thrust that cleaves through defenses and twists reality, causing unpredictable aftereffects.', potency:'High', range:'25 ft', rc:4},
+      {n:4,name:'Devastating Rush', desc:'Charge forward, warping space and time. Enemies hit suffer a surge of chaotic distortion.', potency:'High', range:'20 ft', rc:4},
+      {n:5,name:'Maelstrom Form', desc:'Envelop yourself in chaos, becoming a maelstrom of entropy. Allies and enemies alike are unpredictable in your presence.', potency:'Medium', duration:'15s', rc:5},
+      {n:6,name:'Unraveling Impact', desc:'Slam your lance down, shattering the fabric of reality. Enemies are pulled, fragmented, and left unmade.', potency:'High', area:'15 ft radius', rc:6},
+      {n:7,name:'Riftpierce Lance', desc:'Hurl a lance that tears a rift in reality. Pierces all enemies in its path and distorts their fate.', potency:'High', range:'60 ft', rc:7},
+      {n:8,name:'Cataclysm Sovereign', desc:'Manifest the will of chaos. Summon a primordial chaos dragon that warps reality itself.', potency:'Very High', duration:'20s', rc:8},
+    ]
+  },
+  fire: {
+    title:'Fire Sigil — Attunement Chart', col:'#ff5028',
+    dragoon:{name:'Dragoon of the Flame', text:'The fire sigil answers those who move with fury and fight with unwavering resolve. Let not your heart be cold. Let the flame be your spear.'},
+    tiers:[
+      {n:1,name:'Blazing Stance', desc:'Assume the stance of the inferno. Increases movement speed and empowers your fire techniques.', potency:'Low', duration:'10s', rc:1},
+      {n:2,name:'Ignition Thrust', desc:'Spin your lance to summon a whirling vortex of flame that pulls enemies inward and burns them.', potency:'Medium', range:'30 ft', rc:3},
+      {n:3,name:'Emberbreaker', desc:'A brutal forward thrust that cleaves through flame and armor alike.', potency:'High', range:'25 ft', rc:4},
+      {n:4,name:'Scorching Rush', desc:'Charge forward in a burst of flame, engulfing enemies in your path and leaving only ash.', potency:'High', range:'20 ft', rc:4},
+      {n:5,name:'Living Ember', desc:'Envelop yourself in living flame, burning allies and granting them renewed vigor.', potency:'Medium', duration:'15s', rc:5},
+      {n:6,name:'Molten Impact', desc:'Leap high and slam into the ground, causing an eruption of magma and flame.', potency:'High', area:'15 ft radius', rc:6},
+      {n:7,name:'Dragonfire Lance', desc:'Hurl a condensed spear of draconic fire. Pierces all enemies in its path and ignites the wounded.', potency:'High', range:'60 ft', rc:7},
+      {n:8,name:'Infernal Sovereign', desc:'Manifest the will of the fire. Summon a spectral flame dragon that rains devastation upon your foes.', potency:'Very High', duration:'20s', rc:8},
+    ]
+  },
+  light: {
+    title:'Light Sigil — Attunement Chart', col:'#b478ff',
+    dragoon:{name:'Dragoon of the Light', text:'The light sigil answers those who fight with honor and uplift with their presence. Let not your heart grow dim. Let the light be your guide.'},
+    tiers:[
+      {n:1,name:'Radiant Stance', desc:'Assume the stance of the light. Increases movement speed and enhances your lance techniques.', potency:'Low', duration:'10s', rc:1},
+      {n:2,name:'Lucent Whirlwind', desc:'Spin your lance to summon a whirling vortex of light that pulls enemies inward and blinds them.', potency:'Medium', range:'30 ft', rc:3},
+      {n:3,name:'Celestial Lance', desc:'A blindingly fast thrust that pierces through armor and leaves a trail of holy light.', potency:'High', range:'25 ft', rc:4},
+      {n:4,name:'Purifying Rush', desc:'Charge forward in a burst of light, damaging enemies and cleansing allies in your path.', potency:'High', range:'20 ft', rc:4},
+      {n:5,name:'Beacon of Grace', desc:'Envelop yourself in healing radiance, cleansing allies and fortifying them with light.', potency:'Medium', duration:'15s', rc:5},
+      {n:6,name:'Dawnbreak Impact', desc:'Slam your lance into the ground, erupting blinding light that stuns and cleanses allies.', potency:'High', area:'15 ft radius', rc:6},
+      {n:7,name:'Luminex Lance', desc:'Hurl a lance of pure radiance. Pierces all enemies in its path and brands them with searing light.', potency:'High', range:'60 ft', rc:7},
+      {n:8,name:'Solar Sovereign', desc:'Manifest the will of the sun. Summon a spectral light dragon that blinds foes and purifies allies.', potency:'Very High', duration:'20s', rc:8},
+    ]
+  },
+  nature: {
+    title:'Nature Sigil — Attunement Chart', col:'#40c060',
+    dragoon:{name:'Dragoon of the Wild', text:'The nature sigil answers those who fight with harmony and nurture life with purpose. Let not your heart be hardened. Let the wild be your strength.'},
+    tiers:[
+      {n:1,name:'Wildforged Stance', desc:'Assume the stance of the wild. Increases movement speed and grants resistance to interrupts.', potency:'Low', duration:'10s', rc:1},
+      {n:2,name:'Vinewhirl Thrust', desc:'Spin your lance to summon a whirling maelstrom of vines that pulls enemies inward and binds them.', potency:'Medium', range:'30 ft', rc:3},
+      {n:3,name:'Leafrender', desc:'A blindingly fast thrust that tears through foes with razor leaves and natural fury.', potency:'High', range:'25 ft', rc:4},
+      {n:4,name:'Galestrike', desc:'Charge forward on a surge of wind and vines, knocking enemies back and leaving behind razor leaves.', potency:'High', range:'20 ft', rc:4},
+      {n:5,name:'Lifebloom Aegis', desc:'Envelop yourself in life energy, healing allies and granting them renewed vigor.', potency:'Medium', duration:'15s', rc:5},
+      {n:6,name:'Rooted Impact', desc:'Slam the earth with primordial force, causing roots to erupt and entangle enemies.', potency:'High', area:'15 ft radius', rc:6},
+      {n:7,name:'Thornbreak Lance', desc:'Hurl a lance of thorned vines. Pierces all enemies in its path and impales them to the earth.', potency:'High', range:'60 ft', rc:7},
+      {n:8,name:'Verdant Sovereign', desc:'Manifest the will of the wild. Summon a spectral nature dragon that shields allies and crushes your foes.', potency:'Very High', duration:'20s', rc:8},
+    ]
+  },
+  water: null, // not yet supplied — placeholder shown by _buildSigilAttunementChart
+};
+
+function _buildSigilAttunementChart(key){
+  const chart = SIGIL_ATTUNEMENT_CHARTS[key];
+  if(!chart){
+    return `<div class="racial-skills-empty">The ${key.charAt(0).toUpperCase()+key.slice(1)} Sigil's Attunement Chart hasn't been added yet.</div>`;
+  }
+  let h = `<div style="margin:14px 0 10px;padding-bottom:6px;border-bottom:1px solid ${_hexToRgba(chart.col,0.35)};">
+    <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:${chart.col};text-transform:uppercase;">${chart.title}</span>
+  </div>`;
+  chart.tiers.forEach(function(t){
+    const statParts = [];
+    if(t.range) statParts.push('Range '+t.range);
+    if(t.area) statParts.push('Area '+t.area);
+    if(t.duration) statParts.push('Duration '+t.duration);
+    h += `
+    <div style="background:var(--surf);border:1px solid ${_hexToRgba(chart.col,0.3)};border-left:3px solid ${chart.col};border-radius:5px;padding:11px 13px;margin-bottom:8px;">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;flex-wrap:wrap;">
+        <span style="font-family:'Cinzel',serif;font-size:8px;color:${chart.col};padding:1px 6px;background:${_hexToRgba(chart.col,0.12)};border:1px solid ${chart.col};border-radius:3px;">TIER ${t.n}</span>
+        <span style="font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:1px;color:var(--txt);flex:1;">${t.name}</span>
+        <span style="font-family:'Cinzel',serif;font-size:7px;color:var(--txt-dim);padding:1px 6px;background:var(--surf2);border:1px solid var(--bdr);border-radius:3px;">Potency: ${t.potency}</span>
+        <span style="font-family:'Cinzel',serif;font-size:8px;color:var(--res);padding:1px 7px;background:rgba(61,214,219,.08);border:1px solid rgba(61,214,219,.3);border-radius:3px;">RC ${t.rc}</span>
+      </div>
+      <div style="font-family:'EB Garamond',serif;font-size:13px;color:var(--txt-lbl);line-height:1.55;">${t.desc}</div>
+      ${statParts.length ? `<div style="font-family:'EB Garamond',serif;font-size:11px;font-style:italic;color:var(--txt-dim);margin-top:5px;">${statParts.join(' · ')}</div>` : ''}
+      <div class="sig-cast-row" style="margin-top:8px;padding-top:8px;">
+        <span class="sig-cast-rc-lbl">Costs ${t.rc} RC</span>
+        <button type="button" class="sig-cast-btn" onclick="castSigilByRC(${t.rc},0,'${t.name.replace(/'/g,"\\'")}','${key}',null)">⟳ Cast</button>
+      </div>
+    </div>`;
+  });
+  h += `<div style="margin-top:6px;padding:10px 13px;background:${_hexToRgba(chart.col,0.06)};border:1px solid ${_hexToRgba(chart.col,0.2)};border-radius:5px;font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-lbl);line-height:1.6;">
+    <span style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:${chart.col};text-transform:uppercase;font-style:normal;display:block;margin-bottom:4px;">${chart.dragoon.name}</span>
+    ${chart.dragoon.text}
+  </div>`;
+  return h;
+}
+
+// Renders every currently-attuned Sigil's Attunement Chart, for embedding
+// right after _buildAttunementRow() wherever that's shown.
+function _buildAllAttunedCharts(){
+  const active = _getAttunedSigils();
+  if(!active.length) return '';
+  let h = '';
+  active.forEach(function(key){ h += _buildSigilAttunementChart(key); });
+  return h;
+}
+
+// Flat, non-stacking ability score bonus granted by having ANY Sigil
+// attuned (state.attunedSigils.length > 0) — attuning to multiple Sigils
+// does not stack this bonus. Keys match the 'ab_STR' etc. convention used
+// by getSpellAbilityEffectBonuses/getEquippedItemEffectBonuses/
+// getActiveSetStatBonuses so it threads through updateCalcs() the same way.
+function getSigilAttunementBonuses(){
+  if(!_getAttunedSigils().length) return {};
+  return { ab_STR:2, ab_DEX:2, ab_CON:2, ab_WIS:1, ab_CHA:1 };
+}
+
 function buildClassSigilDisplay(){
   const cls = document.getElementById('charClass').value;
   const level = parseInt(document.getElementById('charLevel').value)||1;
@@ -19690,7 +19830,7 @@ function buildClassSigilDisplay(){
 
   // ── SIGIL ATTUNEMENT — for all classes ────────────────────────────────────
   // (For isOriginBased classes this is embedded in the Sigil Origin box below)
-  if(!cs.isOriginBased){ html += _buildAttunementRow(); }
+  if(!cs.isOriginBased){ html += _buildAttunementRow() + _buildAllAttunedCharts(); }
 
   // ── SIGIL-ADAPTATION (all classes except Sigil-Touched) ───────────────────────
   const freeAll = (!cs.isOriginBased && state.sigilAdaptation === 'Non Elemental');
@@ -19768,6 +19908,7 @@ function buildClassSigilDisplay(){
       }
     }
     html += `</div>`;
+    html += _buildAllAttunedCharts();
     if(origin && SIGIL_COMPENDIUM[origin]){
       SIGIL_COMPENDIUM[origin].forEach(sig => { html += buildSigilRefCard(sig, true, false); });
     } else if(!origin){
