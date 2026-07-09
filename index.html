@@ -15198,6 +15198,8 @@ function ensureStateDefaults(){
   if(state.initMod===undefined) state.initMod=0;
   if(!state.pcConditions || typeof state.pcConditions !== 'object') state.pcConditions = {};
   if(!state.pcCondDmg    || typeof state.pcCondDmg    !== 'object') state.pcCondDmg    = {};
+  if(!state.dragoonStatus || typeof state.dragoonStatus !== 'object') state.dragoonStatus = {};
+  if(!state.dragoonGauge  || typeof state.dragoonGauge  !== 'object') state.dragoonGauge  = {};
   if(!state.combatInitEntries || !Array.isArray(state.combatInitEntries)) state.combatInitEntries = [];
   if(state.combatRound    === undefined) state.combatRound    = 0;
   if(state.combatTurnIdx  === undefined) state.combatTurnIdx  = -1;
@@ -19818,7 +19820,7 @@ function _buildAllAttunedCharts(){
   const active = _getAttunedSigils();
   if(!active.length) return '';
   let h = '';
-  active.forEach(function(key){ h += _buildSigilAttunementChart(key); });
+  active.forEach(function(key){ h += _buildSigilAttunementChart(key) + _buildDragoonSection(key); });
   return h;
 }
 
@@ -19832,6 +19834,264 @@ function getSigilAttunementBonuses(){
   return { ab_STR:2, ab_DEX:2, ab_CON:2, ab_WIS:1, ab_CHA:1 };
 }
 
+// ── DRAGOON SYSTEM ───────────────────────────────────────────────────────
+// Separate from mere Sigil Attunement (see SIGIL_ATTUNEMENT_CHARTS above).
+// Per user ruling: "The Dragoon is not a class but an enhancement bestowed
+// upon capable warriors that have tamed the correct elemental type of
+// Dragon." So it requires a manual toggle (state.dragoonStatus[key]) —
+// only offered once that Sigil is attuned — rather than unlocking
+// automatically. Each element also gets its own spendable Gauge
+// (state.dragoonGauge[key], manual pip tracker like Instability/Exhaustion,
+// since the sheet has no way to auto-detect "successful jumps" in play).
+// Per user ruling, using the 9 Unique Dragoon Abilities as a chained combo
+// additionally requires the character to have enough Multi-Attacks left
+// this turn AND enough Resonance (RC) to cover each ability's normal
+// casting cost — that's a play-time rule enforced by the player/GM, not
+// something this sheet can auto-check, so it's called out as a note.
+const SIGIL_DRAGOON_CHARTS = {
+  air: {
+    title:'Air Sigil Attunement Chart', path:'Path of the Azure Dragoon', col:'#90c8f8',
+    quote:'"The wind remembers all things, so does the spear remember you."',
+    desc:'Harness the untamed power of air to become an unstoppable force upon the battlefield. Swift. Precise. Relentless. Ascend.',
+    benefits:['Enhanced Mobility & Agility','High-Speed Lancer Combos','Evade, Disengage & Reposition','Critical Hit & Evasion Boosts','Adaptable in Any Terrain'],
+    gaugeName:'Azure Gauge', gaugeMax:6,
+    tiers:[
+      {n:'I',   name:'Gust Initiate',        desc:'Your movements become the wind. Swiftness and grace are awakened.'},
+      {n:'II',  name:'Sky Lancer',           desc:'Ride the updraft. Your thrusts become razors in the gale.'},
+      {n:'III', name:'Tempest Dragoon',      desc:'Power rises with the storm. You become the squall.'},
+      {n:'IV',  name:'Aerial Spear',         desc:'Break the bounds of earth. Strike from above, unseen.'},
+      {n:'V — Ascendant', name:'Warden of the Storm', desc:'You and the wind are one. Nothing can anchor you.'},
+    ],
+    abilities:[
+      {name:'Gale Thrust',      desc:'A lightning-fast lunge that pierces through enemies with razor wind.', cost:1},
+      {name:'Wind Shear',       desc:'A wide slash of compressed air that cuts forward, pushing enemies back.', cost:2},
+      {name:'Spinning Gust',    desc:'Twirl your lance to create a whirling gust, pulling enemies in and launching them up.', cost:2},
+      {name:'Skyward Ascent',   desc:'Launch high into the air with a burst of wind, becoming untouchable.', cost:2},
+      {name:'Hurricane Impale', desc:'Impale the target with a lance charged by hurricane winds, dealing severe damage.', cost:3},
+      {name:'Cyclone Veil',     desc:'Surround yourself in a protective cyclone, increasing evasion and reducing incoming damage.', cost:3},
+      {name:'Eye of the Storm', desc:'Create a focused vortex that sucks in enemies and blasts them with cutting winds.', cost:3},
+      {name:'Sky Splitter',     desc:'Rain down a barrage of lances from above, each strike carried by slicing wind.', cost:4},
+      {name:'Storm Dragoon',    desc:'Transform into a tempest, moving like lightning and striking with the fury of the storm.', cost:5, ultimate:true},
+    ]
+  },
+  chaos: {
+    title:'Chaos Sigil Attunement Chart', path:'Path of the Umbral Dragoon', col:'#9d55ff',
+    quote:'"In chaos is freedom, in freedom is power, and in power, all paths are yours to break."',
+    desc:'Harness the boundless force of chaos to become an unpredictable storm upon the battlefield. Break. Corrupt. Overwhelm. Evolve.',
+    benefits:['Unpredictable Damage & Effects','High-Speed Lancer Combos','Debuff & Disruption Mastery','Enemy Control & Chaos Spread','Adaptable in Any Terrain'],
+    gaugeName:'Umbral Gauge', gaugeMax:6,
+    tiers:[
+      {n:'I',   name:'Void Initiate',        desc:'Chaos stirs within you. Instincts awaken. Order bends.'},
+      {n:'II',  name:'Rupture Lancer',       desc:'Tear through reality. Your thrusts inflict chaos and unbalance.'},
+      {n:'III', name:'Dark Abyss Dragoon',   desc:'Power from the void corrupts your enemies and empowers you.'},
+      {n:'IV',  name:'Chaotic Spear',        desc:'Your lance becomes a conduit for raw, untamed chaos.'},
+      {n:'V — Ascendant', name:'Harbinger of Chaos', desc:'You transcend all order. You are the collapse of fate.'},
+    ],
+    abilities:[
+      {name:'Void Lunge',      desc:'A jagged lunge that distorts space, striking and teleporting past the enemy.', cost:1},
+      {name:'Shadow Break',    desc:'A ferocious slash that shatters guards and spreads chaos, reducing defenses.', cost:2},
+      {name:'Chaos Spiral',    desc:'Spin your lance to summon a spiraling void that pulls in and damages enemies.', cost:2},
+      {name:'Umbral Ascent',   desc:'Launch into the void, becoming untargetable briefly and leaving chaos in your wake.', cost:2},
+      {name:'Rupture Impale',  desc:'Impale the target with a lance of chaos, causing a lingering rupture that spreads.', cost:3},
+      {name:'Reality Tear',    desc:'Open a tear in reality that explodes after a short delay, distorting nearby foes.', cost:3},
+      {name:'Chaos Call',      desc:'Summon chaotic phantoms that assault enemies, inflicting random debuffs and mayhem.', cost:3},
+      {name:'Maelstrom Deluge',desc:'Rain down spears of chaos from all directions, overwhelming the battlefield.', cost:4},
+      {name:'Apocalypse Dragoon', desc:'Transform into an avatar of chaos, unleashing catastrophic force that defies all control.', cost:5, ultimate:true},
+    ]
+  },
+  fire: {
+    title:'Fire Sigil Attunement Chart', path:'Path of the Ruby Dragoon', col:'#ff5028',
+    quote:'"As flame consumes all in its path, so does the spear forge destiny."',
+    desc:'Harness the searing power of fire to become an unstoppable inferno upon the battlefield. Burn. Pierce. Scorch. Conquer.',
+    benefits:['Enhanced Damage & Burst','High-Speed Lancer Combos','Damage Over Time (Burn)','Area of Effect & Cleave','Adaptable in Any Terrain'],
+    gaugeName:'Ember Gauge', gaugeMax:6,
+    tiers:[
+      {n:'I',   name:'Flame Initiate',   desc:'Your lance ignites with embers. Power and ferocity are awakened.'},
+      {n:'II',  name:'Ignition Lancer',  desc:'Sear the earth. Your thrusts ignite enemies with flame.'},
+      {n:'III', name:'Molten Dragoon',   desc:'Unleash burning fury. Enemies are scorched.'},
+      {n:'IV',  name:'Inferno Spear',    desc:'Your spear becomes a blazing comet of destruction.'},
+      {n:'V — Ascendant', name:'Ruby Inferno', desc:'You become the fire. All before you turns to ash.'},
+    ],
+    abilities:[
+      {name:'Infernal Thrust',  desc:'A piercing lunge wreathed in fire, dealing heavy damage and igniting the target.', cost:1},
+      {name:'Flame Breaker',    desc:'A sweeping slash that cleaves enemies in front and leaves a trail of burning embers.', cost:2},
+      {name:'Blazing Cyclone',  desc:'Spin your lance to summon a whirling vortex of fire that damages enemies over time.', cost:2},
+      {name:'Pyre Ascent',      desc:'Launch high into the air surrounded by flame, then descend in a fiery strike.', cost:2},
+      {name:'Ember Impale',     desc:'Impale the target with a lance wreathed in flame, detonating in an explosive burst.', cost:3},
+      {name:'Living Inferno',   desc:'Surround yourself in flames, immobilizing enemies and burning them relentlessly.', cost:3},
+      {name:"Phoenix's Call",   desc:'Summon a phoenix of fire to scorch enemies and empower allies with burning might.', cost:3},
+      {name:'Meteoric Deluge',  desc:'Rain down fiery lances from the sky, incinerating the battlefield.', cost:4},
+      {name:'Inferno Dragoon',  desc:'Transform into a living inferno and unleash catastrophic flame upon all who oppose you.', cost:5, ultimate:true},
+    ]
+  },
+  nature: {
+    title:'Nature Sigil Attunement Chart', path:'Path of the Verdant Dragoon', col:'#40c060',
+    quote:'"As the roots run deep and the leaves reach high, so does the spear thrive with life."',
+    desc:'Harness the vital power of nature to become an unstoppable bulwark upon the battlefield. Grow. Endure. Thrive. Protect.',
+    benefits:['Enhanced Healing & Regeneration','High-Speed Lancer Combos','Crowd Control & Entanglement','Damage Mitigation & Fortitude','Adaptable in Any Terrain'],
+    gaugeName:'Verdant Gauge', gaugeMax:6,
+    tiers:[
+      {n:'I',   name:'Sprout Initiate',   desc:'Your lance blossoms with life. Vitality and instinct are awakened.'},
+      {n:'II',  name:'Vine Lancer',       desc:'Whip forth vines. Your thrusts root and restrain your foes.'},
+      {n:'III', name:'Rootbound Dragoon', desc:'You anchor like the earth. Enemies cannot move you.'},
+      {n:'IV',  name:'Verdant Spear',     desc:"Nature's power flows through you. You heal, you endure, you rise."},
+      {n:'V — Ascendant', name:"Gaia's Champion", desc:"You are nature's will made flesh. The land fights alongside you."},
+    ],
+    abilities:[
+      {name:'Verdant Thrust',    desc:'A lunging thrust that erupts with leaves, dealing damage and restoring vitality.', cost:1},
+      {name:'Leaf Breaker',      desc:'A sweeping slash of razor leaves that shreds enemies and inflicts bleeding over time.', cost:2},
+      {name:'Entangling Vortex', desc:'Spin your lance to summon a vortex of vines that pulls in and binds enemies.', cost:2},
+      {name:"Nature's Ascent",   desc:'Launch high into the air with a burst of life, restoring health and empowering allies.', cost:2},
+      {name:'Thornbark Impale',  desc:'Impale the target with a lance overgrown with thorns, causing heavy damage and rooting.', cost:3},
+      {name:'Sanctuary Grove',   desc:'Create a grove that heals allies within and grants damage reduction over time.', cost:3},
+      {name:'Spirit of the Wild',desc:'Summon nature spirits to assault enemies, poisoning and weakening them.', cost:3},
+      {name:'Verdant Deluge',    desc:'Call down a rain of seeds that burst into vines, healing allies and harming foes.', cost:4},
+      {name:'Gaia Dragoon',      desc:"Transform into an avatar of Gaia, unleashing nature's wrath and unbreakable protection.", cost:5, ultimate:true},
+    ]
+  },
+  water: {
+    title:'Water Sigil Attunement Chart', path:'Path of the Azure Dragoon', col:'#288cff',
+    quote:'"As the tide obeys the moon, so does the spear obey the will."',
+    desc:'Harness the fluid power of water to become an unstoppable wave upon the battlefield. Flow. Pierce. Surge. Conquer.',
+    benefits:['Enhanced Mobility & Flow','High-Speed Lancer Combos','Healing Through Momentum','Crowd Control & Displacement','Adaptable in Any Terrain'],
+    gaugeName:'Azure Gauge', gaugeMax:6,
+    tiers:[
+      {n:'I',   name:'Riptide Initiate', desc:'Your lance moves like flowing water. Speed and precision are awakened.'},
+      {n:'II',  name:'Tidal Lancer',     desc:'Ride the current. Your thrusts become waves that crash.'},
+      {n:'III', name:'Abyssal Dragoon',  desc:'Power rises from the deep. You become the storm.'},
+      {n:'IV',  name:'Maelstrom Spear',  desc:"Unleash the ocean's fury. Nothing can stand before you."},
+      {n:'V — Ascendant', name:'Azure Typhoon', desc:'You and the sea become one. A legend carved in waves.'},
+    ],
+    abilities:[
+      {name:'Tidal Thrust',      desc:'A piercing lunge that surges forward, dealing water damage.', cost:1},
+      {name:'Wave Breaker',      desc:'A sweeping horizontal slash that knocks enemies back with a crashing wave.', cost:2},
+      {name:'Spinning Current',  desc:'Twirl your lance to create a whirlpool that pulls enemies in and damages over time.', cost:2},
+      {name:"Leviathan's Ascent",desc:'Launch high into the air with a geyser of water, ignoring knockback.', cost:2},
+      {name:'Coral Impale',      desc:'Impale the target with a lance of condensed water, stunning them briefly.', cost:3},
+      {name:'Tidal Veil',        desc:'Surround yourself in a dome of water, reducing damage and cleansing ailments.', cost:3},
+      {name:"Ocean's Call",      desc:'Summon spectral waves that pursue enemies and burst on impact.', cost:3},
+      {name:'Azure Deluge',      desc:'Rain down a torrent of lances from above, obliterating the battlefield.', cost:4},
+      {name:'Typhoon Dragoon',   desc:'Transform into a vortex of water and become untouchable while delivering relentless strikes.', cost:5, ultimate:true},
+    ]
+  },
+  light: null, // not yet supplied — placeholder shown by _buildDragoonSection
+};
+
+function toggleDragoonStatus(key){
+  if(!state.dragoonStatus) state.dragoonStatus = {};
+  state.dragoonStatus[key] = !state.dragoonStatus[key];
+  if(!state.dragoonStatus[key]){
+    // Losing Dragoon status clears its banked Gauge too — nothing to spend it on.
+    if(state.dragoonGauge) delete state.dragoonGauge[key];
+  } else if(!state.dragoonGauge){
+    state.dragoonGauge = {};
+  }
+  _debouncedSave();
+  buildClassSigilDisplay();
+}
+
+// Same click pattern as Exhaustion pips: clicking the current filled pip
+// clears back down by one; clicking further out fills up to that pip.
+function setDragoonGauge(key, val){
+  if(!state.dragoonGauge) state.dragoonGauge = {};
+  const cur = state.dragoonGauge[key] || 0;
+  state.dragoonGauge[key] = (cur === val ? val - 1 : val);
+  _debouncedSave();
+  buildClassSigilDisplay();
+}
+
+function useDragoonAbility(key, cost, name){
+  const cur = (state.dragoonGauge && state.dragoonGauge[key]) || 0;
+  if(cur < cost){
+    showToast(`Not enough Gauge for ${name} — need ${cost}, have ${cur}.`);
+    return;
+  }
+  state.dragoonGauge[key] = cur - cost;
+  _debouncedSave();
+  buildClassSigilDisplay();
+  showToast(`${name} — Gauge spent (${cost}). Remember: chaining this combo also needs enough Multi-Attacks left this turn and enough Resonance to cast each ability.`);
+}
+
+function _buildDragoonSection(key){
+  const chart = SIGIL_DRAGOON_CHARTS[key];
+  const dragoonOn = !!(state.dragoonStatus && state.dragoonStatus[key]);
+  const col = chart ? chart.col : '#c9a227';
+
+  let h = `<div style="margin-top:10px;padding:9px 12px;background:${_hexToRgba(col,0.06)};border:1px solid ${_hexToRgba(col,0.25)};border-radius:5px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+    <span style="font-family:'EB Garamond',serif;font-size:11.5px;font-style:italic;color:var(--txt-dim);">Has this character tamed the ${key.charAt(0).toUpperCase()+key.slice(1)} Dragon and earned Dragoon status?</span>
+    <button type="button" onclick="toggleDragoonStatus('${key}')" style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:4px;cursor:pointer;background:${dragoonOn?_hexToRgba(col,0.18):'var(--surf2)'};border:1px solid ${dragoonOn?col:'var(--bdr)'};color:${dragoonOn?col:'var(--txt-dim)'};">${dragoonOn?'⚔ Dragoon Active':'Become a Dragoon'}</button>
+  </div>`;
+
+  if(!dragoonOn) return h;
+
+  if(!chart){
+    h += `<div class="racial-skills-empty" style="margin-top:8px;">The ${key.charAt(0).toUpperCase()+key.slice(1)} Sigil's Dragoon chart hasn't been added yet.</div>`;
+    return h;
+  }
+
+  const gauge = (state.dragoonGauge && state.dragoonGauge[key]) || 0;
+
+  h += `<div style="margin:12px 0 10px;padding-bottom:6px;border-bottom:1px solid ${_hexToRgba(col,0.35)};">
+    <span style="font-family:'Cinzel',serif;font-size:9px;letter-spacing:2px;color:${col};text-transform:uppercase;">${chart.title}</span><br>
+    <span style="font-family:'Cinzel',serif;font-size:8px;letter-spacing:1.5px;color:var(--gold);text-transform:uppercase;">${chart.path}</span>
+  </div>`;
+  h += `<div style="font-family:'EB Garamond',serif;font-size:12px;font-style:italic;color:var(--txt-dim);margin-bottom:8px;">${chart.quote}</div>`;
+  h += `<div style="font-family:'EB Garamond',serif;font-size:12.5px;color:var(--txt-lbl);line-height:1.55;margin-bottom:10px;">${chart.desc}</div>`;
+
+  h += `<div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:9px 12px;margin-bottom:10px;">
+    <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;color:var(--gold-d);text-transform:uppercase;margin-bottom:5px;">Sigil Benefits</div>
+    ${chart.benefits.map(function(b){ return `<div style="font-family:'EB Garamond',serif;font-size:11.5px;color:var(--txt-lbl);line-height:1.6;">• ${b}</div>`; }).join('')}
+  </div>`;
+
+  // Gauge tracker — same click-to-set pip pattern as Exhaustion pips.
+  h += `<div style="background:var(--surf2);border:1px solid var(--bdr);border-radius:5px;padding:9px 12px;margin-bottom:12px;">
+    <div style="font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;color:${col};text-transform:uppercase;margin-bottom:6px;">${chart.gaugeName} — ${gauge}/${chart.gaugeMax}</div>
+    <div style="display:flex;gap:5px;">`;
+  for(let i=1;i<=chart.gaugeMax;i++){
+    const on = gauge >= i;
+    h += `<div onclick="setDragoonGauge('${key}',${i})" style="width:22px;height:22px;border-radius:4px;cursor:pointer;border:1px solid ${on?col:'var(--bdr)'};background:${on?_hexToRgba(col,0.4):'var(--surf)'};"></div>`;
+  }
+  h += `</div>
+    <div style="font-family:'EB Garamond',serif;font-size:10.5px;font-style:italic;color:var(--txt-dim);margin-top:6px;">Build Gauge through attacks and successful jumps in play — click a pip to set it. Spend Gauge below to unleash powerful ${key.charAt(0).toUpperCase()+key.slice(1)} Dragoon Abilities.</div>
+  </div>`;
+
+  // Tier ladder — reference/flavor progression, not individually unlocked.
+  h += `<div style="margin-bottom:6px;font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;color:var(--gold-d);text-transform:uppercase;">Tier Progression</div>`;
+  chart.tiers.forEach(function(t){
+    h += `<div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:7px;">
+      <div style="flex-shrink:0;width:28px;text-align:center;font-family:'Cinzel',serif;font-size:8px;color:${col};border:1px solid ${col};border-radius:4px;padding:3px 0;">${t.n}</div>
+      <div>
+        <span style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;color:var(--txt);">${t.name}</span>
+        <div style="font-family:'EB Garamond',serif;font-size:11.5px;font-style:italic;color:var(--txt-dim);line-height:1.5;">${t.desc}</div>
+      </div>
+    </div>`;
+  });
+
+  // Unique Dragoon Abilities — spend Gauge, per the note above these also
+  // require enough Multi-Attacks + Resonance to chain as an actual combo.
+  h += `<div style="margin:12px 0 6px;font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;color:var(--gold-d);text-transform:uppercase;">Unique Dragoon Abilities</div>
+  <div style="font-family:'EB Garamond',serif;font-size:10.5px;font-style:italic;color:var(--txt-dim);margin-bottom:8px;">Chaining these as a combo also requires enough Multi-Attacks left this turn and enough Resonance to cast each ability normally.</div>`;
+  chart.abilities.forEach(function(a){
+    const can = gauge >= a.cost;
+    h += `<div style="background:var(--surf);border:1px solid ${_hexToRgba(col,0.3)};border-left:3px solid ${col};border-radius:5px;padding:11px 13px;margin-bottom:8px;${a.ultimate?'box-shadow:0 0 10px '+_hexToRgba(col,0.25)+';':''}">
+      <div style="display:flex;align-items:center;gap:7px;margin-bottom:6px;flex-wrap:wrap;">
+        <span style="font-family:'Cinzel',serif;font-size:10.5px;letter-spacing:1px;color:${a.ultimate?col:'var(--txt)'};flex:1;">${a.ultimate?'★ ':''}${a.name}</span>
+        <span style="font-family:'Cinzel',serif;font-size:8px;color:${col};padding:1px 7px;background:${_hexToRgba(col,0.1)};border:1px solid ${col};border-radius:3px;">Cost: ${a.cost}</span>
+      </div>
+      <div style="font-family:'EB Garamond',serif;font-size:13px;color:var(--txt-lbl);line-height:1.55;">${a.desc}</div>
+      <div class="sig-cast-row" style="margin-top:8px;padding-top:8px;">
+        <span class="sig-cast-rc-lbl">${can?`Costs ${a.cost} Gauge`:`Needs ${a.cost} Gauge (have ${gauge})`}</span>
+        <button type="button" class="sig-cast-btn" ${can?'':'disabled style="opacity:.4;cursor:not-allowed;"'} onclick="useDragoonAbility('${key}',${a.cost},'${a.name.replace(/'/g,"\\'")}')">⟳ Use</button>
+      </div>
+    </div>`;
+  });
+
+  return h;
+}
+
+// Renders every currently-attuned Sigil's Dragoon section (toggle + chart
+// if active), for embedding right after each attuned Sigil's Attunement
+// Chart in _buildAllAttunedCharts().
 function buildClassSigilDisplay(){
   const cls = document.getElementById('charClass').value;
   const level = parseInt(document.getElementById('charLevel').value)||1;
