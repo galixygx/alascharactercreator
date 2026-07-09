@@ -21334,14 +21334,61 @@ const SIGIL_COMPENDIUM_DATA = {
      notes:'Flavor: Reality tried to solve the equation. Reality failed.'},
   ],
   // Future class compendiums are added here keyed by exact class name
+  'Flow Disciple': [
+    // ── LEVEL 0 CANTRIPS ──────────────────────────────────────────────
+    {name:'Whisper Step',aff:'Physical',rc:0,ip:0,ct:'Bonus Action',range:'Self',dur:'Until next turn',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'Move 5 ft without provoking opportunity attacks.\nIf used after an attack: +1 AC until the start of your next turn.'},
+
+    {name:'Breath of Still Water',aff:'Physical',rc:0,ip:0,ct:'Action',range:'Self',dur:'Instant',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'Advantage on your next saving throw.\nReduce the duration of one minor condition affecting you by 1 turn.'},
+
+    {name:'Open Hand Feint',aff:'Physical',rc:0,ip:0,ct:'Action',range:'Melee',dur:'Until next turn',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'Target suffers −2 to its next attack roll against you.\nIf it misses: you may move 5 ft safely (no opportunity attack).'},
+
+    {name:'Flow Adjustment',aff:'Physical',rc:0,ip:0,ct:'Reaction',range:'Self',dur:'Until triggering attack resolves',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'+1 AC against the triggering attack.\nIf it misses: reposition your stance (flavor shift only).'},
+
+    {name:'Guided Palm',aff:'Physical',rc:0,ip:0,ct:'Action',range:'Melee',dur:'Instant',spellLevel:0,dmgDie:'d1',dmgCount:'1',dmgType:'Physical',element:'Physical',
+     effect:'Deal 1 damage.\nPush the target 5 ft OR rotate its facing/position.'},
+
+    {name:'Quiet Hand',aff:'Physical',rc:0,ip:0,ct:'Action',range:'Self',dur:'Instant',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'Advantage on your next Stealth check.\nIf already hidden: remain hidden after moving up to 5 ft.'},
+
+    {name:'Soft Impact',aff:'Physical',rc:0,ip:0,ct:'Reaction',range:'Self',dur:'Instant',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'Reduce falling or impact damage you take by 1d6.'},
+
+    {name:'Echoing Motion',aff:'Physical',rc:0,ip:0,ct:'Action',range:'Self',dur:'Until next attack',spellLevel:0,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'The next attack made against you has disadvantage if the attacker moved this turn.'},
+
+    // ── LEVEL 1 SIGILS ──────────────────────────────────────────────
+    {name:'Flowstate Transition',aff:'Physical',rc:0,ip:0,ct:'Passive / Reaction',range:'Melee',dur:'Instant',spellLevel:1,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'Your movements never truly stop — they evolve.\nOnce per turn, after hitting a target with an unarmed strike or monk weapon, you may immediately make a second attack using the alternate form (weapon → unarmed OR unarmed → weapon).\nThis second attack deals −2d6 damage but gains +2 to hit.\nIf you spend 1 Resonance, the second attack instead gains advantage OR forces a Balance Check (fail: staggered, half movement until end of next turn).',
+     notes:'Cost: 1 Resonance (optional enhancement — the base attack itself is free). Flavor: There is no beginning or end — only continuation.'},
+
+    {name:'Veil of Redirection',aff:'Physical',rc:1,ip:0,ct:'Reaction',range:'Self',dur:'Instant',spellLevel:1,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'You guide force rather than oppose it.\nWhen hit by an attack, reduce the damage by 1d8 + your Dexterity modifier.\nThen choose one: move 5 ft without provoking opportunity attacks, or force the attacker to shift 5 ft (in a logical direction).\nIf the attacker fails a Dexterity save (vs your Sigil Save DC): it takes −2 to its next attack and cannot take reactions until the end of the turn.',
+     notes:'Flavor: Their strength becomes their mistake.'},
+
+    {name:"Pacifist's Pressure",aff:'Physical',rc:1,ip:0,ct:'Action',range:'Melee',dur:'1 turn',spellLevel:1,dmgDie:'d6',dmgCount:'1',dmgType:'Physical',element:'Physical',
+     effect:'A precise strike meant to end conflict, not life.\nMake an unarmed strike dealing 1d6 + your Dexterity modifier damage.\nChoose one effect: Disarm (target drops a held item), Immobilize (its movement becomes 0 until the end of its next turn), or Silence the Body (it cannot take Attack actions on its next turn).\nIf the target is below half HP: it must succeed on a Wisdom save (vs your Sigil Save DC) or lose its reaction and suffer disadvantage on its next attack.\nRestriction: you cannot deal lethal damage this turn after using this ability.',
+     notes:'Flavor: You strike where violence ends.'},
+  ],
 };
 
 const _SC_AFF_COLS = {Light:'#b478ff',Nature:'#40c060',Water:'#3080c0',Air:'#4db8ff',Fire:'#c82030',Chaos:'#9040d0',Arcane:'#a0a0e0',Resonance:'#c9a227',Physical:'#888'};
 let _scCurrentAff = 'All';
 let _scCurrentLvl = 'All';
+// The compendium's own class filter — independent of the character's
+// selected class, so any class's spell list can be browsed. Defaults to
+// the character's class when the modal opens, but the Class filter row
+// lets the player switch to browse any class in SIGIL_COMPENDIUM_DATA.
+let _scCurrentClass = '';
 
 function openSigilCompendium(){
   const cls = (document.getElementById('charClass')||{}).value || '';
+  _scCurrentClass = cls;
+  _scCurrentAff = 'All';
+  _scCurrentLvl = 'All';
 
   if(!document.getElementById('sigilCompCSS')){
     const s = document.createElement('style'); s.id='sigilCompCSS';
@@ -21387,21 +21434,31 @@ function openSigilCompendium(){
 
   const existing = document.getElementById('sigilCompOverlay');
   if(existing) existing.remove();
-  _scCurrentAff = 'All';
-  _scCurrentLvl = 'All';
-
-  const spells = SIGIL_COMPENDIUM_DATA[cls] || [];
-  const hasSpells = spells.length > 0;
-
-  // Determine which level pills to show
-  const levels = hasSpells ? [...new Set(spells.map(s=>s.spellLevel||0))].sort((a,b)=>a-b) : [];
-  const lvlLabels = {0:'Cantrip',1:'Level 1',2:'Level 2',3:'Level 3',4:'Level 4',5:'Level 5'};
 
   const overlay = document.createElement('div');
   overlay.id='sigilCompOverlay'; overlay.className='sc-overlay';
   overlay.onclick=function(e){if(e.target===overlay)closeSigilCompendium();};
+  overlay.innerHTML = _scRenderModal();
 
-  overlay.innerHTML=`
+  document.body.appendChild(overlay);
+  const inp=document.getElementById('scSearchInput');
+  if(inp) setTimeout(()=>inp.focus(),80);
+}
+
+// Builds the full modal contents (header, filter rows incl. Class, body)
+// from the current _scCurrentClass/_scCurrentAff/_scCurrentLvl. Re-called
+// whenever the Class filter changes, since switching class swaps the
+// entire spell list and its available levels.
+function _scRenderModal(){
+  const cls = _scCurrentClass;
+  const spells = SIGIL_COMPENDIUM_DATA[cls] || [];
+  const hasSpells = spells.length > 0;
+  const classList = Object.keys(SIGIL_COMPENDIUM_DATA);
+
+  const levels = hasSpells ? [...new Set(spells.map(s=>s.spellLevel||0))].sort((a,b)=>a-b) : [];
+  const lvlLabels = {0:'Cantrip',1:'Level 1',2:'Level 2',3:'Level 3',4:'Level 4',5:'Level 5'};
+
+  return `
     <div class="sc-modal">
       <div class="sc-hdr">
         <span style="font-size:18px">📚</span>
@@ -21413,6 +21470,12 @@ function openSigilCompendium(){
       <div class="sc-filters">
         <div class="sc-search-row">
           <input class="sc-search" id="scSearchInput" placeholder="🔍 Search spells…" oninput="_scFilter()">
+        </div>
+        <div class="sc-filter-group">
+          <span class="sc-filter-lbl">Class</span>
+          ${classList.map(c=>
+            `<button class="sc-pill${c===cls?' on':''}" data-cls="${c}" onclick="_scSetClass(this.dataset.cls)">${c}</button>`
+          ).join('')}
         </div>
         ${hasSpells?`
         <div class="sc-filter-group">
@@ -21440,8 +21503,19 @@ function openSigilCompendium(){
           }</div>`}
       </div>
     </div>`;
+}
 
-  document.body.appendChild(overlay);
+// Switches which class's spell list the compendium browses — independent
+// of the character's own selected class. Resets Affinity/Level filters
+// since they don't necessarily carry over between different classes'
+// spell lists, then rebuilds the whole modal.
+function _scSetClass(newCls){
+  _scCurrentClass = newCls;
+  _scCurrentAff = 'All';
+  _scCurrentLvl = 'All';
+  const overlay = document.getElementById('sigilCompOverlay');
+  if(!overlay) return;
+  overlay.innerHTML = _scRenderModal();
   const inp=document.getElementById('scSearchInput');
   if(inp) setTimeout(()=>inp.focus(),80);
 }
@@ -21468,7 +21542,7 @@ function _scRenderSpells(spells, search, affFilter, lvlFilter){
   let lastLvl = null;
 
   filtered.forEach(function(sp, i){
-    const realIdx = (SIGIL_COMPENDIUM_DATA[(document.getElementById('charClass')||{}).value||'']||[]).indexOf(sp);
+    const realIdx = (SIGIL_COMPENDIUM_DATA[_scCurrentClass||'']||[]).indexOf(sp);
     const col = _SC_AFF_COLS[sp.aff] || 'var(--gold-d)';
     const lvlNum = sp.spellLevel !== undefined ? sp.spellLevel : 1;
     const isCantrip = lvlNum === 0;
@@ -21511,16 +21585,14 @@ function _scSetFilter(type, btn){
 }
 
 function _scFilter(){
-  const cls   = (document.getElementById('charClass')||{}).value||'';
-  const spells = SIGIL_COMPENDIUM_DATA[cls]||[];
+  const spells = SIGIL_COMPENDIUM_DATA[_scCurrentClass]||[];
   const q      = (document.getElementById('scSearchInput')||{}).value||'';
   const body   = document.getElementById('scBody');
   if(body) body.innerHTML = _scRenderSpells(spells, q);
 }
 
 function _scAddSpell(idx, btn){
-  const cls = (document.getElementById('charClass')||{}).value||'';
-  const spells = SIGIL_COMPENDIUM_DATA[cls]||[];
+  const spells = SIGIL_COMPENDIUM_DATA[_scCurrentClass]||[];
   const sp = spells[idx];
   if(!sp) return;
   addSpell({
