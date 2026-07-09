@@ -20055,14 +20055,22 @@ function _buildDragoonSection(key){
     <div style="font-family:'EB Garamond',serif;font-size:10.5px;font-style:italic;color:var(--txt-dim);margin-top:6px;">Build Gauge through attacks and successful jumps in play — click a pip to set it. Spend Gauge below to unleash powerful ${key.charAt(0).toUpperCase()+key.slice(1)} Dragoon Abilities.</div>
   </div>`;
 
-  // Tier ladder — reference/flavor progression, not individually unlocked.
+  // Tier ladder — Tier I-IV each unlock the matching Sigil Benefit above
+  // (1st benefit at Tier I, 2nd at Tier II, etc.); Tier V (Ascendant)
+  // grants all 5 at once as the fully-awakened form. Reuses the chart's
+  // own benefits list rather than inventing separate numbers, per the
+  // user's ruling.
   h += `<div style="margin-bottom:6px;font-family:'Cinzel',serif;font-size:7.5px;letter-spacing:1.5px;color:var(--gold-d);text-transform:uppercase;">Tier Progression</div>`;
-  chart.tiers.forEach(function(t){
+  chart.tiers.forEach(function(t,i){
+    const grants = (i < chart.benefits.length - 1)
+      ? chart.benefits[i]
+      : 'All Sigil Benefits above, at once — the fully-awakened ' + chart.path.replace('Path of the ','');
     h += `<div style="display:flex;gap:9px;align-items:flex-start;margin-bottom:7px;">
       <div style="flex-shrink:0;width:28px;text-align:center;font-family:'Cinzel',serif;font-size:8px;color:${col};border:1px solid ${col};border-radius:4px;padding:3px 0;">${t.n}</div>
       <div>
         <span style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:1px;color:var(--txt);">${t.name}</span>
         <div style="font-family:'EB Garamond',serif;font-size:11.5px;font-style:italic;color:var(--txt-dim);line-height:1.5;">${t.desc}</div>
+        <div style="font-family:'EB Garamond',serif;font-size:11px;color:${col};margin-top:2px;"><b>Grants:</b> ${grants}</div>
       </div>
     </div>`;
   });
