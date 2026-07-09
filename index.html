@@ -21385,6 +21385,19 @@ const SIGIL_COMPENDIUM_DATA = {
     {name:'Unbroken Sequence',aff:'Physical',rc:1,ip:0,ct:'Action',range:'Melee',dur:'Instant',spellLevel:2,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
      effect:'You unleash a seamless chain of motion — strikes that are not separate, but one continuous action.\nMake two unarmed strikes. After each successful hit, choose one: step 5 ft without provoking opportunity attacks, or apply "Off-Balance" (disadvantage on the target\'s next attack).\nIf both attacks hit: you may make a third strike that deals reduced damage (−1d4), OR apply Pacifist\'s Pressure without an additional Resonance cost.\nRestriction: if you choose the Pacifist option, all damage from this ability becomes non-lethal (unless the damage exceeds 35).',
      notes:'Flavor: There are no openings, only moments you allow to exist.'},
+
+    // ── LEVEL 3 SIGILS ──────────────────────────────────────────────
+    {name:'Perfect Redirection',aff:'Physical',rc:1,ip:0,ct:'Reaction',range:'Melee',dur:'Instant',spellLevel:3,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'At this level, you no longer avoid attacks — you decide where they go.\nWhen a creature misses you with a melee attack, you may redirect their momentum. Choose one: the attack instead targets another creature within reach (the new target must be valid); the attacker falls prone; or the attacker is moved 10 ft in a direction of your choice.\nAdvanced Control: if the attacker failed their previous attack this turn (missed earlier or suffered disadvantage), they also lose their reaction.',
+     notes:'Flavor: You do not counter. You correct.'},
+
+    {name:'Flow State: Unbroken',aff:'Physical',rc:0,ip:0,ct:'Passive',range:'Self',dur:'Ongoing (resets each turn)',spellLevel:3,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'Your combat is no longer a series of actions — it is a continuous state.\nEach time you hit a target, you gain 1 Flow (max 3). Flow resets at the end of your turn.\nFlow Bonuses: 1 Flow grants +1d8 damage to your next attack; 2 Flow grants +1 to hit; 3 Flow makes your next ability cost 0 Resonance.\nFlow Break: if you miss an attack, Flow drops to 0.',
+     notes:'Flavor: Perfection is not achieved — it is maintained.'},
+
+    {name:'Mercy Without Weakness',aff:'Physical',rc:1,ip:0,ct:'Action',range:'Melee',dur:'1 turn',spellLevel:3,dmgDie:'none',dmgCount:'0',dmgType:'',element:'Physical',
+     effect:'You demonstrate absolute control — ending a fight without ending a life.\nMake an unarmed strike with advantage. On a hit, deal minimal damage (1 + your Dexterity modifier), then choose two: the target is restrained until the end of its next turn; it drops all held items; it cannot take hostile actions next turn; or it is forced to kneel/prone.\nIf the target is below half HP: it must succeed on a Wisdom save or become Incapacitated for 1 turn.\nRestriction: all damage you deal this turn becomes non-lethal (unless the damage exceeds 35).',
+     notes:'Flavor: Power is proven not in destruction — but in restraint.'},
   ],
 };
 
